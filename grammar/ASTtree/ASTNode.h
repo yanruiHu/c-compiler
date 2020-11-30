@@ -5,43 +5,47 @@
 #include <string>
 #include <vector>
 
-enum ASTNodeType {
-    root = 0,
-};
+namespace AST {
 
-std::string prefix[2] = {"└─ ", "├─ "};
-std::string separator[2] = {"│  ", "   "};
+    enum ASTNodeType {
+        root = 0,
+    };
 
-class ASTNode {
-private:
-    ASTNodeType type;
-    ASTNode *parent;
-    ASTNode *cousin;
-    ASTNode *child;
+    std::string prefix[2] = {"`- ", "|- "};
+    std::string separator[2] = {"|  ", "   "};
 
-protected:
-    std::string content;
-    // static void tree(ASTNode*, int);
-    static void tree(ASTNode*, int, bool, std::vector<bool>);
+    class ASTNode {
+    private:
+        ASTNodeType type;
+        ASTNode *parent;
+        ASTNode *cousin;
+        ASTNode *child;
 
-public:
-    ASTNode();
-    ASTNode(ASTNodeType);
-    ASTNode(char*, ASTNodeType);
-    ASTNode(char*);
-    inline void setParent(ASTNode *parent) { this->parent = parent; }
-    void addChild(ASTNode*);
-    void addCousin(ASTNode*);
-    ASTNode *getFinalCousinNode();
-    void printTree();
-    inline std::string getContent() { return this->content; }
-    void printInfo(int);
-};
+    protected:
+        std::string content;
+        // static void tree(ASTNode*, int);
+        static void tree(ASTNode*, int, bool, std::vector<bool>);
 
-class RootNode: public ASTNode {
-public:
-    RootNode();
-    RootNode(char*);
-};
+    public:
+        ASTNode();
+        ASTNode(ASTNodeType);
+        ASTNode(char*, ASTNodeType);
+        ASTNode(char*);
+        inline void setParent(ASTNode *parent) { this->parent = parent; }
+        void addChild(ASTNode*);
+        void addCousin(ASTNode*);
+        ASTNode *getFinalCousinNode();
+        void printTree();
+        inline std::string getContent() { return this->content; }
+        void printInfo(int);
+    };
+
+    class RootNode: public ASTNode {
+    public:
+        RootNode();
+        RootNode(char*);
+    };
+
+}
 
 #endif
