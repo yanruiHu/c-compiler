@@ -40,12 +40,6 @@ namespace AST {
         void printInfo(int);
     };
 
-    class RootNode: public BaseNode {
-    public:
-        RootNode();
-        RootNode(char*);
-    };
-
 }
 
 #endif

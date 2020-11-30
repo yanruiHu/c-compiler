@@ -92,18 +92,12 @@ AST::BaseNode *AST::BaseNode::getFinalCousinNode() {
     return node;
 }
 
-AST::RootNode::RootNode() : BaseNode(root) {
-    this->content = "root";
-}
-
-AST::RootNode::RootNode(char* string) : BaseNode(string) {}
-
 int main() {
     AST::BaseNode* r[11];
     for (int i = 0; i < 11; i++) {
         char* a = (char*)malloc(sizeof(char) * 5);
         sprintf(a, "%d", i + 1);
-        r[i] = new AST::RootNode(a);
+        r[i] = new AST::BaseNode(a);
     }
     r[0]->addChild(r[1]);
     r[1]->addChild(r[2]);
