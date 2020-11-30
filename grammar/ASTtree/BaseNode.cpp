@@ -1,20 +1,20 @@
-#include "./ASTNode.h"
+#include "./BaseNode.h"
 
-AST::ASTNode::ASTNode() {
+AST::BaseNode::BaseNode() {
     this->child = NULL;
     this->parent = NULL;
     this->cousin = NULL;
     this->content = "code start!";
 }
 
-AST::ASTNode::ASTNode(char* string) {
+AST::BaseNode::BaseNode(char* string) {
     this->child = NULL;
     this->parent = NULL;
     this->cousin = NULL;
     this->content = string;
 }
 
-AST::ASTNode::ASTNode(ASTNodeType type) {
+AST::BaseNode::BaseNode(ASTNodeType type) {
     this->child = NULL;
     this->parent = NULL;
     this->cousin = NULL;
@@ -22,7 +22,7 @@ AST::ASTNode::ASTNode(ASTNodeType type) {
     this->content = "code start!";
 }
 
-AST::ASTNode::ASTNode(char* content, ASTNodeType type) {
+AST::BaseNode::BaseNode(char* content, ASTNodeType type) {
     this->child = NULL;
     this->parent = NULL;
     this->cousin = NULL;
@@ -30,14 +30,14 @@ AST::ASTNode::ASTNode(char* content, ASTNodeType type) {
     this->content = content;
 }
 
-void AST::ASTNode::addCousin(ASTNode* node) {
+void AST::BaseNode::addCousin(BaseNode* node) {
     this->cousin = node;
     if (node) {
         node->parent = this->parent;
     }
 }
 
-void AST::ASTNode::addChild(ASTNode* node) {
+void AST::BaseNode::addChild(BaseNode* node) {
     this->child = node;
     while(node) {
         node->parent = this;
@@ -45,11 +45,11 @@ void AST::ASTNode::addChild(ASTNode* node) {
     }
 }
 
-void AST::ASTNode::printInfo(int depth) {
+void AST::BaseNode::printInfo(int depth) {
     std::cout << this->content << std::endl;
 }
 
-void AST::ASTNode::tree(ASTNode* node, int depth, bool flag, std::vector<bool> pre_sep) {
+void AST::BaseNode::tree(BaseNode* node, int depth, bool flag, std::vector<bool> pre_sep) {
     std::cout << AST::prefix[!flag] << node->content << std::endl;
     ++depth;
     pre_sep.push_back(flag);
@@ -58,48 +58,48 @@ void AST::ASTNode::tree(ASTNode* node, int depth, bool flag, std::vector<bool> p
         for (std::vector<bool>::iterator i = pre_sep.begin(); i != pre_sep.end(); i++) {
             std::cout << AST::separator[*i];
         }
-        ASTNode* temp = node->child;
+        BaseNode* temp = node->child;
         if (!temp) {
             bool f = node->cousin;
             std::cout << AST::prefix[f] << node->content << std::endl;
         } else {
             bool f = node->cousin;
             std::vector<bool> v(pre_sep);
-            ASTNode::tree(temp, depth, !f, v);
+            BaseNode::tree(temp, depth, !f, v);
         }
         node = node->cousin;
     }
 }
 
-// void ASTNode::tree(ASTNode* node, int depth) {
+// void BaseNode::tree(BaseNode* node, int depth) {
 //     if (!node) return;
 //     node->printInfo(depth);
-//     ASTNode::tree(node->child, depth + 1);
-//     ASTNode::tree(node->cousin, depth);
+//     BaseNode::tree(node->child, depth + 1);
+//     BaseNode::tree(node->cousin, depth);
 // }
 
-void AST::ASTNode::printTree() {
-    // ASTNode::tree(this, 0);
+void AST::BaseNode::printTree() {
+    // BaseNode::tree(this, 0);
     std::vector<bool> v(0);
-    ASTNode::tree(this, 1, true, v);
+    BaseNode::tree(this, 1, true, v);
 }
 
-AST::ASTNode *AST::ASTNode::getFinalCousinNode() {
-    ASTNode *node = this;
+AST::BaseNode *AST::BaseNode::getFinalCousinNode() {
+    BaseNode *node = this;
     while(node->cousin) {
         node = node->cousin;
     }
     return node;
 }
 
-AST::RootNode::RootNode() : ASTNode(ASTNodeType::root) {
+AST::RootNode::RootNode() : BaseNode(root) {
     this->content = "root";
 }
 
-AST::RootNode::RootNode(char* string) : ASTNode(string) {}
+AST::RootNode::RootNode(char* string) : BaseNode(string) {}
 
 int main() {
-    AST::ASTNode* r[11];
+    AST::BaseNode* r[11];
     for (int i = 0; i < 11; i++) {
         char* a = (char*)malloc(sizeof(char) * 5);
         sprintf(a, "%d", i + 1);
