@@ -1,5 +1,5 @@
-#ifndef BASENODE_H
-#define BASENODE_H
+#ifndef _BASENODE_H_
+#define _BASENODE_H_
 
 #include <iostream>
 #include <string>
