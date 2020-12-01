@@ -8,7 +8,7 @@ namespace AST {
 
     class VarNode : public BaseNode {
     private:
-        SMB::SymbolType smb_type;       // type 名称被 ASTNodeType 占用
+        SMB::SymbolType smb_type;       // type 字段被 ASTNodeType 占用
 
     public:
 

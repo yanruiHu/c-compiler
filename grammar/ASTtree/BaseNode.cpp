@@ -92,23 +92,24 @@ AST::BaseNode *AST::BaseNode::getFinalCousinNode() {
     return node;
 }
 
-int main() {
-    AST::BaseNode* r[11];
-    for (int i = 0; i < 11; i++) {
-        char* a = (char*)malloc(sizeof(char) * 5);
-        sprintf(a, "%d", i + 1);
-        r[i] = new AST::BaseNode(a);
-    }
-    r[0]->addChild(r[1]);
-    r[1]->addChild(r[2]);
-    r[1]->addCousin(r[3]);
-    r[3]->addChild(r[4]);
-    r[3]->addCousin(r[5]);
-    r[5]->addChild(r[6]);
-    r[5]->addCousin(r[9]);
-    r[4]->addCousin(r[7]);
-    r[7]->addChild(r[8]);
-    r[6]->addCousin(r[10]);
-    r[0]->printTree();
-    return 0;
-}
+// // for test
+// int main() {
+//     AST::BaseNode* r[11];
+//     for (int i = 0; i < 11; i++) {
+//         char* a = (char*)malloc(sizeof(char) * 5);
+//         sprintf(a, "%d", i + 1);
+//         r[i] = new AST::BaseNode(a);
+//     }
+//     r[0]->addChild(r[1]);
+//     r[1]->addChild(r[2]);
+//     r[1]->addCousin(r[3]);
+//     r[3]->addChild(r[4]);
+//     r[3]->addCousin(r[5]);
+//     r[5]->addChild(r[6]);
+//     r[5]->addCousin(r[9]);
+//     r[4]->addCousin(r[7]);
+//     r[7]->addChild(r[8]);
+//     r[6]->addCousin(r[10]);
+//     r[0]->printTree();
+//     return 0;
+// }
