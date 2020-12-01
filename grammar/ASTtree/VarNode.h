@@ -6,11 +6,19 @@
 
 namespace AST {
 
-    class VarNode : public BaseNode {
+    class DeclareVarNode : public BaseNode {
     private:
-        SMB::SymbolType smb_type;       // type 字段被 ASTNodeType 占用
+        SMB::SymbolType var_type;       // type 字段被 ASTNodeType 占用
+        int array_length;               // for array
+        std::string struct_name;
 
     public:
+        DeclareVarNode();
+        DeclareVarNode(char*);
+        void print_info(int);
+    };
+
+    class AssignVarNode : public BaseNode {
 
     };
 

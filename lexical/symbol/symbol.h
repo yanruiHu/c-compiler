@@ -8,7 +8,7 @@ namespace SMB {
         pointer = 2,
         boolean = 3,
         void_type = 4,
-        homebrew = 5,   // for struct
+        struct_type = 5,   // for struct
         array = 6,
         literal = 7,
         function = 8,
