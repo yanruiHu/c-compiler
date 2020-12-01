@@ -91,7 +91,19 @@ real16  0[xX]([A-Fa-f0-9])+\.([A-Fa-f0-9])*
 "<="             {return (LE);}
 ">"             {return (GT);}
 ">="             {return (GE);}
-"="             {return (EQ);}
+"=="             {return (EQ);} 
+"!="              {return (NE);}
+
+    /* 
+    * Editor:Liuyin
+    * content:
+    * "="     { return(ASSIGNOP); }
+    * (>=)|(<=)|(==)|(!=)|<|>           { yylval.str=strdup(yytext); return(RELOP); } 
+                                            strdup cmp symlook? 
+    * "!"     {return (NOT)}    
+    * "||"    { return(OR); }   
+    * "&&"    { return(AND); }                                 
+    */
 "+"             {return (ADD);}
 "-"             {return (DEC);}
 "*"             {return (MUL);}
@@ -99,8 +111,12 @@ real16  0[xX]([A-Fa-f0-9])+\.([A-Fa-f0-9])*
 ";"             {return (SEM);}
 "("             {return (LB);}
 ")"             {return (RB);}
-"{"     {return (BLB);}
-"}"     {return (BRB);}
+    /*
+    * "[" {return (MLB)}
+    * "]" {return (MRB)}
+    */
+"{"      {return (BLB);}
+"}"      {return (BRB);}
 
 .       {return (ERRORCHAR);}
 
@@ -200,27 +216,30 @@ symlook(char *s){
         perror("Too many symbols.");
         exit(1);
 }
-int main(int argc,char ** argv){
-    int c,j=0;
-    if(argc>=2){
-        if((yyin=fopen(argv[1],"r"))==NULL){
-            printf("Can't open file %s\n",argv[1]);
-            return 1;
-        }
-        if(argc>=3){
-            yyout=fopen(argv[2],"w");
-        }
-    }
-    while(c=yylex()){
-        writeout(c);
-        j++;
-        if(j%5==0)
-            writeout(NEWLINE);
-        }
-    if(argc>=2){
-        fclose(yyin);
-        if(argc>=3)
-            fclose(yyout);
-    }
-    return 0;
-}
+/* 
+* Editor:Liuyin
+* Content: delete main()
+// int main(int argc,char ** argv){  //写入文件
+//     int c,j=0;
+//     if(argc>=2){
+//         if((yyin=fopen(argv[1],"r"))==NULL){
+//             printf("Can't open file %s\n",argv[1]);
+//             return 1;
+//         }
+//         if(argc>=3){
+//             yyout=fopen(argv[2],"w");
+//         }
+//     }
+//     while(c=yylex()){
+//         writeout(c);
+//         j++;
+//         if(j%5==0)
+//             writeout(NEWLINE);
+//         }
+//     if(argc>=2){
+//         fclose(yyin);
+//         if(argc>=3)
+//             fclose(yyout);
+//     }
+//     return 0;
+// }
