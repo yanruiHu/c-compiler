@@ -19,11 +19,14 @@ id  {letter}({letter}|{digit})*
 int   ([1-9]|[1-9]([0-9])+|0)
 
 %%
-
+"/*"           { BEGIN(COMMENT) ; }
+<COMMENT>"*/"  { BEGIN(INITIAL); }
+<COMMENT>{ws}   {printf("inside commenet ws\n");}
+<COMMENT>([^*]|\en)+|.
+<COMMENT><<EOF>>    {printf("Unterminated comment\n"); return 0;}
 
 
 "int"                               {yylval.str=strdup(yytext);return(INT);}
-
 "main"                              {yylval.str=strdup(yytext);return(ID);}
 "void"                              {yylval.str=strdup(yytext);return(VOID);}
 "if"                                {return(IF);}
