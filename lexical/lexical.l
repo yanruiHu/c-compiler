@@ -29,8 +29,8 @@ int   ([1-9]|[1-9]([0-9])+|0)
 
 "int"                               {yylval.str=strdup(yytext);return(INT);}
 
-"main"                              {yylval.str=strdup(yytext);return(ID);}
-"void"                              {return(VOID);}
+"main"                              {printf("main");yylval.str=strdup(yytext);return(ID);}
+"void"                              {printf("void");return(VOID);}
 "if"                                {return(IF);}
 "else"                              {return(ELSE);}
 "for"                               {return(FOR);}
