@@ -425,7 +425,7 @@ argument_expression_list: expression {
 * Content: Add main() modify yyerror
 * 
 */
-void yyerror(char* s) {
+void yyerror(const char* s) {
 	fprintf(stderr, "Parse error: At line %d. %s\n", yylineno, s);
 	exit(1);
 }
