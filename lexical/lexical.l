@@ -22,7 +22,7 @@ int   ([1-9]|[1-9]([0-9])+|0)
 "//".*\n
 
 {whitespace}                        {;}
-{id}                                {yylval.str=strdup(yytext);return(ID);}
+
 {int}                               {yylval.str=strdup(yytext);return(INT);}
 
 "main"                              {yylval.str=strdup(yytext);return(ID);}
@@ -40,7 +40,7 @@ int   ([1-9]|[1-9]([0-9])+|0)
 "&&"                                {return(AND);}
 "||"                                {return(OR);}  
 
-    
+{id}                                {yylval.str=strdup(yytext);return(ID);}
 {int}{id}                           {return(ERRID);}
 .                                   {return(ERRORCHAR);}
 

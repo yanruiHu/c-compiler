@@ -40,8 +40,8 @@ BaseNode* root;
 %token <str> ID   //终结符
 %token <str> INT VOID
 %token ',' ';' // , ;
-%token <ast> STRUCT
-%token <ast> IF ELSE WHILE DO FOR CONTINUE RETURN ERRORCHAR GETMEMBER
+%token STRUCT
+%token IF ELSE WHILE FOR CONTINUE RETURN ERRORCHAR GETMEMBER
 %token '{' '}' //{}
 
 
