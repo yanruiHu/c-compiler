@@ -32,7 +32,7 @@
 
     protected:
         std::string content;
-        // static void tree(BaseNode*, int);
+        static void tree(BaseNode*, int);
         static void tree(BaseNode*, int, bool, std::vector<bool>);
 
     public:

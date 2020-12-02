@@ -50,6 +50,10 @@ void BaseNode::addChildNode(BaseNode* node) {
 }
 
 void BaseNode::printInfo(int depth) {
+    while(depth) {
+        std::cout << "   ";
+        depth--;
+    }
     std::cout << this->content << std::endl;
 }
 
@@ -75,17 +79,17 @@ void BaseNode::tree(BaseNode* node, int depth, bool flag, std::vector<bool> pre_
     }
 }
 
-// void BaseNode::tree(BaseNode* node, int depth) {
-//     if (!node) return;
-//     node->printInfo(depth);
-//     BaseNode::tree(node->child, depth + 1);
-//     BaseNode::tree(node->cousin, depth);
-// }
+void BaseNode::tree(BaseNode* node, int depth) {
+    if (!node) return;
+    node->printInfo(depth);
+    BaseNode::tree(node->child, depth + 1);
+    BaseNode::tree(node->cousin, depth);
+}
 
 void BaseNode::printTree() {
-    // BaseNode::tree(this, 0);
-    std::vector<bool> v(0);
-    BaseNode::tree(this, 1, true, v);
+    BaseNode::tree(this, 0);
+    // std::vector<bool> v(0);
+    // BaseNode::tree(this, 1, true, v);
 }
 
 BaseNode *BaseNode::getFinalCousinNode() {
