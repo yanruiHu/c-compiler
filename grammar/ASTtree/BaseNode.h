@@ -8,7 +8,7 @@
 // namespace AST {
 
     enum ASTNodeType {
-        root = 0,
+        root_ = 0,
         dec_var = 1,
         assign_var = 2,
         dec_func = 3,
@@ -16,12 +16,12 @@
         op = 5,
         stmt = 6,
         loop = 7, 
-        select = 8,
+        //select = 8,
         literal = 9,        // unknown
     };
 
-    std::string prefix[2] = {"`- ", "|- "};
-    std::string separator[2] = {"|  ", "   "};
+    static std::string prefix[2] = {"`- ", "|- "};
+    static std::string separator[2] = {"|  ", "   "};
 
     class BaseNode {
     private:

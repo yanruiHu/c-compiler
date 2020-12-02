@@ -1,20 +1,17 @@
 %{
 #include "stdio.h"
-#include "hdr.h"
+// #include "hdr.h"
 #include <string.h>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
 #include <fstream>
 #include "../grammar/ASTtree/BaseNode.h"
 
 class BaseNode;
 
-// using AST::BaseNode;
 extern int yylex();
-extern FILE * yyin
+extern FILE * yyin;
 void yyerror(char* s);
 BaseNode* root;
+extern int yylineno;
 %}
 
 
@@ -56,11 +53,12 @@ BaseNode* root;
 %type <ast> compound_statement block_item_list declaration_for expression_statement statement defination declaration_list declaration
 %type <ast> expression argument_expression_list
 // %
+// %start program
 
 %%
 /*注：有关declarator的和declaration的yacc逻辑过于混乱，保证准确起见参考了lpy的*/
 program: translation_unit { 
-        root = new BaseNode(AST::root);
+        root = new BaseNode(root_);
         root->addChildNode($1);
     }
     ;
@@ -121,23 +119,23 @@ struct_declaration: specifier ID ';' { $$ = NULL; }
 direct_declarator: ID {
         char* s = "";
         sprintf(s, "variable defination, name: %s", $1);
-        $$ = new BaseNode(s, AST::dec_var);
+        $$ = new BaseNode(s, dec_var);
     }
     | ID '[' INT ']' {
         char* s = "";
         sprintf(s, "variable defination (array), name: %s", $1);
-        $$ = new BaseNode(s, AST::dec_var);
+        $$ = new BaseNode(s, dec_var);
     }
     ;
 func_declarator: ID '(' direct_declarator ')' { 
         char* s = "";
         sprintf(s, "func defination, name: %s", $1);
-        $$ = new BaseNode(s, AST::dec_func);
+        $$ = new BaseNode(s, dec_func);
     }
     | ID '(' ')' {
         char* s = "";
         sprintf(s, "func defination, name: %s", $1);
-        $$ = new BaseNode(s, AST::dec_func);
+        $$ = new BaseNode(s, dec_func);
     }
     ;
 parameter_list: direct_declarator ',' parameter_declaration {
@@ -149,7 +147,7 @@ parameter_list: direct_declarator ',' parameter_declaration {
 parameter_declaration: specifier ID {
         char* s = "";
         sprintf(s, "variable defination, name: %s", $1);
-        $$ = new BaseNode(s, AST::dec_var);
+        $$ = new BaseNode(s, dec_var);
     }
     | specifier {}
     ;
@@ -159,7 +157,7 @@ parameter_declaration: specifier ID {
 compound_statement: '{' block_item_list '}' {
         BaseNode* temp = new BaseNode("compound statement");
         temp->addChildNode($2);
-        $$ = temp
+        $$ = temp;
     }
     | '{' '}' {}
     | error '}' { yyerrok; }
@@ -177,43 +175,43 @@ block_item_list: block_item_list statement {
     }
     ;
 
-/*这个不知道是啥*/
-declaration_for: defination { $$ = $1 }
-    | expression { $$ = $1 }
+  /*这个不知道是啥*/
+declaration_for: defination { $$ = $1; }
+    | expression { $$ = $1; }
     ;
 expression_statement: ';' {}
     | expression ';' { 
         BaseNode* temp = new BaseNode("statement inside for");
         temp->addChildNode($1);
-        $$ = temp
+        $$ = temp;
     }
     ;
 statement: compound_statement
     | expression ';' { 
         BaseNode* temp = new BaseNode("expression statement");
         temp->addChildNode($1);
-        $$ = temp
+        $$ = temp;
     }
     | STRUCT ID ID ';' {}
     | defination ';' { 
         BaseNode* temp = new BaseNode("defination statement");
         temp->addChildNode($1);
-        $$ = temp
+        $$ = temp;
     }
     | IF '(' expression ')' statement { 
         BaseNode* temp = new BaseNode("select statement(if)");
         temp->addChildNode($3);
         $3->addCousinNode($5);
-        $$ = temp
+        $$ = temp;
     }
     | IF '(' expression ')' statement ELSE statement {
         BaseNode* temp = new BaseNode("select statement(if)");
         temp->addChildNode($3);
         $3->addCousinNode($5);
-        BaseNode else_node = new BaseNode("select statement(else)");
+        BaseNode* else_node = new BaseNode("select statement(else)");
         else_node->addChildNode($7);
         temp->addCousinNode(else_node);
-        $$ = temp
+        $$ = temp;
     }
     | WHILE '(' expression ')' statement {
         BaseNode* temp = new BaseNode("loop statement(while)");
@@ -313,19 +311,19 @@ declaration: direct_declarator { $$ = $1; }
 /* expressionression */
 expression: expression '=' expression {
             BaseNode* temp = NULL;
-            temp = new BaseNode("operator: =", AST::op);
+            temp = new BaseNode("operator: =", op);
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
         | expression AND expression {
-            BaseNode* temp = new BaseNode("operator: &&", AST::op);
+            BaseNode* temp = new BaseNode("operator: &&", op);
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
         | expression OR expression {
-            BaseNode* temp = new BaseNode("operator: ||", AST::op);
+            BaseNode* temp = new BaseNode("operator: ||", op);
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
@@ -333,43 +331,43 @@ expression: expression '=' expression {
         | expression RELOP expression {
             char* s = "";
             sprintf(s, "operator: %s", $2);
-            BaseNode* temp = new BaseNode(s, AST::op);
+            BaseNode* temp = new BaseNode(s, op);
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
         | expression '+' expression {
-            BaseNode* temp = new BaseNode("operator: +", AST::op);
+            BaseNode* temp = new BaseNode("operator: +", op);
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
         | expression '-' expression {
-            BaseNode* temp = new BaseNode("operator: -", AST::op);
+            BaseNode* temp = new BaseNode("operator: -", op);
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
         | expression '*' expression {
-            BaseNode* temp = new BaseNode("operator: *", AST::op);
+            BaseNode* temp = new BaseNode("operator: *", op);
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
         | expression '/' expression {
-            BaseNode* temp = new BaseNode("operator: /", AST::op);
+            BaseNode* temp = new BaseNode("operator: /", op);
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
         | expression '%' expression {
-            BaseNode* temp = new BaseNode("operator: %", AST::op);
+            BaseNode* temp = new BaseNode("operator: %", op);
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
         | expression '^' expression {
-            BaseNode* temp = new BaseNode("operator: ^", AST::op);
+            BaseNode* temp = new BaseNode("operator: ^", op);
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
@@ -378,12 +376,12 @@ expression: expression '=' expression {
             $$ = $2;
         }
         | '-' expression {
-            BaseNode* temp = new BaseNode("operator: -", AST::op);
+            BaseNode* temp = new BaseNode("operator: -", op);
             temp->addChildNode($2);
             $$ = temp;
         }
         | '!' expression {
-            BaseNode* temp = new BaseNode("operator: !", AST::op);
+            BaseNode* temp = new BaseNode("operator: !", op);
             temp->addChildNode($2);
             $$ = temp;
         }
@@ -451,17 +449,12 @@ int main(int argc,char ** argv){  //不确定语法的在哪里输出
             printf("Can't open file %s\n",argv[1]);
             return 1;
         }
-        if(argc>=3){
-            yyout=fopen(argv[2],"w");
-        }
     }
-    while(c=yylex()){
-            yyparse()  
-        }
+    do {
+		yyparse();
+	} while(!feof(yyin));
     if(argc>=2){
         fclose(yyin);
-        if(argc>=3)
-            fclose(yyout);
     }
     root->printTree();
     return 0;
