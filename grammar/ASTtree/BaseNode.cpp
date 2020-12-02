@@ -88,9 +88,9 @@ void BaseNode::tree(BaseNode* node, int depth) {
 }
 
 void BaseNode::printTree() {
-    BaseNode::tree(this, 0);
-    // std::vector<bool> v(0);
-    // BaseNode::tree(this, 1, true, v);
+    // BaseNode::tree(this, 0);
+    std::vector<bool> v(0);
+    BaseNode::tree(this, 1, true, v);
 }
 
 BaseNode *BaseNode::getFinalCousinNode() {
