@@ -1,5 +1,5 @@
 %{
-#include "stdio.h"
+#include <stdio.h>
 // #include "hdr.h"
 #include <string.h>
 #include <fstream>
@@ -77,7 +77,7 @@ translation_unit: external_declaration {
     }
     ;
 external_declaration: specifier external_declaration_list ';' {}
-    // | specifier ';' {}
+    | specifier ';' {}
     | specifier func_declarator compound_statement {
         $2->addChildNode($3);
         $$ = $2;
@@ -127,7 +127,7 @@ direct_declarator: ID {
         $$ = new BaseNode(s, dec_var);
     }
     ;
-func_declarator: ID '(' direct_declarator ')' { 
+func_declarator: ID '(' parameter_list ')' { 
         char* s = "";
         sprintf(s, "func defination, name: %s", $1);
         $$ = new BaseNode(s, dec_func);
@@ -138,7 +138,7 @@ func_declarator: ID '(' direct_declarator ')' {
         $$ = new BaseNode(s, dec_func);
     }
     ;
-parameter_list: direct_declarator ',' parameter_declaration {
+parameter_list: parameter_list ',' parameter_declaration {
         $1->getFinalCousinNode()->addCousinNode($3);
         $$ = $1;
     }
@@ -179,25 +179,19 @@ block_item_list: block_item_list statement {
 declaration_for: defination { $$ = $1; }
     | expression { $$ = $1; }
     ;
-expression_statement: ';' {}
-    | expression ';' { 
-        BaseNode* temp = new BaseNode("statement inside for");
-        temp->addChildNode($1);
-        $$ = temp;
-    }
-    ;
-statement: compound_statement
-    | expression ';' { 
+
+statement: expression ';' { 
         BaseNode* temp = new BaseNode("expression statement");
         temp->addChildNode($1);
         $$ = temp;
     }
-    | STRUCT ID ID ';' {}
     | defination ';' { 
         BaseNode* temp = new BaseNode("defination statement");
         temp->addChildNode($1);
         $$ = temp;
     }
+    | STRUCT ID ID ';' {}
+    | compound_statement { $$=$1;}
     | IF '(' expression ')' statement { 
         BaseNode* temp = new BaseNode("select statement(if)");
         temp->addChildNode($3);
@@ -219,30 +213,17 @@ statement: compound_statement
         $3->addCousinNode($5);
         $$ = temp;
     }
-    | FOR '(' expression_statement expression_statement ')' statement {
-        BaseNode* temp = new BaseNode("loop statement(for)");
-        temp->addChildNode($3);
-        $3->addCousinNode($4);
-        $4->addCousinNode($6);
-        $$ = temp;
+
+    | FOR '(' ';' ';' ')' statement{
+
     }
-    | FOR '(' expression_statement expression_statement expression ')' statement {
-        BaseNode* temp = new BaseNode("loop statement(for)");
-        temp->addChildNode($3);
-        $3->addCousinNode($4);
-        $4->addCousinNode($5);
-        $5->addCousinNode($7);
-        $$ = temp;
+
+    | FOR '(' ';' expression ';' ')' statement{
+
     }
-    // | FOR '(' ';' ';' ')' statement
-    | FOR '(' declaration_for ';' ';' ')' statement {
-        BaseNode* temp = new BaseNode("loop statement(for)");
-        temp->addChildNode($3);
-        $3->addCousinNode($7);
-        $$ = temp;
+    | FOR '(' ';' ';' expression ')' statement{
+
     }
-    // | FOR '(' ';' expression ';' ')' statement
-    // | FOR '(' ';' ';' expression ')' statement
     | FOR '(' declaration_for ';' expression ';' expression ')' statement {
         BaseNode* temp = new BaseNode("loop statement(for)");
         temp->addChildNode($3);
@@ -283,7 +264,6 @@ statement: compound_statement
     }
     | error ';' { yyerrok; }  /*官方没报错 参考代码报错了不知道为啥*/
     ;
-
 
 
 /* Local Definitions 参考代码上注释是这个*/
