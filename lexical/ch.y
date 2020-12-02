@@ -22,6 +22,9 @@ extern int yylineno;
     // struct symtab *symp;
     char* str;
 }
+%locations
+%define parse.error verbose
+
 %right <ast> '='
 %left <ast> OR
 %left <ast> AND
