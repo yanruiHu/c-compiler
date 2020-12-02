@@ -2,15 +2,17 @@
 #include "stdio.h"
 #include "hdr.h"
 #include <string.h>
-#include <fstream>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
-#include "../../grammar/ASTtree/BaseNode.h"
+#include "../grammar/ASTtree/BaseNode.h"
 
+class BaseNode;
+
+// using AST::BaseNode;
 extern int yylex();
-// extern FILE * yyin
+extern FILE * yyin
 void yyerror(char* s);
 BaseNode* root;
 %}
@@ -33,17 +35,26 @@ BaseNode* root;
 %right <ast> '!'
 %left '(' ')' '[' ']'
 
-%token <str> ID  //终结符
-%token <str> INT
+%token ERRID
+
+%token <str> ID   //终结符
+%token <str> INT VOID
 %token ',' ';' // , ;
 %token <ast> STRUCT
-%token <ast> IF ELSE WHILE DO FOR CONTINUE RETURN ERRORCHAR
+%token <ast> IF ELSE WHILE DO FOR CONTINUE RETURN ERRORCHAR GETMEMBER
 %token '{' '}' //{}
+
+
 
 %nonassoc UMINUS
 
 /*非终结符——>定义了语法树之后再添加类型*/
-%type <ast> expression 
+%type <ast> program translation_unit external_declaration external_declaration_list
+%type <str> specifier
+%type <ast> struct_specifier struct_declaration_list struct_declaration
+%type <ast> direct_declarator func_declarator parameter_list parameter_declaration
+%type <ast> compound_statement block_item_list declaration_for expression_statement statement defination declaration_list declaration
+%type <ast> expression argument_expression_list
 // %
 
 %%
@@ -222,7 +233,7 @@ statement: compound_statement
         temp->addChildNode($3);
         $3->addCousinNode($4);
         $4->addCousinNode($5);
-        $5->addCousinNode($6);
+        $5->addCousinNode($7);
         $$ = temp;
     }
     // | FOR '(' ';' ';' ')' statement
@@ -291,8 +302,8 @@ declaration_list: declaration { $$ = $1; }
     }
     ;
 
-declaration: direct_declaration { $$ = $1; }
-    | direct_declaration '=' expression {
+declaration: direct_declarator { $$ = $1; }
+    | direct_declarator '=' expression {
         $1->addChildNode($3);
         $$ = $1;
     }
@@ -413,10 +424,10 @@ expression: expression '=' expression {
         | error ')' {yyerrok;}  /*当不可计算的表达式被读入后，上述第三条规则将识别出这个错误，解析将继续。yyerror 仍将被调用以打印出一条消息。第三条规则对应的动作是一个宏 yyerrok*/
         ;
 argument_expression_list: expression {
-            $1->getFinalCousinNode()->addCousinNode($3);
             $$ = $1;
         }
         | argument_expression_list ',' expression {
+            $1->getFinalCousinNode()->addCousinNode($3);
             $$ = $1;
         }
         ;
@@ -433,6 +444,7 @@ void yyerror(char* s) {
 }
 
 int main(int argc,char ** argv){  //不确定语法的在哪里输出
+
     int c,j=0;
     if(argc>=2){
         if((yyin=fopen(argv[1],"r"))==NULL){
@@ -451,5 +463,6 @@ int main(int argc,char ** argv){  //不确定语法的在哪里输出
         if(argc>=3)
             fclose(yyout);
     }
+    root->printTree();
     return 0;
 }

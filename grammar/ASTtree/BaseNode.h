@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace AST {
+// namespace AST {
 
     enum ASTNodeType {
         root = 0,
@@ -50,6 +50,6 @@ namespace AST {
         void printInfo(int);
     };
 
-}
+// }
 
 #endif

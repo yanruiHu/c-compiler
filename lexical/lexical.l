@@ -1,7 +1,7 @@
 %x COMMENT
 %{
 #include "y.tab.h"
-#include<stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 %}
@@ -22,10 +22,10 @@ int   ([1-9]|[1-9]([0-9])+|0)
 "//".*\n
 
 {whitespace}                        {;}
-{id}                                {yylval.str=atof(yytext);return(ID);}
-{int}                               {yylval.str=atof(yytext);return(INT);}
+{id}                                {yylval.str=strdup(yytext);return(ID);}
+{int}                               {yylval.str=strdup(yytext);return(INT);}
 
-"main"                              {return(MAIN);}
+"main"                              {yylval.str=strdup(yytext);return(ID);}
 "void"                              {return(VOID);}
 "if"                                {return(IF);}
 "else"                              {return(ELSE);}
@@ -35,24 +35,12 @@ int   ([1-9]|[1-9]([0-9])+|0)
 "struct"                            {return(STRUCT);}
 "."                                 {return(GETMEMBER);}
 (>=)|(<=)|(==)|(!=)|<|>             {yylval.str=strdup(yytext);return(RELOP);}
-"="                                 {return(ASSIGNOP);}
-"!"                                 {return(NOT);} 
+
+
 "&&"                                {return(AND);}
 "||"                                {return(OR);}  
-"+"                                 {return(ADD);}
-"-"                                 {return(DEC);}
-"*"                                 {return(MUL);}
-"/"                                 {return(DIV);}
-"%"                                 {return(MOD);}
-"^"                                 {return(POWER);}
-","                                 {return(COM);}
-";"                                 {return(SEM);}
-"("                                 {return(LB);}
-")"                                 {return(RB);}
-"["                                 {return(MLB)}
-"]"                                 {return(MRB)}
-"{"                                 {return(BLB);}
-"}"                                 {return(BRB);}
+
+    
 {int}{id}                           {return(ERRID);}
 .                                   {return(ERRORCHAR);}
 
