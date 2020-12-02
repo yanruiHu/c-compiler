@@ -30,14 +30,14 @@ AST::BaseNode::BaseNode(char* content, ASTNodeType type) {
     this->content = content;
 }
 
-void AST::BaseNode::addCousin(BaseNode* node) {
+void AST::BaseNode::addCousinNode(BaseNode* node) {
     this->cousin = node;
     if (node) {
         node->parent = this->parent;
     }
 }
 
-void AST::BaseNode::addChild(BaseNode* node) {
+void AST::BaseNode::addChildNode(BaseNode* node) {
     this->child = node;
     while(node) {
         node->parent = this;

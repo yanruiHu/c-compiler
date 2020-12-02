@@ -7,194 +7,419 @@
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
+#include "../../grammar/ASTtree/BaseNode.h"
 
-extern int yylex()
+extern int yylex();
 // extern FILE * yyin
-void yyerror(char* s)
+void yyerror(char* s);
+BaseNode* root;
 %}
 
 
 %union {
-        /*maybe a tree strurt ?*/
-        double  dval;
-        struct symtab *symp;
+    /*maybe a tree strurt ?*/
+    BaseNode* ast;
+    double dval;
+    // struct symtab *symp;
+    char* str;
 }
-%right '='
-%left OR
-%left AND
-%left LT GT LE GE EQ NE
-%left '-' '+'
-%left '*' '/' '%'
-%left '^'
-%right '!'
+%right <ast> '='
+%left <ast> OR
+%left <ast> AND
+%left <ast> RELOP
+%left <ast> '-' '+'
+%left <ast> '*' '/' '%'
+%left <ast> '^'
+%right <ast> '!'
 %left '(' ')' '[' ']'
 
-%token <symp> ID  //终结符
-%token <dval> INT10
-%token ',' ';' //,;
-%token STRUCT
-%token IF ELSE WHILE DO FOR CONTINUE RETURN ERRORCHAR
+%token <str> ID  //终结符
+%token <str> INT
+%token ',' ';' // , ;
+%token <ast> STRUCT
+%token <ast> IF ELSE WHILE DO FOR CONTINUE RETURN ERRORCHAR
 %token '{' '}' //{}
+
 %nonassoc UMINUS
 
-    /*非终结符——>定义了语法树之后再添加类型*/
-%type <dval> expression 
+/*非终结符——>定义了语法树之后再添加类型*/
+%type <ast> expression 
 // %
 
 %%
-    /*注：有关declarator的和declaration的yacc逻辑过于混乱，保证准确起见参考了lpy的*/
-    // Program: translation_unit;
-    translation_unit
-        : external_declaration
-        | translation_unit external_declaration
-        ;
-    external_declaration
-        : specifier ExtDecList ';'
-        | specifier ';'
-        | specifier func_declarator compound_statement
-        | specifier func_declarator ';'
-        | struct_specifier ';'
-        | error ';' { yyerrok; $$ = NULL;}
-        ;
-    ExtDecList: direct_declarator
-        | ExtDecList ',' direct_declarator
-        ;
-    /*↑*/
+/*注：有关declarator的和declaration的yacc逻辑过于混乱，保证准确起见参考了lpy的*/
+program: translation_unit { 
+        root = new BaseNode(AST::root);
+        root->addChildNode($1);
+    }
+    ;
+translation_unit: external_declaration { 
+        $$ = $1;
+    }
+    | translation_unit external_declaration {
+        if ($1 == NULL) {
+            $$ = $2;
+        } else {
+            if ($2 != NULL) {
+                $1->getFinalCousinNode()->addCousinNode($2);
+            }
+            $$ = $1;
+        }
+    }
+    ;
+external_declaration: specifier external_declaration_list ';' {}
+    // | specifier ';' {}
+    | specifier func_declarator compound_statement {
+        $2->addChildNode($3);
+        $$ = $2;
+    }
+    | specifier func_declarator ';'  {
+        $$ = $2;
+    }
+    | struct_specifier ';' {}
+    | error ';' { yyerrok; $$ = NULL;}
+    ;
+external_declaration_list: direct_declarator { $$ = $1; }
+    | external_declaration_list ',' direct_declarator {
+        $1->getFinalCousinNode()->addCousinNode($3);
+        $$ = $1;
+    }
+    ;
+/*↑*/
 
-    /* specifiers 说明符*/
-    specifier
-        : TYPE 
-        | VOID  
-        | TYPE '*'
-        | VOID '*'
-        ;
+/* specifiers 说明符*/
+specifier: INT { $$ = (char*)("int"); }
+    | VOID { $$ = (char*)("void"); }
+    | INT '*' { $$ = (char*)("int ptr"); }
+    | VOID '*' { $$ = (char*)("void ptr"); }
+    ;
 
-    struct_specifier
-        : STRUCT ID '{' struct_declaration_list '}' 
-        | STRUCT '{' struct_declaration_list '}'
-        | STRUCT ID
-        ;
+struct_specifier: STRUCT ID '{' struct_declaration_list '}' { $$ = NULL; }
+    | STRUCT '{' struct_declaration_list '}' { $$ = NULL; }
+    | STRUCT ID { $$ = NULL; }
+    ;
 
-    struct_declaration_list
-        : struct_declaration
-        | struct_declaration_list struct_declaration_list
-        ;
+struct_declaration_list: struct_declaration { $$ = NULL; }
+    | struct_declaration_list struct_declaration_list { $$ = NULL; }
+    ;
 
-    struct_declaration: specifier ID ';' ;
+struct_declaration: specifier ID ';' { $$ = NULL; }
+    ;
 
-    /* declarationorator 装饰符 声明？格式*/
-    direct_declarator
-        : ID
-        | ID '[' INT10 ']'
-        ;
-    func_declarator
-        : ID '(' direct_declarator ')' 
-        | ID '(' ')' 
-        ;
-    parameter_list
-        : direct_declarator ',' parameter_declaration
-        | parameter_declaration
-        ;
-    parameter_declaration
-        : specifier ID 
-        | specifier 
-        ;
-
-
-    /* Statement 声明*/
-    compound_statement
-        : '{' block_item_list '}'
-        | '{' '}'
-        | error '}' { yyerrok; }
-        ;
-
-    block_item_list
-        : block_item_list statement
-        | 
-        ;
-
-    declaration_for /*这个不知道是啥*/
-        : Def
-        | expression 
-        ;
-    expression_statement
-        : ';'
-        | expression ';'
-        ;
-    statement
-        : compound_statement
-        | expression ';'
-        | STRUCT ID ID ';'
-        | Def ';'
-        | IF '(' expression ')' statement
-        | IF '(' expression ')' statement ELSE statement 
-        | WHILE '(' expression ')' statement
-        | FOR '(' expression_statement expression_statement ')' statement
-        | FOR '(' expression_statement expression_statement expression ')' statement
-        // | FOR '(' ';' ';' ')' statement
-        | FOR '(' declaration_for ';' ';' ')' statement
-        // | FOR '(' ';' expression ';' ')' statement
-        // | FOR '(' ';' ';' expression ')' statement
-        | FOR '(' declaration_for ';' expression ';' expression ')' statement 
-        | FOR '(' declaration_for ';' expression ';' ')' statement 
-        | FOR '(' declaration_for ';' ';' expression ')' statement 
-        | FOR '(' ';' expression ';' expression ')' statement
-        | RETURN expression ';'
-        | RETURN ';'
-        | error ';' { yyerrok; }  /*官方没报错 参考代码报错了不知道为啥*/
-        ;
-
-
-
-    /* Local Definitions 参考代码上注释是这个*/
-    Def: specifier declaration_list 
-        | error ';' { yyerrok; }
-        ;
-
-    declaration_list
-        : declaration
-        | declaration ',' declaration_list
-        ;
-
-    declaration: direct_declaration
-        | direct_declaration '=' expression
+/* declarationorator 装饰符 声明？格式*/
+direct_declarator: ID {
+        char* s = "";
+        sprintf(s, "variable defination, name: %s", $1);
+        $$ = new BaseNode(s, AST::dec_var);
+    }
+    | ID '[' INT ']' {
+        char* s = "";
+        sprintf(s, "variable defination (array), name: %s", $1);
+        $$ = new BaseNode(s, AST::dec_var);
+    }
+    ;
+func_declarator: ID '(' direct_declarator ')' { 
+        char* s = "";
+        sprintf(s, "func defination, name: %s", $1);
+        $$ = new BaseNode(s, AST::dec_func);
+    }
+    | ID '(' ')' {
+        char* s = "";
+        sprintf(s, "func defination, name: %s", $1);
+        $$ = new BaseNode(s, AST::dec_func);
+    }
+    ;
+parameter_list: direct_declarator ',' parameter_declaration {
+        $1->getFinalCousinNode()->addCousinNode($3);
+        $$ = $1;
+    }
+    | parameter_declaration { $$ = $1 }
+    ;
+parameter_declaration: specifier ID {
+        char* s = "";
+        sprintf(s, "variable defination, name: %s", $1);
+        $$ = new BaseNode(s, AST::dec_var);
+    }
+    | specifier {}
     ;
 
 
-    /* expressionression */
-    expression
-            : expression '=' expression
-            | expression AND expression
-            | expression OR expression
-            | expression GE expression
-            | expression LE expression
-            | expression EQ expression
-            | expression NE expression
-            | expression GE expression
-            | expression LE expression
-            | expression '+' expression
-            | expression '-' expression
-            | expression '*' expression
-            | expression '/' expression
-            | expression "%" expression
-            | expression '^' expression
-            | '(' expression ')'
-            | '-' expression
-            | '!' expression
-            | ID '(' argument_expression_list ')'
-            | ID '(' ')'
-            | expression '[' expression ']'
-            | ID
-            | ID '[' expression ']'
-            | ID  ERRORCHAR ID  // '.'
-            | INT10
-            | '*' ID
-            | error ')' {yyerrok;}  /*当不可计算的表达式被读入后，上述第三条规则将识别出这个错误，解析将继续。yyerror 仍将被调用以打印出一条消息。第三条规则对应的动作是一个宏 yyerrok*/
-            ;
-    argument_expression_list
-            : expression
-            | argument_expression_list ',' expression
-            ;
+/* Statement 声明*/
+compound_statement: '{' block_item_list '}' {
+        BaseNode* temp = new BaseNode("compound statement");
+        temp->addChildNode($2);
+        $$ = temp
+    }
+    | '{' '}' {}
+    | error '}' { yyerrok; }
+    ;
+
+block_item_list: block_item_list statement {
+        if ($1 == NULL) {
+            $$ = $2;
+        } else {
+            $1->getFinalCousinNode()->addCousinNode($2);
+        }
+    }
+    | {
+        $$ = NULL;
+    }
+    ;
+
+/*这个不知道是啥*/
+declaration_for: defination { $$ = $1 }
+    | expression { $$ = $1 }
+    ;
+expression_statement: ';' {}
+    | expression ';' { 
+        BaseNode* temp = new BaseNode("statement inside for");
+        temp->addChildNode($1);
+        $$ = temp
+    }
+    ;
+statement: compound_statement
+    | expression ';' { 
+        BaseNode* temp = new BaseNode("expression statement");
+        temp->addChildNode($1);
+        $$ = temp
+    }
+    | STRUCT ID ID ';' {}
+    | defination ';' { 
+        BaseNode* temp = new BaseNode("defination statement");
+        temp->addChildNode($1);
+        $$ = temp
+    }
+    | IF '(' expression ')' statement { 
+        BaseNode* temp = new BaseNode("select statement(if)");
+        temp->addChildNode($3);
+        $3->addCousinNode($5);
+        $$ = temp
+    }
+    | IF '(' expression ')' statement ELSE statement {
+        BaseNode* temp = new BaseNode("select statement(if)");
+        temp->addChildNode($3);
+        $3->addCousinNode($5);
+        BaseNode else_node = new BaseNode("select statement(else)");
+        else_node->addChildNode($7);
+        temp->addCousinNode(else_node);
+        $$ = temp
+    }
+    | WHILE '(' expression ')' statement {
+        BaseNode* temp = new BaseNode("loop statement(while)");
+        temp->addChildNode($3);
+        $3->addCousinNode($5);
+        $$ = temp;
+    }
+    | FOR '(' expression_statement expression_statement ')' statement {
+        BaseNode* temp = new BaseNode("loop statement(for)");
+        temp->addChildNode($3);
+        $3->addCousinNode($4);
+        $4->addCousinNode($6);
+        $$ = temp;
+    }
+    | FOR '(' expression_statement expression_statement expression ')' statement {
+        BaseNode* temp = new BaseNode("loop statement(for)");
+        temp->addChildNode($3);
+        $3->addCousinNode($4);
+        $4->addCousinNode($5);
+        $5->addCousinNode($6);
+        $$ = temp;
+    }
+    // | FOR '(' ';' ';' ')' statement
+    | FOR '(' declaration_for ';' ';' ')' statement {
+        BaseNode* temp = new BaseNode("loop statement(for)");
+        temp->addChildNode($3);
+        $3->addCousinNode($7);
+        $$ = temp;
+    }
+    // | FOR '(' ';' expression ';' ')' statement
+    // | FOR '(' ';' ';' expression ')' statement
+    | FOR '(' declaration_for ';' expression ';' expression ')' statement {
+        BaseNode* temp = new BaseNode("loop statement(for)");
+        temp->addChildNode($3);
+        $3->addCousinNode($5);
+        $5->addCousinNode($7);
+        $7->addCousinNode($9);
+        $$ = temp;
+    }
+    | FOR '(' declaration_for ';' expression ';' ')' statement  {
+        BaseNode* temp = new BaseNode("loop statement(for)");
+        temp->addChildNode($3);
+        $3->addCousinNode($5);
+        $5->addCousinNode($8);
+        $$ = temp;
+    }
+    | FOR '(' declaration_for ';' ';' expression ')' statement  {
+        BaseNode* temp = new BaseNode("loop statement(for)");
+        temp->addChildNode($3);
+        $3->addCousinNode($6);
+        $6->addCousinNode($8);
+        $$ = temp;
+    }
+    | FOR '(' ';' expression ';' expression ')' statement {
+        BaseNode* temp = new BaseNode("loop statement(for)");
+        temp->addChildNode($4);
+        $4->addCousinNode($6);
+        $6->addCousinNode($8);
+        $$ = temp;
+    }
+    | RETURN expression ';' {
+        BaseNode* temp = new BaseNode("return statement");
+        temp->addChildNode($2);
+        $$ = temp;
+    }
+    | RETURN ';' {
+        BaseNode* temp = new BaseNode("return statement");
+        $$ = temp;
+    }
+    | error ';' { yyerrok; }  /*官方没报错 参考代码报错了不知道为啥*/
+    ;
+
+
+
+/* Local Definitions 参考代码上注释是这个*/
+defination: specifier declaration_list  {
+        $$ = $2;
+    }
+    | error ';' { yyerrok; }
+    ;
+
+declaration_list: declaration { $$ = $1; }
+    | declaration ',' declaration_list {
+        $1->getFinalCousinNode()->addCousinNode($3);
+        $$ = $1;
+    }
+    ;
+
+declaration: direct_declaration { $$ = $1; }
+    | direct_declaration '=' expression {
+        $1->addChildNode($3);
+        $$ = $1;
+    }
+;
+
+
+/* expressionression */
+expression: expression '=' expression {
+            BaseNode* temp = NULL;
+            temp = new BaseNode("operator: =", AST::op);
+            temp->addChildNode($1);
+            $1->addCousinNode($3);
+            $$ = temp;
+        }
+        | expression AND expression {
+            BaseNode* temp = new BaseNode("operator: &&", AST::op);
+            temp->addChildNode($1);
+            $1->addCousinNode($3);
+            $$ = temp;
+        }
+        | expression OR expression {
+            BaseNode* temp = new BaseNode("operator: ||", AST::op);
+            temp->addChildNode($1);
+            $1->addCousinNode($3);
+            $$ = temp;
+        }
+        | expression RELOP expression {
+            char* s = "";
+            sprintf(s, "operator: %s", $2);
+            BaseNode* temp = new BaseNode(s, AST::op);
+            temp->addChildNode($1);
+            $1->addCousinNode($3);
+            $$ = temp;
+        }
+        | expression '+' expression {
+            BaseNode* temp = new BaseNode("operator: +", AST::op);
+            temp->addChildNode($1);
+            $1->addCousinNode($3);
+            $$ = temp;
+        }
+        | expression '-' expression {
+            BaseNode* temp = new BaseNode("operator: -", AST::op);
+            temp->addChildNode($1);
+            $1->addCousinNode($3);
+            $$ = temp;
+        }
+        | expression '*' expression {
+            BaseNode* temp = new BaseNode("operator: *", AST::op);
+            temp->addChildNode($1);
+            $1->addCousinNode($3);
+            $$ = temp;
+        }
+        | expression '/' expression {
+            BaseNode* temp = new BaseNode("operator: /", AST::op);
+            temp->addChildNode($1);
+            $1->addCousinNode($3);
+            $$ = temp;
+        }
+        | expression '%' expression {
+            BaseNode* temp = new BaseNode("operator: %", AST::op);
+            temp->addChildNode($1);
+            $1->addCousinNode($3);
+            $$ = temp;
+        }
+        | expression '^' expression {
+            BaseNode* temp = new BaseNode("operator: ^", AST::op);
+            temp->addChildNode($1);
+            $1->addCousinNode($3);
+            $$ = temp;
+        }
+        | '(' expression ')' {
+            $$ = $2;
+        }
+        | '-' expression {
+            BaseNode* temp = new BaseNode("operator: -", AST::op);
+            temp->addChildNode($2);
+            $$ = temp;
+        }
+        | '!' expression {
+            BaseNode* temp = new BaseNode("operator: !", AST::op);
+            temp->addChildNode($2);
+            $$ = temp;
+        }
+        | ID '(' argument_expression_list ')' {
+            char* s = "";
+            sprintf(s, "call function name: %s", $1);
+            BaseNode* temp = new BaseNode(s);
+            temp->addChildNode($3);
+            $$ = temp;
+        }
+        | ID '(' ')' {
+            char* s = "";
+            sprintf(s, "call function name: %s", $1);
+            BaseNode* temp = new BaseNode(s);
+        }
+        | expression '[' expression ']' {
+            $$ = NULL;
+        }
+        | ID {
+            $$ = new BaseNode($1);
+        }
+        | ID '[' expression ']' {
+            BaseNode* op = new BaseNode("operator: []");
+            char* s = "";
+            sprintf(s, "variable: %s", $1);
+            BaseNode* temp = new BaseNode(s);
+            $$ = op;
+            op->addChildNode(temp);
+            temp->addCousinNode($3);
+        }
+        | ID '.' ID {}
+        | INT {
+            char* s = "";
+            sprintf(s, "literal: %s", $1);
+            $$ = new BaseNode(s);
+        }
+        | '*' ID {}
+        | error ')' {yyerrok;}  /*当不可计算的表达式被读入后，上述第三条规则将识别出这个错误，解析将继续。yyerror 仍将被调用以打印出一条消息。第三条规则对应的动作是一个宏 yyerrok*/
+        ;
+argument_expression_list: expression {
+            $1->getFinalCousinNode()->addCousinNode($3);
+            $$ = $1;
+        }
+        | argument_expression_list ',' expression {
+            $$ = $1;
+        }
+        ;
 %%
 
 /*
