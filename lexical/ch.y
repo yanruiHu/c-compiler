@@ -5,6 +5,7 @@
 #include <fstream>
 #include "../grammar/ASTtree/BaseNode.h"
 
+using AST::BaseNode;
 class BaseNode;
 extern char *yytext;
 extern int yylex();
@@ -16,7 +17,7 @@ extern int yylineno;
 
 
 %union {
-    BaseNode* ast;
+    AST::BaseNode* ast;
     // struct symtab *symp;
     char* str;
 }
@@ -75,7 +76,7 @@ translation_unit: external_declaration {
     }
     ;
 external_declaration: specifier external_declaration_list SEM {
-            $$ = $2;
+        $$ = $2;
     }
     | specifier SEM {}
     | specifier func_declarator compound_statement {
@@ -317,19 +318,19 @@ declaration: direct_declarator { $$ = $1; }
 /* expressionression */
 expression: expression ASSIGNOP expression {
             BaseNode* temp = NULL;
-            temp = new BaseNode("operator: =", op);
+            temp = new BaseNode("operator: =");
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
         | expression AND expression {
-            BaseNode* temp = new BaseNode("operator: &&", op);
+            BaseNode* temp = new BaseNode("operator: &&");
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
         | expression OR expression {
-            BaseNode* temp = new BaseNode("operator: ||", op);
+            BaseNode* temp = new BaseNode("operator: ||");
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
@@ -347,37 +348,37 @@ expression: expression ASSIGNOP expression {
             $$ = temp;
         }
         | expression ADD expression {
-            BaseNode* temp = new BaseNode("operator: +", op);
+            BaseNode* temp = new BaseNode("operator: +");
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
         | expression DEC expression {
-            BaseNode* temp = new BaseNode("operator: -", op);
+            BaseNode* temp = new BaseNode("operator: -");
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
         | expression MUL expression {
-            BaseNode* temp = new BaseNode("operator: *", op);
+            BaseNode* temp = new BaseNode("operator: *");
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
         | expression DIV expression {
-            BaseNode* temp = new BaseNode("operator: /", op);
+            BaseNode* temp = new BaseNode("operator: /");
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
         | expression MOD expression {
-            BaseNode* temp = new BaseNode("operator: %", op);
+            BaseNode* temp = new BaseNode("operator: %");
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
         | expression POWER expression {
-            BaseNode* temp = new BaseNode("operator: ^", op);
+            BaseNode* temp = new BaseNode("operator: ^");
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
@@ -386,12 +387,12 @@ expression: expression ASSIGNOP expression {
             $$ = $2;
         }
         | DEC expression {
-            BaseNode* temp = new BaseNode("operator: -", op);
+            BaseNode* temp = new BaseNode("operator: -");
             temp->addChildNode($2);
             $$ = temp;
         }
         | NOT expression {
-            BaseNode* temp = new BaseNode("operator: !", op);
+            BaseNode* temp = new BaseNode("operator: !");
             temp->addChildNode($2);
             $$ = temp;
         }
