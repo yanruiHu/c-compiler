@@ -307,8 +307,9 @@ declaration_list: declaration { $$ = $1; }
 
 declaration: direct_declarator { $$ = $1; }
     | direct_declarator ASSIGNOP expression {
-        $1->addChildNode($3);
-        $$ = $1;
+        $$ = new BaseNode("operator: =");
+        $$->addChildNode($1);
+        $1->addCousinNode($3);
     }
 ;
 

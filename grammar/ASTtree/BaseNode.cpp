@@ -62,6 +62,7 @@ void BaseNode::tree(BaseNode* node, int depth, bool flag, std::vector<bool> pre_
     ++depth;
     pre_sep.push_back(flag);
 
+    node = node->child;
     while(node) {
         for (std::vector<bool>::iterator i = pre_sep.begin(); i != pre_sep.end(); i++) {
             std::cout << separator[*i];
@@ -73,7 +74,7 @@ void BaseNode::tree(BaseNode* node, int depth, bool flag, std::vector<bool> pre_
         } else {
             bool f = node->cousin;
             std::vector<bool> v(pre_sep);
-            BaseNode::tree(temp, depth, !f, v);
+            BaseNode::tree(node, depth, !f, v);
         }
         node = node->cousin;
     }
