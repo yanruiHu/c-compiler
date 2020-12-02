@@ -441,21 +441,20 @@ void yyerror(char* s) {
 	exit(1);
 }
 
-int main(int argc,char ** argv){  //不确定语法的在哪里输出
+int main(int argc,char * argv[]){  //不确定语法的在哪里输出
 
     int c,j=0;
-    if(argc>=2){
-        if((yyin=fopen(argv[1],"r"))==NULL){
-            printf("Can't open file %s\n",argv[1]);
-            return 1;
-        }
-    }
+    yyin=fopen("./test.txt","r");
+    // if(argc>=2){
+    //     if()==NULL){
+    //         printf("Can't open file %s\n",argv[1]);
+    //         return 1;
+    //     }
+    // }
     do {
 		yyparse();
 	} while(!feof(yyin));
-    if(argc>=2){
-        fclose(yyin);
-    }
+    fclose(yyin);
     root->printTree();
     return 0;
 }

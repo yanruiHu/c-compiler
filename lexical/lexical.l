@@ -1,6 +1,6 @@
 %x COMMENT
 %{
-#include "y.tab.h"
+#include "../Linux/grammar.tab.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

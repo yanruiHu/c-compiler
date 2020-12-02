@@ -17,13 +17,13 @@ CXXVER = c++11
 $(PROGRAM): $(OBJ)
 	$(CXX) -o $(PROGRAM) $(OBJ) -std=$(CXXVER) -g
 
-grammar: lexer.l grammar.y
+grammar: ./lexical/lexical.l ./lexical/ch.y
 ifeq ($(GRAMMAREXIST),notexist)
 	mkdir $(GRAMMARFOLDER)
 endif
 	$(BISON) --output="./Linux/grammar.tab.cpp" --defines="./Linux/grammar.tab.h" ./lexical/ch.y
 	$(FLEX) --outfile="./Linux/lexer.flex.cpp" ./lexical/lexical.l
-	sed -i "1i\#include \"../grammar/ASTtree/BaseNode.h\"" ./Linux/grammar.tab.h
+	sed -i "1i\#include \"../grammar/ASTtree/BaseNode.h\"" ./Linux/grammar.tab.h 
 
 %.o: %.cpp $(DEPS)
 	$(CXX) -c $< -o $@ -std=$(CXXVER) -g
@@ -31,16 +31,16 @@ endif
 clean:
 	rm -rf $(GRAMMARFOLDER) $(OBJ) $(PROGRAM) $(BUILDFOLDER) common/util/io/asm_io.o
 
-# build:
-# ifeq ($(BUILDEXIST),notexist)
-# 	mkdir $(BUILDFOLDER)
-# endif
-# ifeq ($(BUILDIOEXIST),notexist)
-# 	mkdir $(BUILDIO)
-# endif
-# 	$(NASM) -f elf -d ELF_TYPE common/util/io/asm_io.asm -o common/util/io/asm_io.o
-# 	cp $(PROGRAM) $(BUILDFOLDER)
-# 	cp common/util/io/asm_io.o $(BUILDIO)
-# 	cp common/util/io/asm_io.inc $(BUILDIO)
-# 	cp -r test/ $(BUILDFOLDER)
-# 	cp example/Makefile $(BUILDFOLDER)
+build:
+ifeq ($(BUILDEXIST),notexist)
+	mkdir $(BUILDFOLDER)
+endif
+ifeq ($(BUILDIOEXIST),notexist)
+	mkdir $(BUILDIO)
+endif
+	$(NASM) -f elf -d ELF_TYPE common/util/io/asm_io.asm -o common/util/io/asm_io.o
+	cp $(PROGRAM) $(BUILDFOLDER)
+	cp common/util/io/asm_io.o $(BUILDIO)
+	cp common/util/io/asm_io.inc $(BUILDIO)
+	cp -r test/ $(BUILDFOLDER)
+	cp example/Makefile $(BUILDFOLDER)
