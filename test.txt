@@ -1,4 +1,6 @@
-void main() {
+int main() {
     int i = 0, a = 2;
-    i + a;
+    int a[]={1,2};
+    i=i + a;
+    i=a[0]+a[1];
 }
