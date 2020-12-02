@@ -115,17 +115,38 @@ struct_declaration: specifier ID SEM { $$ = NULL; }
 
 /* declarationorator 装饰符 声明？格式*/
 direct_declarator: ID {
-        $$ = new BaseNode($1);
+        std::string s = "variable defination, name: ";
+        s = s + $1;
+        $$ = new BaseNode(strdup(s.c_str()));
+        // $$ = new BaseNode($1);
     }
     | ID MLB INT MRB {
-        $$ = new BaseNode($3);
+        // char* s = "";
+        // sprintf(s, "variable defination (array), name: %s, length: %s", $1, $3);
+        // $$ = new BaseNode(s);
+        std::string s = "variable defination (array), name: ";
+        s = s + $1 + ", length: " + $3;
+        $$ = new BaseNode(strdup(s.c_str()));
+        // $$ = new BaseNode($3);
     }
     ;
 func_declarator: ID LB parameter_list RB { 
-        $$ = new BaseNode($1);
+        // char* s = "";
+        // sprintf(s, "func defination, name: %s", $1);
+        // $$ = new BaseNode(s);
+        std::string s = "func defination, name: ";
+        s = s + $1;
+        $$ = new BaseNode(strdup(s.c_str()));
+        // $$ = new BaseNode($1);
     }
     | ID LB RB {
-        $$ = new BaseNode($1);
+        // char* s = "";
+        // sprintf(s, "func defination, name: %s", $1);
+        // $$ = new BaseNode(s);
+        std::string s = "func defination, name: ";
+        s = s + $1;
+        $$ = new BaseNode(strdup(s.c_str()));
+        // $$ = new BaseNode($1);
     }
     ;
 parameter_list: parameter_list COM parameter_declaration {
@@ -135,7 +156,13 @@ parameter_list: parameter_list COM parameter_declaration {
     | parameter_declaration { $$ = $1; }
     ;
 parameter_declaration: specifier ID {
-        $$ = new BaseNode($1);
+        // char* s = "";
+        // sprintf(s, "variable defination, name: %s", $1);
+        // $$ = new BaseNode(s);
+        std::string s = "variable defination, name: ";
+        s = s + $1;
+        $$ = new BaseNode(strdup(s.c_str()));
+        // $$ = new BaseNode($1);
     }
     | specifier {}
     ;
@@ -309,7 +336,11 @@ expression: expression ASSIGNOP expression {
         | expression RELOP expression {
             // char* s = "";
             // sprintf(s, "operator: %s", $2);
-            BaseNode* temp = new BaseNode($2);
+            // BaseNode* temp = new BaseNode(s);
+            // BaseNode* temp = new BaseNode($2);
+            std::string s = "operator: ";
+            s = s + $2;
+            BaseNode* temp = new BaseNode(strdup(s.c_str()));
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
@@ -364,12 +395,24 @@ expression: expression ASSIGNOP expression {
             $$ = temp;
         }
         | ID LB argument_expression_list RB {
-            BaseNode* temp = new BaseNode($1);
+            // char* s = "";
+            // sprintf(s, "call function name: %s", $1);
+            // BaseNode* temp = new BaseNode(s);
+            std::string s = "call function name: ";
+            s = s + $1;
+            BaseNode* temp = new BaseNode(strdup(s.c_str()));
+            // BaseNode* temp = new BaseNode($1);
             temp->addChildNode($3);
             $$ = temp;
         }
         | ID LB RB {
-            $$ = new BaseNode($1);
+            // char* s = "";
+            // sprintf(s, "call function name: %s", $1);
+            // BaseNode* temp = new BaseNode(s);
+            std::string s = "call function name: ";
+            s = s + $1;
+            $$ = new BaseNode(strdup(s.c_str()));
+            // $$ = new BaseNode($1);$$ = new BaseNode($1);
         }
         | expression MLB expression MRB {
             $$ = NULL;
@@ -379,14 +422,26 @@ expression: expression ASSIGNOP expression {
         }
         | ID MLB expression MRB {
             BaseNode* op = new BaseNode("operator: []");
-            BaseNode* temp = new BaseNode($1);
+            // char* s = "";
+            // sprintf(s, "variable: %s", $1);
+            // BaseNode* temp = new BaseNode(s);
+            std::string s = "variable: ";
+            s = s + $1;
+            BaseNode* temp = new BaseNode(strdup(s.c_str()));
+            // BaseNode* temp = new BaseNode($1);
             $$ = op;
             op->addChildNode(temp);
             temp->addCousinNode($3);
         }
         | ID '.' ID {}
         | INT {
-            $$ = new BaseNode($1);
+            // char* s = "";
+            // sprintf(s, "literal: %s", $1);
+            // $$ = new BaseNode(s);
+            std::string s = "literal: ";
+            s = s + $1;
+            $$ = new BaseNode(strdup(s.c_str()));
+            // $$ = new BaseNode($1);
         }
         | MUL ID {}
         | error RB {yyerrok;}  /*当不可计算的表达式被读入后，上述第三条规则将识别出这个错误，解析将继续。yyerror 仍将被调用以打印出一条消息。第三条规则对应的动作是一个宏 yyerrok*/
