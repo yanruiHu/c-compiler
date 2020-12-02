@@ -40,10 +40,10 @@ namespace AST {
         BaseNode(ASTNodeType);
         BaseNode(char*, ASTNodeType);
         BaseNode(char*);
-        inline void setParent(BaseNode *parent) { this->parent = parent; }
+        inline void setParentNode(BaseNode *parent) { this->parent = parent; }
         inline ASTNodeType getASTNodeType() { return this->type; }
-        void addChild(BaseNode*);
-        void addCousin(BaseNode*);
+        void addChildNode(BaseNode*);
+        void addCousinNode(BaseNode*);
         BaseNode *getFinalCousinNode();
         void printTree();
         inline std::string getContent() { return this->content; }
