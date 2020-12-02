@@ -6,10 +6,10 @@
 #include "../grammar/ASTtree/BaseNode.h"
 
 class BaseNode;
-
+extern char *yytext;
 extern int yylex();
 extern FILE * yyin;
-void yyerror(char* s);
+void yyerror(const char* s);
 BaseNode* root;
 extern int yylineno;
 %}
@@ -25,7 +25,7 @@ extern int yylineno;
 %right <ast> '='
 %left <ast> OR
 %left <ast> AND
-%left <ast> RELOP
+%left <str> RELOP
 %left <ast> '-' '+'
 %left <ast> '*' '/' '%'
 %left <ast> '^'
@@ -50,7 +50,7 @@ extern int yylineno;
 %type <str> specifier
 %type <ast> struct_specifier struct_declaration_list struct_declaration
 %type <ast> direct_declarator func_declarator parameter_list parameter_declaration
-%type <ast> compound_statement block_item_list declaration_for expression_statement statement defination declaration_list declaration
+%type <ast> compound_statement block_item_list declaration_for  statement defination declaration_list declaration
 %type <ast> expression argument_expression_list
 // %
 // %start program
@@ -142,7 +142,7 @@ parameter_list: parameter_list ',' parameter_declaration {
         $1->getFinalCousinNode()->addCousinNode($3);
         $$ = $1;
     }
-    | parameter_declaration { $$ = $1 }
+    | parameter_declaration { $$ = $1; }
     ;
 parameter_declaration: specifier ID {
         char* s = "";
@@ -215,13 +215,22 @@ statement: expression ';' {
     }
 
     | FOR '(' ';' ';' ')' statement{
-
+        BaseNode* temp = new BaseNode("loop statement(for)");
+        temp->addChildNode($6);
+        $$ = temp;
     }
 
     | FOR '(' ';' expression ';' ')' statement{
-
+        BaseNode* temp = new BaseNode("loop statement(for)");
+        temp->addChildNode($4);
+        $4->addCousinNode($7);
+        $$ = temp;
     }
     | FOR '(' ';' ';' expression ')' statement{
+        BaseNode* temp = new BaseNode("loop statement(for)");
+        temp->addChildNode($5);
+        $5->addCousinNode($7);
+        $$ = temp;
 
     }
     | FOR '(' declaration_for ';' expression ';' expression ')' statement {
