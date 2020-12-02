@@ -12,22 +12,17 @@ void yyerror(const char *str);
 %}
 %option yylineno
 delim   [ \t\n]
-whitespace  {delim}+
+ws  {delim}+
 digit   [0-9]
 letter  [A-Za-z_]
 id  {letter}({letter}|{digit})*
 int   ([1-9]|[1-9]([0-9])+|0)
 
 %%
-"/*"                                {BEGIN(COMMENT);}
-<COMMENT>"*/"                       {BEGIN(INITIAL);}
-<COMMENT>{whitespace}               {printf("inside commenet whitespace\n");}
-<COMMENT>([^*]|\en)+|.
-<COMMENT><<EOF>>                    {printf("Unterminated comment\n");return 0;}
-"//".*\n
 
 
-"int"                               {yylval.str=strdup(yytext);return(INT);}
+
+"int"                               {printf("int\n");yylval.str=strdup(yytext);return(INT);}
 
 "main"                              {printf("main");yylval.str=strdup(yytext);return(ID);}
 "void"                              {printf("void");return(VOID);}
@@ -42,12 +37,29 @@ int   ([1-9]|[1-9]([0-9])+|0)
 
 
 "&&"                                {return(AND);}
-"||"                                {return(OR);}  
+"||"                                {return(OR);}
+"="                                 {return(ASSIGNOP);}
+"!"                                 {return(NOT);} 
+"+"                                 {return(ADD);}
+"-"                                 {return(DEC);}
+"*"                                 {return(MUL);}
+"/"                                 {return(DIV);}
+
+"%"                                 {return(MOD);}
+"^"                                 {return(POWER);}
+","                                 {return(COM);}
+";"                                 {return(SEM);}
+"("                                 {return(LB);}
+")"                                 {return(RB);}
+"["                                 {return(MLB);}
+"]"                                 {return(MRB);}
+"{"                                 {return(BLB);}
+"}"                                 {return(BRB);}
 
 {int}                               {yylval.str=strdup(yytext);return(INT);}
 {id}                                {yylval.str=strdup(yytext);return(ID);}
 {int}{id}                           {return(ERRID);}
-.                                   {return(ERRORCHAR);}
+.                                   {printf("error\n");return(ERRORCHAR);}
 
 %%
 int yywrap(){
