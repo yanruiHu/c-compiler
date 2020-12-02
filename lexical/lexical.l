@@ -22,10 +22,10 @@ int   ([1-9]|[1-9]([0-9])+|0)
 
 
 
-"int"                               {printf("int\n");yylval.str=strdup(yytext);return(INT);}
+"int"                               {yylval.str=strdup(yytext);return(INT);}
 
-"main"                              {printf("main");yylval.str=strdup(yytext);return(ID);}
-"void"                              {printf("void");return(VOID);}
+"main"                              {yylval.str=strdup(yytext);return(ID);}
+"void"                              {yylval.str=strdup(yytext);return(VOID);}
 "if"                                {return(IF);}
 "else"                              {return(ELSE);}
 "for"                               {return(FOR);}
@@ -56,11 +56,11 @@ int   ([1-9]|[1-9]([0-9])+|0)
 "{"                                 {return(BLB);}
 "}"                                 {return(BRB);}
 
+[ \t\v\f\r\n]                       { }
 {int}                               {yylval.str=strdup(yytext);return(INT);}
 {id}                                {yylval.str=strdup(yytext);return(ID);}
-{int}{id}                           {return(ERRID);}
-.                                   {printf("error\n");return(ERRORCHAR);}
-
+{digit}{id}                         {return(ERRID);}
+.                                   {return(ERRORCHAR);}
 %%
 int yywrap(){
     return 1;

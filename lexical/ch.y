@@ -32,7 +32,7 @@ extern int yylineno;
 %left <ast> POWER
 %right <ast> NOT
 %left LB RB MLB MRB
-
+%nonassoc LOWER_THAN_ELSE
 %token ERRID
 %token <str> ID   //终结符
 %token <str> INT VOID
@@ -56,7 +56,7 @@ extern int yylineno;
 %%
 /*注：有关declarator的和declaration的yacc逻辑过于混乱，保证准确起见参考了lpy的*/
 program: translation_unit { 
-        root = new BaseNode(root_);
+        root = new BaseNode();
         root->addChildNode($1);
     }
     ;
@@ -74,7 +74,9 @@ translation_unit: external_declaration {
         }
     }
     ;
-external_declaration: specifier external_declaration_list SEM {}
+external_declaration: specifier external_declaration_list SEM {
+            $$ = $2;
+    }
     | specifier SEM {}
     | specifier func_declarator compound_statement {
         $2->addChildNode($3);
@@ -83,7 +85,7 @@ external_declaration: specifier external_declaration_list SEM {}
     | specifier func_declarator SEM  {
         $$ = $2;
     }
-    | struct_specifier SEM {}
+    | struct_specifier SEM {$$ = $1;}
     | error SEM { yyerrok; $$ = NULL;}
     ;
 external_declaration_list: direct_declarator { $$ = $1; }
@@ -95,19 +97,17 @@ external_declaration_list: direct_declarator { $$ = $1; }
 /*↑*/
 
 /* specifiers 说明符*/
-specifier: INT { $$ = (char*)("int"); }
-    | VOID { $$ = (char*)("void"); }
-    | INT MUL { $$ = (char*)("int ptr"); }
-    | VOID MUL { $$ = (char*)("void ptr"); }
+specifier: INT { $$ = strdup("int"); }
+    | VOID { $$ = strdup("void"); }
+    | INT MUL { $$ = strdup("int ptr"); }
+    | VOID MUL { $$ = strdup("void ptr"); }
     ;
 
 struct_specifier: STRUCT ID BLB struct_declaration_list BRB { $$ = NULL; }
-    | STRUCT BLB struct_declaration_list BRB { $$ = NULL; }
-    | STRUCT ID { $$ = NULL; }
     ;
 
 struct_declaration_list: struct_declaration { $$ = NULL; }
-    | struct_declaration_list struct_declaration_list { $$ = NULL; }
+    | struct_declaration_list struct_declaration{ $$ = NULL; }
     ;
 
 struct_declaration: specifier ID SEM { $$ = NULL; }
@@ -115,25 +115,17 @@ struct_declaration: specifier ID SEM { $$ = NULL; }
 
 /* declarationorator 装饰符 声明？格式*/
 direct_declarator: ID {
-        char* s = "";
-        sprintf(s, "variable defination, name: %s", $1);
-        $$ = new BaseNode(s, dec_var);
+        $$ = new BaseNode($1);
     }
     | ID MLB INT MRB {
-        char* s = "";
-        sprintf(s, "variable defination (array), name: %s", $1);
-        $$ = new BaseNode(s, dec_var);
+        $$ = new BaseNode($3);
     }
     ;
 func_declarator: ID LB parameter_list RB { 
-        char* s = "";
-        sprintf(s, "func defination, name: %s", $1);
-        $$ = new BaseNode(s, dec_func);
+        $$ = new BaseNode($1);
     }
     | ID LB RB {
-        char* s = "";
-        sprintf(s, "func defination, name: %s", $1);
-        $$ = new BaseNode(s, dec_func);
+        $$ = new BaseNode($1);
     }
     ;
 parameter_list: parameter_list COM parameter_declaration {
@@ -143,9 +135,7 @@ parameter_list: parameter_list COM parameter_declaration {
     | parameter_declaration { $$ = $1; }
     ;
 parameter_declaration: specifier ID {
-        char* s = "";
-        sprintf(s, "variable defination, name: %s", $1);
-        $$ = new BaseNode(s, dec_var);
+        $$ = new BaseNode($1);
     }
     | specifier {}
     ;
@@ -157,7 +147,6 @@ compound_statement: BLB block_item_list BRB {
         temp->addChildNode($2);
         $$ = temp;
     }
-    | BLB BRB {}
     | error BRB { yyerrok; }
     ;
 
@@ -188,15 +177,24 @@ statement: expression SEM {
         temp->addChildNode($1);
         $$ = temp;
     }
-    | STRUCT ID ID SEM {}
+    | STRUCT ID ID SEM {$$ =NULL;}
     | compound_statement { $$=$1;}
-    | IF LB expression RB statement { 
+    | RETURN expression SEM {
+        BaseNode* temp = new BaseNode("return statement");
+        temp->addChildNode($2);
+        $$ = temp;
+    }
+    | RETURN SEM {
+        BaseNode* temp = new BaseNode("return statement");
+        $$ = temp;
+    }
+    | IF LB expression RB statement {  // ok
         BaseNode* temp = new BaseNode("select statement(if)");
         temp->addChildNode($3);
         $3->addCousinNode($5);
         $$ = temp;
     }
-    | IF LB expression RB statement ELSE statement {
+    | IF LB expression RB statement ELSE statement %prec LOWER_THAN_ELSE{
         BaseNode* temp = new BaseNode("select statement(if)");
         temp->addChildNode($3);
         $3->addCousinNode($5);
@@ -205,33 +203,35 @@ statement: expression SEM {
         temp->addCousinNode(else_node);
         $$ = temp;
     }
-    | WHILE LB expression RB statement {
+    | WHILE LB expression RB statement { //ok
         BaseNode* temp = new BaseNode("loop statement(while)");
         temp->addChildNode($3);
         $3->addCousinNode($5);
         $$ = temp;
     }
 
-    | FOR LB SEM SEM RB statement{
+    | FOR LB SEM SEM RB statement{ //ok
         BaseNode* temp = new BaseNode("loop statement(for)");
         temp->addChildNode($6);
         $$ = temp;
     }
+    | FOR LB declaration_for SEM SEM RB statement{
 
-    | FOR LB SEM expression SEM RB statement{
+    }
+    | FOR LB SEM expression SEM RB statement{ //ok
         BaseNode* temp = new BaseNode("loop statement(for)");
         temp->addChildNode($4);
         $4->addCousinNode($7);
         $$ = temp;
     }
-    | FOR LB SEM SEM expression RB statement{
+    | FOR LB SEM SEM expression RB statement{ //OK
         BaseNode* temp = new BaseNode("loop statement(for)");
         temp->addChildNode($5);
         $5->addCousinNode($7);
         $$ = temp;
 
     }
-    | FOR LB declaration_for SEM expression SEM expression RB statement {
+    | FOR LB declaration_for SEM expression SEM expression RB statement { //OK
         BaseNode* temp = new BaseNode("loop statement(for)");
         temp->addChildNode($3);
         $3->addCousinNode($5);
@@ -239,34 +239,25 @@ statement: expression SEM {
         $7->addCousinNode($9);
         $$ = temp;
     }
-    | FOR LB declaration_for SEM expression SEM RB statement  {
+    | FOR LB declaration_for SEM expression SEM RB statement  { //OK
         BaseNode* temp = new BaseNode("loop statement(for)");
         temp->addChildNode($3);
         $3->addCousinNode($5);
         $5->addCousinNode($8);
         $$ = temp;
     }
-    | FOR LB declaration_for SEM SEM expression RB statement  {
+    | FOR LB declaration_for SEM SEM expression RB statement  { //OK
         BaseNode* temp = new BaseNode("loop statement(for)");
         temp->addChildNode($3);
         $3->addCousinNode($6);
         $6->addCousinNode($8);
         $$ = temp;
     }
-    | FOR LB SEM expression SEM expression RB statement {
+    | FOR LB SEM expression SEM expression RB statement { //OK
         BaseNode* temp = new BaseNode("loop statement(for)");
         temp->addChildNode($4);
         $4->addCousinNode($6);
         $6->addCousinNode($8);
-        $$ = temp;
-    }
-    | RETURN expression SEM {
-        BaseNode* temp = new BaseNode("return statement");
-        temp->addChildNode($2);
-        $$ = temp;
-    }
-    | RETURN SEM {
-        BaseNode* temp = new BaseNode("return statement");
         $$ = temp;
     }
     | error SEM { yyerrok; }  /*官方没报错 参考代码报错了不知道为啥*/
@@ -316,9 +307,9 @@ expression: expression ASSIGNOP expression {
             $$ = temp;
         }
         | expression RELOP expression {
-            char* s = "";
-            sprintf(s, "operator: %s", $2);
-            BaseNode* temp = new BaseNode(s, op);
+            // char* s = "";
+            // sprintf(s, "operator: %s", $2);
+            BaseNode* temp = new BaseNode($2);
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
@@ -373,16 +364,12 @@ expression: expression ASSIGNOP expression {
             $$ = temp;
         }
         | ID LB argument_expression_list RB {
-            char* s = "";
-            sprintf(s, "call function name: %s", $1);
-            BaseNode* temp = new BaseNode(s);
+            BaseNode* temp = new BaseNode($1);
             temp->addChildNode($3);
             $$ = temp;
         }
         | ID LB RB {
-            char* s = "";
-            sprintf(s, "call function name: %s", $1);
-            BaseNode* temp = new BaseNode(s);
+            $$ = new BaseNode($1);
         }
         | expression MLB expression MRB {
             $$ = NULL;
@@ -392,18 +379,14 @@ expression: expression ASSIGNOP expression {
         }
         | ID MLB expression MRB {
             BaseNode* op = new BaseNode("operator: []");
-            char* s = "";
-            sprintf(s, "variable: %s", $1);
-            BaseNode* temp = new BaseNode(s);
+            BaseNode* temp = new BaseNode($1);
             $$ = op;
             op->addChildNode(temp);
             temp->addCousinNode($3);
         }
         | ID '.' ID {}
         | INT {
-            char* s = "";
-            sprintf(s, "literal: %s", $1);
-            $$ = new BaseNode(s);
+            $$ = new BaseNode($1);
         }
         | MUL ID {}
         | error RB {yyerrok;}  /*当不可计算的表达式被读入后，上述第三条规则将识别出这个错误，解析将继续。yyerror 仍将被调用以打印出一条消息。第三条规则对应的动作是一个宏 yyerrok*/

@@ -243,19 +243,19 @@ Stmt: Exp ';' {
     | FOR '(' ';' ';' ')' Stmt {
         $$ = new LoopASTNode((char*)"", LoopType::_for, $6, NULL, NULL, NULL);
     }
-    | FOR '(' DecFor ';' ';' ')' Stmt {
+    | FOR '(' DecFor ';' ';' ')' Stmt { // 无
         $$ = new LoopASTNode((char*)"", LoopType::_for, $7, $3, NULL, NULL);
     }
-    | FOR '(' ';' Exp ';' ')' Stmt {
+    | FOR '(' ';' Exp ';' ')' Stmt { //OK
         $$ = new LoopASTNode((char*)"", LoopType::_for, $7, NULL, $4, NULL);
     }
-    | FOR '(' ';' ';' Exp ')' Stmt {
+    | FOR '(' ';' ';' Exp ')' Stmt { //OK
         $$ = new LoopASTNode((char*)"", LoopType::_for, $7, NULL, NULL, $5);
     }
-    | FOR '(' DecFor ';' Exp ';' Exp ')' Stmt {
+    | FOR '(' DecFor ';' Exp ';' Exp ')' Stmt { //OK
         $$ = new LoopASTNode((char*)"", LoopType::_for, $9, $3, $5, $7);
     }
-    | FOR '(' DecFor ';' Exp ';' ')' Stmt {
+    | FOR '(' DecFor ';' Exp ';' ')' Stmt {//ok
         $$ = new LoopASTNode((char*)"", LoopType::_for, $8, $3, $5, NULL);
     }
     | FOR '(' DecFor ';' ';' Exp ')' Stmt { // for ( decfor ; ; expression )statement
