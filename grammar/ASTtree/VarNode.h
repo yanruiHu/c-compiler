@@ -2,24 +2,21 @@
 #define _VARNODE_H_
 
 #include "./BaseNode.h"
-#include "../../lexical/symbol/symbol.h"
 
 namespace AST {
 
-    class DeclareVarNode : public BaseNode {
-    private:
-        SMB::SymbolType var_type;       // type 字段被 ASTNodeType 占用
-        int array_length;               // for array
-        std::string struct_name;
-
+    class DefineVarNode : public BaseNode {
     public:
-        DeclareVarNode();
-        DeclareVarNode(char*);
-        void print_info(int);
+        DefineVarNode();
+        DefineVarNode(std::string);
+        virtual void printInfo(int) override;
     };
 
     class AssignVarNode : public BaseNode {
-
+    public:
+        AssignVarNode();
+        AssignVarNode(std::string);
+        virtual void printInfo(int) override;
     };
 
 } // namespace AST

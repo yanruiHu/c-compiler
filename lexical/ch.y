@@ -3,7 +3,7 @@
 // #include "hdr.h"
 #include <string.h>
 #include <fstream>
-#include "../grammar/ASTtree/BaseNode.h"
+#include "../grammar/Nodes.h"
 
 using AST::BaseNode;
 class BaseNode;
@@ -57,7 +57,7 @@ extern int yylineno;
 %%
 /*注：有关declarator的和declaration的yacc逻辑过于混乱，保证准确起见参考了lpy的*/
 program: translation_unit { 
-        root = new BaseNode();
+        root = new BaseNode("code start!", AST::root);
         root->addChildNode($1);
     }
     ;
@@ -116,38 +116,19 @@ struct_declaration: specifier ID ';' { $$ = NULL; }
 
 /* declarationorator 装饰符 声明？格式*/
 direct_declarator: ID {
-        std::string s = "variable defination, name: ";
-        s = s + $1;
-        $$ = new BaseNode(s);
-        // $$ = new BaseNode($1);
+        $$ = new AST::DefineVarNode($1);
     }
     | ID '[' INT ']' {
-        // char* s = "";
-        // sprintf(s, "variable defination (array), name: %s, length: %s", $1, $3);
-        // $$ = new BaseNode(s);
-        std::string s = "variable defination (array), name: ";
+        std::string s = "array name: ";
         s = s + $1 + ", length: " + $3;
-        $$ = new BaseNode(s);
-        // $$ = new BaseNode($3);
+        $$ = new AST::DefineVarNode(s);
     }
     ;
 func_declarator: ID '(' parameter_list ')' { 
-        // char* s = "";
-        // sprintf(s, "func defination, name: %s", $1);
-        // $$ = new BaseNode(s);
-        std::string s = "func defination, name: ";
-        s = s + $1;
-        $$ = new BaseNode(s);
-        // $$ = new BaseNode($1);
+        $$ = new AST::DefineFuncNode($1);
     }
     | ID '(' ')' {
-        // char* s = "";
-        // sprintf(s, "func defination, name: %s", $1);
-        // $$ = new BaseNode(s);
-        std::string s = "func defination, name: ";
-        s = s + $1;
-        $$ = new BaseNode(s);
-        // $$ = new BaseNode($1);
+        $$ = new AST::DefineFuncNode($1);
     }
     ;
 parameter_list: parameter_list ',' parameter_declaration {
@@ -157,13 +138,7 @@ parameter_list: parameter_list ',' parameter_declaration {
     | parameter_declaration { $$ = $1; }
     ;
 parameter_declaration: specifier ID {
-        // char* s = "";
-        // sprintf(s, "variable defination, name: %s", $1);
-        // $$ = new BaseNode(s);
-        std::string s = "variable defination, name: ";
-        s = s + $1;
-        $$ = new BaseNode(s);
-        // $$ = new BaseNode($1);
+        $$ = new AST::DefineVarNode($1);
     }
     | specifier {}
     ;
@@ -171,7 +146,7 @@ parameter_declaration: specifier ID {
 
 /* Statement 声明*/
 compound_statement: '{' block_item_list '}' {
-        BaseNode* temp = new BaseNode("compound statement");
+        BaseNode* temp = new AST::StatementNode(AST::compoundation);
         temp->addChildNode($2);
         $$ = temp;
     }
@@ -196,50 +171,50 @@ declaration_for: defination { $$ = $1; }
     ;
 
 statement: expression ';' { 
-        BaseNode* temp = new BaseNode("expression statement");
+        BaseNode* temp = new AST::StatementNode(AST::expression);
         temp->addChildNode($1);
         $$ = temp;
     }
     | defination ';' { 
-        BaseNode* temp = new BaseNode("defination statement");
+        BaseNode* temp = new AST::StatementNode(AST::defination);
         temp->addChildNode($1);
         $$ = temp;
     }
-    | STRUCT ID ID ';' {$$ =NULL;}
+    | STRUCT ID ID ';' { $$ =NULL; }
     | compound_statement { $$=$1;}
     | RETURN expression ';' {
-        BaseNode* temp = new BaseNode("return statement");
+        BaseNode* temp = new AST::StatementNode(AST::return_stmt);
         temp->addChildNode($2);
         $$ = temp;
     }
     | RETURN ';' {
-        BaseNode* temp = new BaseNode("return statement");
+        BaseNode* temp = new AST::StatementNode(AST::return_stmt);
         $$ = temp;
     }
     | IF '(' expression ')' statement {  // ok
-        BaseNode* temp = new BaseNode("select statement(if)");
+        BaseNode* temp = new AST::SelectNode(AST::if_stmt);
         temp->addChildNode($3);
         $3->addCousinNode($5);
         $$ = temp;
     }
     | IF '(' expression ')' statement ELSE statement %prec LOWER_THAN_ELSE{
-        BaseNode* temp = new BaseNode("select statement(if)");
+        BaseNode* temp = new AST::SelectNode(AST::if_stmt);
         temp->addChildNode($3);
         $3->addCousinNode($5);
-        BaseNode* else_node = new BaseNode("select statement(else)");
+        BaseNode* else_node = new AST::SelectNode(AST::else_stmt);
         else_node->addChildNode($7);
         temp->addCousinNode(else_node);
         $$ = temp;
     }
     | WHILE '(' expression ')' statement { //ok
-        BaseNode* temp = new BaseNode("loop statement(while)");
+        BaseNode* temp = new AST::LoopNode(AST::while_loop);
         temp->addChildNode($3);
         $3->addCousinNode($5);
         $$ = temp;
     }
 
     | FOR '(' ';' ';' ')' statement{ //ok
-        BaseNode* temp = new BaseNode("loop statement(for)");
+        BaseNode* temp = new AST::LoopNode(AST::for_loop);
         temp->addChildNode($6);
         $$ = temp;
     }
@@ -247,20 +222,20 @@ statement: expression ';' {
 
     }
     | FOR '(' ';' expression ';' ')' statement{ //ok
-        BaseNode* temp = new BaseNode("loop statement(for)");
+        BaseNode* temp = new AST::LoopNode(AST::for_loop);
         temp->addChildNode($4);
         $4->addCousinNode($7);
         $$ = temp;
     }
     | FOR '(' ';' ';' expression ')' statement{ //OK
-        BaseNode* temp = new BaseNode("loop statement(for)");
+        BaseNode* temp = new AST::LoopNode(AST::for_loop);
         temp->addChildNode($5);
         $5->addCousinNode($7);
         $$ = temp;
 
     }
     | FOR '(' declaration_for ';' expression ';' expression ')' statement { //OK
-        BaseNode* temp = new BaseNode("loop statement(for)");
+        BaseNode* temp = new AST::LoopNode(AST::for_loop);
         temp->addChildNode($3);
         $3->addCousinNode($5);
         $5->addCousinNode($7);
@@ -268,21 +243,21 @@ statement: expression ';' {
         $$ = temp;
     }
     | FOR '(' declaration_for ';' expression ';' ')' statement  { //OK
-        BaseNode* temp = new BaseNode("loop statement(for)");
+        BaseNode* temp = new AST::LoopNode(AST::for_loop);
         temp->addChildNode($3);
         $3->addCousinNode($5);
         $5->addCousinNode($8);
         $$ = temp;
     }
     | FOR '(' declaration_for ';' ';' expression ')' statement  { //OK
-        BaseNode* temp = new BaseNode("loop statement(for)");
+        BaseNode* temp = new AST::LoopNode(AST::for_loop);
         temp->addChildNode($3);
         $3->addCousinNode($6);
         $6->addCousinNode($8);
         $$ = temp;
     }
     | FOR '(' ';' expression ';' expression ')' statement { //OK
-        BaseNode* temp = new BaseNode("loop statement(for)");
+        BaseNode* temp = new AST::LoopNode(AST::for_loop);
         temp->addChildNode($4);
         $4->addCousinNode($6);
         $6->addCousinNode($8);
@@ -308,7 +283,7 @@ declaration_list: declaration { $$ = $1; }
 
 declaration: direct_declarator { $$ = $1; }
     | direct_declarator '=' expression {
-        $$ = new BaseNode("operator: =");
+        $$ = new AST::OperatorNode("=");
         $$->addChildNode($1);
         $1->addCousinNode($3);
     }
@@ -317,68 +292,61 @@ declaration: direct_declarator { $$ = $1; }
 
 /* expressionression */
 expression: expression '=' expression {
-            BaseNode* temp = NULL;
-            temp = new BaseNode("operator: =");
+            BaseNode* temp = new AST::OperatorNode("=");
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
         | expression AND expression {
-            BaseNode* temp = new BaseNode("operator: &&");
+            BaseNode* temp = new AST::OperatorNode("&&");
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
         | expression OR expression {
-            BaseNode* temp = new BaseNode("operator: ||");
+            BaseNode* temp = new AST::OperatorNode("||");
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
         | expression RELOP expression {
-            // char* s = "";
-            // sprintf(s, "operator: %s", $2);
-            // BaseNode* temp = new BaseNode(s);
-            // BaseNode* temp = new BaseNode($2);
-            std::string s = "operator: ";
-            s = s + $2;
-            BaseNode* temp = new BaseNode(s);
+            BaseNode* temp = new AST::OperatorNode($2);
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
         | expression '+' expression {
-            BaseNode* temp = new BaseNode("operator: +");
+            BaseNode* temp = new AST::OperatorNode("+");
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
         | expression '-' expression {
-            BaseNode* temp = new BaseNode("operator: -");
+            BaseNode* temp = new AST::OperatorNode("-");
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
         | expression '*' expression {
-            BaseNode* temp = new BaseNode("operator: *");
+            BaseNode* temp = new AST::OperatorNode("*");
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
         | expression '/' expression {
-            BaseNode* temp = new BaseNode("operator: /");
+            BaseNode* temp = new AST::OperatorNode("/");
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
         | expression '%' expression {
-            BaseNode* temp = new BaseNode("operator: %");
+            BaseNode* temp = new AST::OperatorNode("%");
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
         | expression '^' expression {
-            BaseNode* temp = new BaseNode("operator: ^");
+            BaseNode* temp = new AST::OperatorNode("^");
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
@@ -387,63 +355,39 @@ expression: expression '=' expression {
             $$ = $2;
         }
         | '-' expression {
-            BaseNode* temp = new BaseNode("operator: -");
+            BaseNode* temp = new AST::OperatorNode("-");
             temp->addChildNode($2);
             $$ = temp;
         }
         | '!' expression {
-            BaseNode* temp = new BaseNode("operator: !");
+            BaseNode* temp = new AST::OperatorNode("!");
             temp->addChildNode($2);
             $$ = temp;
         }
         | ID '(' argument_expression_list ')' {
-            // char* s = "";
-            // sprintf(s, "call function name: %s", $1);
-            // BaseNode* temp = new BaseNode(s);
-            std::string s = "call function name: ";
-            s = s + $1;
-            BaseNode* temp = new BaseNode(s);
-            // BaseNode* temp = new BaseNode($1);
+            BaseNode* temp = new AST::CallFuncNode($1);
             temp->addChildNode($3);
             $$ = temp;
         }
         | ID '(' ')' {
-            // char* s = "";
-            // sprintf(s, "call function name: %s", $1);
-            // BaseNode* temp = new BaseNode(s);
-            std::string s = "call function name: ";
-            s = s + $1;
-            $$ = new BaseNode(s);
-            // $$ = new BaseNode($1);$$ = new BaseNode($1);
+            $$ = new AST::CallFuncNode($1);
         }
         | expression '[' expression ']' {
             $$ = NULL;
         }
         | ID {
-            $$ = new BaseNode($1);
+            $$ = new AST::AssignVarNode($1);
         }
         | ID '[' expression ']' {
-            BaseNode* op = new BaseNode("operator: []");
-            // char* s = "";
-            // sprintf(s, "variable: %s", $1);
-            // BaseNode* temp = new BaseNode(s);
-            std::string s = "variable: ";
-            s = s + $1;
-            BaseNode* temp = new BaseNode(s);
-            // BaseNode* temp = new BaseNode($1);
+            BaseNode* op = new AST::OperatorNode("[]");
+            BaseNode* temp = new AST::AssignVarNode($1);
             $$ = op;
             op->addChildNode(temp);
             temp->addCousinNode($3);
         }
         | ID '.' ID {}
         | INT {
-            // char* s = "";
-            // sprintf(s, "literal: %s", $1);
-            // $$ = new BaseNode(s);
-            std::string s = "literal: ";
-            s = s + $1;
-            $$ = new BaseNode(s);
-            // $$ = new BaseNode($1);
+            $$ = new AST::LiteralNode($1);
         }
         | '*' ID {}
         | error ')' {yyerrok;}  /*当不可计算的表达式被读入后，上述第三条规则将识别出这个错误，解析将继续。yyerror 仍将被调用以打印出一条消息。第三条规则对应的动作是一个宏 yyerrok*/

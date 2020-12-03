@@ -19,7 +19,7 @@ AST::BaseNode::BaseNode(ASTNodeType type) {
     this->parent = NULL;
     this->cousin = NULL;
     this->type = type;
-    this->content = "code start!";
+    this->content = "";
 }
 
 AST::BaseNode::BaseNode(std::string content, ASTNodeType type) {
@@ -46,15 +46,17 @@ void AST::BaseNode::addChildNode(AST::BaseNode* node) {
 }
 
 void AST::BaseNode::printInfo(int depth) {
-    while(depth) {
+    /* while(depth) {
         std::cout << "   ";
         depth--;
-    }
-    std::cout << this->content << std::endl;
+    } */
+    std::cout << this->content << " in BaseNode!";
 }
 
 void AST::BaseNode::tree(AST::BaseNode* node, int depth, bool flag, std::vector<bool> pre_sep) {
-    std::cout << prefix[!flag] << node->content << std::endl;
+    std::cout << prefix[!flag] << node->getASTNodeType() << " ";
+    node->printInfo(depth);
+    std::cout << std::endl;
     ++depth;
     pre_sep.push_back(flag);
 
@@ -66,7 +68,9 @@ void AST::BaseNode::tree(AST::BaseNode* node, int depth, bool flag, std::vector<
         AST::BaseNode* temp = node->child;
         if (!temp) {
             bool f = node->cousin;
-            std::cout << prefix[f] << node->content << std::endl;
+            std::cout << prefix[f] << node->getASTNodeType() << " ";
+            node->printInfo(depth);
+            std::cout << std::endl;
         } else {
             bool f = node->cousin;
             std::vector<bool> v(pre_sep);
@@ -76,12 +80,12 @@ void AST::BaseNode::tree(AST::BaseNode* node, int depth, bool flag, std::vector<
     }
 }
 
-void AST::BaseNode::tree(AST::BaseNode* node, int depth) {
-    if (!node) return;
-    node->printInfo(depth);
-    AST::BaseNode::tree(node->child, depth + 1);
-    AST::BaseNode::tree(node->cousin, depth);
-}
+// void AST::BaseNode::tree(AST::BaseNode* node, int depth) {
+//     if (!node) return;
+//     node->printInfo(depth);
+//     AST::BaseNode::tree(node->child, depth + 1);
+//     AST::BaseNode::tree(node->cousin, depth);
+// }
 
 void AST::BaseNode::printTree() {
     // AST::BaseNode::tree(this, 0);
