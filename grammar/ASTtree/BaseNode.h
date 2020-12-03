@@ -38,8 +38,8 @@ namespace AST {
     public:
         BaseNode();
         BaseNode(ASTNodeType);
-        BaseNode(char*, ASTNodeType);
-        BaseNode(char*);
+        BaseNode(std::string, ASTNodeType);
+        BaseNode(std::string);
         inline void setParentNode(BaseNode *parent) { this->parent = parent; }
         inline ASTNodeType getASTNodeType() { return this->type; }
         void addChildNode(BaseNode*);

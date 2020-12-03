@@ -118,7 +118,7 @@ struct_declaration: specifier ID ';' { $$ = NULL; }
 direct_declarator: ID {
         std::string s = "variable defination, name: ";
         s = s + $1;
-        $$ = new BaseNode(strdup(s.c_str()));
+        $$ = new BaseNode(s);
         // $$ = new BaseNode($1);
     }
     | ID '[' INT ']' {
@@ -127,7 +127,7 @@ direct_declarator: ID {
         // $$ = new BaseNode(s);
         std::string s = "variable defination (array), name: ";
         s = s + $1 + ", length: " + $3;
-        $$ = new BaseNode(strdup(s.c_str()));
+        $$ = new BaseNode(s);
         // $$ = new BaseNode($3);
     }
     ;
@@ -137,7 +137,7 @@ func_declarator: ID '(' parameter_list ')' {
         // $$ = new BaseNode(s);
         std::string s = "func defination, name: ";
         s = s + $1;
-        $$ = new BaseNode(strdup(s.c_str()));
+        $$ = new BaseNode(s);
         // $$ = new BaseNode($1);
     }
     | ID '(' ')' {
@@ -146,7 +146,7 @@ func_declarator: ID '(' parameter_list ')' {
         // $$ = new BaseNode(s);
         std::string s = "func defination, name: ";
         s = s + $1;
-        $$ = new BaseNode(strdup(s.c_str()));
+        $$ = new BaseNode(s);
         // $$ = new BaseNode($1);
     }
     ;
@@ -162,7 +162,7 @@ parameter_declaration: specifier ID {
         // $$ = new BaseNode(s);
         std::string s = "variable defination, name: ";
         s = s + $1;
-        $$ = new BaseNode(strdup(s.c_str()));
+        $$ = new BaseNode(s);
         // $$ = new BaseNode($1);
     }
     | specifier {}
@@ -342,7 +342,7 @@ expression: expression '=' expression {
             // BaseNode* temp = new BaseNode($2);
             std::string s = "operator: ";
             s = s + $2;
-            BaseNode* temp = new BaseNode(strdup(s.c_str()));
+            BaseNode* temp = new BaseNode(s);
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
@@ -402,7 +402,7 @@ expression: expression '=' expression {
             // BaseNode* temp = new BaseNode(s);
             std::string s = "call function name: ";
             s = s + $1;
-            BaseNode* temp = new BaseNode(strdup(s.c_str()));
+            BaseNode* temp = new BaseNode(s);
             // BaseNode* temp = new BaseNode($1);
             temp->addChildNode($3);
             $$ = temp;
@@ -413,7 +413,7 @@ expression: expression '=' expression {
             // BaseNode* temp = new BaseNode(s);
             std::string s = "call function name: ";
             s = s + $1;
-            $$ = new BaseNode(strdup(s.c_str()));
+            $$ = new BaseNode(s);
             // $$ = new BaseNode($1);$$ = new BaseNode($1);
         }
         | expression '[' expression ']' {
@@ -429,7 +429,7 @@ expression: expression '=' expression {
             // BaseNode* temp = new BaseNode(s);
             std::string s = "variable: ";
             s = s + $1;
-            BaseNode* temp = new BaseNode(strdup(s.c_str()));
+            BaseNode* temp = new BaseNode(s);
             // BaseNode* temp = new BaseNode($1);
             $$ = op;
             op->addChildNode(temp);
@@ -442,7 +442,7 @@ expression: expression '=' expression {
             // $$ = new BaseNode(s);
             std::string s = "literal: ";
             s = s + $1;
-            $$ = new BaseNode(strdup(s.c_str()));
+            $$ = new BaseNode(s);
             // $$ = new BaseNode($1);
         }
         | '*' ID {}
@@ -479,6 +479,6 @@ int main(int argc,char * argv[]){  //不确定语法的在哪里输出
 	} while(!feof(yyin));
     fclose(yyin);
     if(root) root->printTree();
-    delete root;
+    if(root) delete root;
     return 0;
 }

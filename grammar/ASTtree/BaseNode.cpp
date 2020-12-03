@@ -7,11 +7,11 @@ AST::BaseNode::BaseNode() {
     this->content = "code start!";
 }
 
-AST::BaseNode::BaseNode(char* string) {
+AST::BaseNode::BaseNode(std::string content) {
     this->child = NULL;
     this->parent = NULL;
     this->cousin = NULL;
-    this->content = string;
+    this->content = content;
 }
 
 AST::BaseNode::BaseNode(ASTNodeType type) {
@@ -22,7 +22,7 @@ AST::BaseNode::BaseNode(ASTNodeType type) {
     this->content = "code start!";
 }
 
-AST::BaseNode::BaseNode(char* content, ASTNodeType type) {
+AST::BaseNode::BaseNode(std::string content, ASTNodeType type) {
     this->child = NULL;
     this->parent = NULL;
     this->cousin = NULL;
