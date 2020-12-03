@@ -11,7 +11,7 @@ extern char *yytext;
 extern int yylex();
 extern FILE * yyin;
 void yyerror(const char* s);
-BaseNode* root;
+BaseNode* root = NULL;
 extern int yylineno;
 %}
 
@@ -24,23 +24,23 @@ extern int yylineno;
 %locations
 %define parse.error verbose
 
-%right <ast> ASSIGNOP
+%right <ast> '='
 %left <ast> OR
 %left <ast> AND
 %left <str> RELOP
-%left <ast> DEC ADD
-%left <ast> MUL DIV MOD
-%left <ast> POWER
-%right <ast> NOT
-%left LB RB MLB MRB
+%left <ast> '-' '+'
+%left <ast> '*' '/' '%'
+%left <ast> '^'
+%right <ast> '!'
+%left '(' ')' '[' ']'
 %nonassoc LOWER_THAN_ELSE
 %token ERRID
 %token <str> ID   //终结符
 %token <str> INT VOID
-%token COM SEM // , ;
+%token ',' ';' // , ;
 %token STRUCT
 %token IF ELSE WHILE FOR CONTINUE RETURN ERRORCHAR GETMEMBER
-%token BLB BRB //{}
+%token '{' '}' //{}
 
 
 
@@ -75,22 +75,22 @@ translation_unit: external_declaration {
         }
     }
     ;
-external_declaration: specifier external_declaration_list SEM {
+external_declaration: specifier external_declaration_list ';' {
         $$ = $2;
     }
-    | specifier SEM {}
+    | specifier ';' {}
     | specifier func_declarator compound_statement {
         $2->addChildNode($3);
         $$ = $2;
     }
-    | specifier func_declarator SEM  {
+    | specifier func_declarator ';'  {
         $$ = $2;
     }
-    | struct_specifier SEM {$$ = $1;}
-    | error SEM { yyerrok; $$ = NULL;}
+    | struct_specifier ';' {$$ = $1;}
+    | error ';' { yyerrok; $$ = NULL;}
     ;
 external_declaration_list: direct_declarator { $$ = $1; }
-    | external_declaration_list COM direct_declarator {
+    | external_declaration_list ',' direct_declarator {
         $1->getFinalCousinNode()->addCousinNode($3);
         $$ = $1;
     }
@@ -100,18 +100,18 @@ external_declaration_list: direct_declarator { $$ = $1; }
 /* specifiers 说明符*/
 specifier: INT { $$ = strdup("int"); }
     | VOID { $$ = strdup("void"); }
-    | INT MUL { $$ = strdup("int ptr"); }
-    | VOID MUL { $$ = strdup("void ptr"); }
+    | INT '*' { $$ = strdup("int ptr"); }
+    | VOID '*' { $$ = strdup("void ptr"); }
     ;
 
-struct_specifier: STRUCT ID BLB struct_declaration_list BRB { $$ = NULL; }
+struct_specifier: STRUCT ID '{' struct_declaration_list '}' { $$ = NULL; }
     ;
 
 struct_declaration_list: struct_declaration { $$ = NULL; }
     | struct_declaration_list struct_declaration{ $$ = NULL; }
     ;
 
-struct_declaration: specifier ID SEM { $$ = NULL; }
+struct_declaration: specifier ID ';' { $$ = NULL; }
     ;
 
 /* declarationorator 装饰符 声明？格式*/
@@ -121,7 +121,7 @@ direct_declarator: ID {
         $$ = new BaseNode(strdup(s.c_str()));
         // $$ = new BaseNode($1);
     }
-    | ID MLB INT MRB {
+    | ID '[' INT ']' {
         // char* s = "";
         // sprintf(s, "variable defination (array), name: %s, length: %s", $1, $3);
         // $$ = new BaseNode(s);
@@ -131,7 +131,7 @@ direct_declarator: ID {
         // $$ = new BaseNode($3);
     }
     ;
-func_declarator: ID LB parameter_list RB { 
+func_declarator: ID '(' parameter_list ')' { 
         // char* s = "";
         // sprintf(s, "func defination, name: %s", $1);
         // $$ = new BaseNode(s);
@@ -140,7 +140,7 @@ func_declarator: ID LB parameter_list RB {
         $$ = new BaseNode(strdup(s.c_str()));
         // $$ = new BaseNode($1);
     }
-    | ID LB RB {
+    | ID '(' ')' {
         // char* s = "";
         // sprintf(s, "func defination, name: %s", $1);
         // $$ = new BaseNode(s);
@@ -150,7 +150,7 @@ func_declarator: ID LB parameter_list RB {
         // $$ = new BaseNode($1);
     }
     ;
-parameter_list: parameter_list COM parameter_declaration {
+parameter_list: parameter_list ',' parameter_declaration {
         $1->getFinalCousinNode()->addCousinNode($3);
         $$ = $1;
     }
@@ -170,12 +170,12 @@ parameter_declaration: specifier ID {
 
 
 /* Statement 声明*/
-compound_statement: BLB block_item_list BRB {
+compound_statement: '{' block_item_list '}' {
         BaseNode* temp = new BaseNode("compound statement");
         temp->addChildNode($2);
         $$ = temp;
     }
-    | error BRB { yyerrok; }
+    | error '}' { yyerrok; }
     ;
 
 block_item_list: block_item_list statement {
@@ -195,34 +195,34 @@ declaration_for: defination { $$ = $1; }
     | expression { $$ = $1; }
     ;
 
-statement: expression SEM { 
+statement: expression ';' { 
         BaseNode* temp = new BaseNode("expression statement");
         temp->addChildNode($1);
         $$ = temp;
     }
-    | defination SEM { 
+    | defination ';' { 
         BaseNode* temp = new BaseNode("defination statement");
         temp->addChildNode($1);
         $$ = temp;
     }
-    | STRUCT ID ID SEM {$$ =NULL;}
+    | STRUCT ID ID ';' {$$ =NULL;}
     | compound_statement { $$=$1;}
-    | RETURN expression SEM {
+    | RETURN expression ';' {
         BaseNode* temp = new BaseNode("return statement");
         temp->addChildNode($2);
         $$ = temp;
     }
-    | RETURN SEM {
+    | RETURN ';' {
         BaseNode* temp = new BaseNode("return statement");
         $$ = temp;
     }
-    | IF LB expression RB statement {  // ok
+    | IF '(' expression ')' statement {  // ok
         BaseNode* temp = new BaseNode("select statement(if)");
         temp->addChildNode($3);
         $3->addCousinNode($5);
         $$ = temp;
     }
-    | IF LB expression RB statement ELSE statement %prec LOWER_THAN_ELSE{
+    | IF '(' expression ')' statement ELSE statement %prec LOWER_THAN_ELSE{
         BaseNode* temp = new BaseNode("select statement(if)");
         temp->addChildNode($3);
         $3->addCousinNode($5);
@@ -231,35 +231,35 @@ statement: expression SEM {
         temp->addCousinNode(else_node);
         $$ = temp;
     }
-    | WHILE LB expression RB statement { //ok
+    | WHILE '(' expression ')' statement { //ok
         BaseNode* temp = new BaseNode("loop statement(while)");
         temp->addChildNode($3);
         $3->addCousinNode($5);
         $$ = temp;
     }
 
-    | FOR LB SEM SEM RB statement{ //ok
+    | FOR '(' ';' ';' ')' statement{ //ok
         BaseNode* temp = new BaseNode("loop statement(for)");
         temp->addChildNode($6);
         $$ = temp;
     }
-    | FOR LB declaration_for SEM SEM RB statement{
+    | FOR '(' declaration_for ';' ';' ')' statement{
 
     }
-    | FOR LB SEM expression SEM RB statement{ //ok
+    | FOR '(' ';' expression ';' ')' statement{ //ok
         BaseNode* temp = new BaseNode("loop statement(for)");
         temp->addChildNode($4);
         $4->addCousinNode($7);
         $$ = temp;
     }
-    | FOR LB SEM SEM expression RB statement{ //OK
+    | FOR '(' ';' ';' expression ')' statement{ //OK
         BaseNode* temp = new BaseNode("loop statement(for)");
         temp->addChildNode($5);
         $5->addCousinNode($7);
         $$ = temp;
 
     }
-    | FOR LB declaration_for SEM expression SEM expression RB statement { //OK
+    | FOR '(' declaration_for ';' expression ';' expression ')' statement { //OK
         BaseNode* temp = new BaseNode("loop statement(for)");
         temp->addChildNode($3);
         $3->addCousinNode($5);
@@ -267,28 +267,28 @@ statement: expression SEM {
         $7->addCousinNode($9);
         $$ = temp;
     }
-    | FOR LB declaration_for SEM expression SEM RB statement  { //OK
+    | FOR '(' declaration_for ';' expression ';' ')' statement  { //OK
         BaseNode* temp = new BaseNode("loop statement(for)");
         temp->addChildNode($3);
         $3->addCousinNode($5);
         $5->addCousinNode($8);
         $$ = temp;
     }
-    | FOR LB declaration_for SEM SEM expression RB statement  { //OK
+    | FOR '(' declaration_for ';' ';' expression ')' statement  { //OK
         BaseNode* temp = new BaseNode("loop statement(for)");
         temp->addChildNode($3);
         $3->addCousinNode($6);
         $6->addCousinNode($8);
         $$ = temp;
     }
-    | FOR LB SEM expression SEM expression RB statement { //OK
+    | FOR '(' ';' expression ';' expression ')' statement { //OK
         BaseNode* temp = new BaseNode("loop statement(for)");
         temp->addChildNode($4);
         $4->addCousinNode($6);
         $6->addCousinNode($8);
         $$ = temp;
     }
-    | error SEM { yyerrok; }  /*官方没报错 参考代码报错了不知道为啥*/
+    | error ';' { yyerrok; }  /*官方没报错 参考代码报错了不知道为啥*/
     ;
 
 
@@ -296,18 +296,18 @@ statement: expression SEM {
 defination: specifier declaration_list  {
         $$ = $2;
     }
-    | error SEM { yyerrok; }
+    | error ';' { yyerrok; }
     ;
 
 declaration_list: declaration { $$ = $1; }
-    | declaration COM declaration_list {
+    | declaration ',' declaration_list {
         $1->getFinalCousinNode()->addCousinNode($3);
         $$ = $1;
     }
     ;
 
 declaration: direct_declarator { $$ = $1; }
-    | direct_declarator ASSIGNOP expression {
+    | direct_declarator '=' expression {
         $$ = new BaseNode("operator: =");
         $$->addChildNode($1);
         $1->addCousinNode($3);
@@ -316,7 +316,7 @@ declaration: direct_declarator { $$ = $1; }
 
 
 /* expressionression */
-expression: expression ASSIGNOP expression {
+expression: expression '=' expression {
             BaseNode* temp = NULL;
             temp = new BaseNode("operator: =");
             temp->addChildNode($1);
@@ -347,56 +347,56 @@ expression: expression ASSIGNOP expression {
             $1->addCousinNode($3);
             $$ = temp;
         }
-        | expression ADD expression {
+        | expression '+' expression {
             BaseNode* temp = new BaseNode("operator: +");
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
-        | expression DEC expression {
+        | expression '-' expression {
             BaseNode* temp = new BaseNode("operator: -");
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
-        | expression MUL expression {
+        | expression '*' expression {
             BaseNode* temp = new BaseNode("operator: *");
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
-        | expression DIV expression {
+        | expression '/' expression {
             BaseNode* temp = new BaseNode("operator: /");
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
-        | expression MOD expression {
+        | expression '%' expression {
             BaseNode* temp = new BaseNode("operator: %");
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
-        | expression POWER expression {
+        | expression '^' expression {
             BaseNode* temp = new BaseNode("operator: ^");
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
-        | LB expression RB {
+        | '(' expression ')' {
             $$ = $2;
         }
-        | DEC expression {
+        | '-' expression {
             BaseNode* temp = new BaseNode("operator: -");
             temp->addChildNode($2);
             $$ = temp;
         }
-        | NOT expression {
+        | '!' expression {
             BaseNode* temp = new BaseNode("operator: !");
             temp->addChildNode($2);
             $$ = temp;
         }
-        | ID LB argument_expression_list RB {
+        | ID '(' argument_expression_list ')' {
             // char* s = "";
             // sprintf(s, "call function name: %s", $1);
             // BaseNode* temp = new BaseNode(s);
@@ -407,7 +407,7 @@ expression: expression ASSIGNOP expression {
             temp->addChildNode($3);
             $$ = temp;
         }
-        | ID LB RB {
+        | ID '(' ')' {
             // char* s = "";
             // sprintf(s, "call function name: %s", $1);
             // BaseNode* temp = new BaseNode(s);
@@ -416,13 +416,13 @@ expression: expression ASSIGNOP expression {
             $$ = new BaseNode(strdup(s.c_str()));
             // $$ = new BaseNode($1);$$ = new BaseNode($1);
         }
-        | expression MLB expression MRB {
+        | expression '[' expression ']' {
             $$ = NULL;
         }
         | ID {
             $$ = new BaseNode($1);
         }
-        | ID MLB expression MRB {
+        | ID '[' expression ']' {
             BaseNode* op = new BaseNode("operator: []");
             // char* s = "";
             // sprintf(s, "variable: %s", $1);
@@ -445,24 +445,20 @@ expression: expression ASSIGNOP expression {
             $$ = new BaseNode(strdup(s.c_str()));
             // $$ = new BaseNode($1);
         }
-        | MUL ID {}
-        | error RB {yyerrok;}  /*当不可计算的表达式被读入后，上述第三条规则将识别出这个错误，解析将继续。yyerror 仍将被调用以打印出一条消息。第三条规则对应的动作是一个宏 yyerrok*/
+        | '*' ID {}
+        | error ')' {yyerrok;}  /*当不可计算的表达式被读入后，上述第三条规则将识别出这个错误，解析将继续。yyerror 仍将被调用以打印出一条消息。第三条规则对应的动作是一个宏 yyerrok*/
         ;
 argument_expression_list: expression {
             $$ = $1;
         }
-        | argument_expression_list COM expression {
+        | argument_expression_list ',' expression {
             $1->getFinalCousinNode()->addCousinNode($3);
             $$ = $1;
         }
         ;
 %%
 
-/*
-* Editor:Liuyin
-* Content: Add main() modify yyerror
-* 
-*/
+
 void yyerror(const char* s) {
 	fprintf(stderr, "Parse error: At line %d. %s\n", yylineno, s);
 	exit(1);
@@ -482,6 +478,7 @@ int main(int argc,char * argv[]){  //不确定语法的在哪里输出
 		yyparse();
 	} while(!feof(yyin));
     fclose(yyin);
-    root->printTree();
+    if(root) root->printTree();
+    delete root;
     return 0;
 }

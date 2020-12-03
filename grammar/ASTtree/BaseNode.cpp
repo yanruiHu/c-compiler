@@ -1,6 +1,5 @@
 #include "./BaseNode.h"
 
-// 
 AST::BaseNode::BaseNode() {
     this->child = NULL;
     this->parent = NULL;
@@ -8,7 +7,6 @@ AST::BaseNode::BaseNode() {
     this->content = "code start!";
 }
 
-// 
 AST::BaseNode::BaseNode(char* string) {
     this->child = NULL;
     this->parent = NULL;
@@ -16,7 +14,6 @@ AST::BaseNode::BaseNode(char* string) {
     this->content = string;
 }
 
-// 
 AST::BaseNode::BaseNode(ASTNodeType type) {
     this->child = NULL;
     this->parent = NULL;
@@ -25,7 +22,6 @@ AST::BaseNode::BaseNode(ASTNodeType type) {
     this->content = "code start!";
 }
 
-//
 AST::BaseNode::BaseNode(char* content, ASTNodeType type) {
     this->child = NULL;
     this->parent = NULL;
@@ -99,6 +95,15 @@ AST::BaseNode *AST::BaseNode::getFinalCousinNode() {
         node = node->cousin;
     }
     return node;
+}
+
+AST::BaseNode::~BaseNode() {
+    if (this->cousin) {
+        delete this->cousin;
+    }
+    if (this->child) {
+        delete this->child;
+    }
 }
 
 // // for test

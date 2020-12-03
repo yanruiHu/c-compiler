@@ -8,7 +8,7 @@
 namespace AST {
 
     enum ASTNodeType {
-        root_ = 0,
+        root = 0,
         dec_var = 1,
         assign_var = 2,
         dec_func = 3,
@@ -16,7 +16,7 @@ namespace AST {
         op = 5,
         stmt = 6,
         loop = 7, 
-        //select = 8,
+        select = 8,
         literal = 9,        // unknown
     };
 
@@ -48,6 +48,7 @@ namespace AST {
         void printTree();
         inline std::string getContent() { return this->content; }
         void printInfo(int);
+        ~BaseNode();
     };
 
 }

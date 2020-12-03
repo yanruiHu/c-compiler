@@ -41,23 +41,23 @@ int   ([1-9]|[1-9]([0-9])+|0)
 
 "&&"                                {return(AND);}
 "||"                                {return(OR);}
-"="                                 {return(ASSIGNOP);}
-"!"                                 {return(NOT);} 
-"+"                                 {return(ADD);}
-"-"                                 {return(DEC);}
-"*"                                 {return(MUL);}
-"/"                                 {return(DIV);}
+"="                                 {return('=');}
+"!"                                 {return('!');} 
+"+"                                 {return('+');}
+"-"                                 {return('-');}
+"*"                                 {return('*');}
+"/"                                 {return('/');}
 
-"%"                                 {return(MOD);}
-"^"                                 {return(POWER);}
-","                                 {return(COM);}
-";"                                 {return(SEM);}
-"("                                 {return(LB);}
-")"                                 {return(RB);}
-"["                                 {return(MLB);}
-"]"                                 {return(MRB);}
-"{"                                 {return(BLB);}
-"}"                                 {return(BRB);}
+"%"                                 {return('%');}
+"^"                                 {return('^');}
+","                                 {return(',');}
+";"                                 {return(';');}
+"("                                 {return('(');}
+")"                                 {return(')');}
+"["                                 {return('[');}
+"]"                                 {return(']');}
+"{"                                 {return('{');}
+"}"                                 {return('}');}
 
 [ \t\v\f\r\n]                       { }
 {int}                               {yylval.str=strdup(yytext);return(INT);}
