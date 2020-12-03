@@ -50,7 +50,7 @@ void AST::BaseNode::printInfo(int depth) {
         std::cout << "   ";
         depth--;
     } */
-    std::cout << this->content << " in BaseNode!";
+    std::cout << this->content;
 }
 
 void AST::BaseNode::tree(AST::BaseNode* node, int depth, bool flag, std::vector<bool> pre_sep) {
