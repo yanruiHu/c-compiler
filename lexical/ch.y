@@ -76,6 +76,8 @@ translation_unit: external_declaration {
     }
     ;
 external_declaration: specifier external_declaration_list ';' {
+        // add by zxy
+        $2.setAllSymbolType($1);
         $$ = $2;
     }
     | specifier ';' {}
