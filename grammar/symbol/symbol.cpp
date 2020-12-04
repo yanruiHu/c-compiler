@@ -21,6 +21,7 @@ STE::SymbolType SMB::Symbol::getType() {
 
 
 //FuncSymbol
+//检查StatementType == Compoundation,如果是，就开辟新的作用域，首先把参数插入新作用域符号表
 SMB::FuncSymbol::FuncSymbol() {
     
 }
@@ -43,13 +44,7 @@ bool SMB::FuncSymbol::operator==(const SMB::FuncSymbol& second) {
 }
 
 SMB::SymbolTable::SymbolTable() {
-    this->parent_table = NULL;
-    this->child_table = NULL;
-    this->cousin_table = NULL;
-    // SymbolTable::root_table = this;
 
-    this->total_symbol_count = 0;
-    this->total_offset = 4;
 }
 
 SMB::SymbolTable::SymbolTable(SymbolTable *parent) {
@@ -57,6 +52,7 @@ SMB::SymbolTable::SymbolTable(SymbolTable *parent) {
     this->child_table = NULL;
     this->cousin_table = NULL;
     
+    // 遍历找到根作用域
     SymbolTable *p = this;
     while (p->parent_table)
     {
