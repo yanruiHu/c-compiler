@@ -1,7 +1,5 @@
-void main() {
-    int a = 2,b;
-    while(a>0){
-    	a = a - 1;
-    }
-    print(a);
+int main(){
+	int i = 1;
+	int i = 2;
+	print(i);
 }

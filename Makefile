@@ -17,7 +17,7 @@ CXXVER = c++11
 $(PROGRAM): $(OBJ)
 	$(CXX) -o $(PROGRAM) $(OBJ) -std=$(CXXVER) -g
 
-grammar: ./lexical/lexical.l ./lexical/ch.y
+grammara: ./lexical/lexical.l ./lexical/ch.y
 ifeq ($(GRAMMAREXIST),notexist)
 	mkdir $(GRAMMARFOLDER)
 endif
