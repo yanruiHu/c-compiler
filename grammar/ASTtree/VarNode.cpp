@@ -1,23 +1,23 @@
 #include "./VarNode.h"
 
 AST::DefineVarNode::DefineVarNode() : BaseNode(AST::def_var) {
-    this->symbol_type = SMB::SymbolType::none;
+    this->symbol_type = STE::SymbolType::none;
 }
 
 // AST::DefineVarNode::DefineVarNode(std::string content, BaseNode *child)
 // : BaseNode(content, AST::def_var) {
-//     this->symbol_type = SMB::SymbolType::none;
+//     this->symbol_type = STE::SymbolType::none;
 //     this->addChildNode(child);
 // }
 
 AST::DefineVarNode::DefineVarNode(std::string content, std::string struct_name)
 : BaseNode(content, AST::def_var) {
-    this->symbol_type = SMB::SymbolType::struct_type;
+    this->symbol_type = STE::SymbolType::struct_type;
     this->struct_name = struct_name;
 }
 
 AST::DefineVarNode::DefineVarNode(std::string content) : BaseNode(content, AST::def_var) {
-    this->symbol_type = SMB::SymbolType::none;
+    this->symbol_type = STE::SymbolType::none;
 }
 
 void AST::DefineVarNode::printInfo(int) {
@@ -25,24 +25,26 @@ void AST::DefineVarNode::printInfo(int) {
 }
 
 void AST::DefineVarNode::setAllSymbolType(std::string symbol_type) {
-    SMB::SymbolType var_type;
+    std::cout<<"setAllSymbolType"<<std::endl;
+    STE::SymbolType var_type;
     if (symbol_type == "int") {
-        var_type = SMB::SymbolType::integer;
+        var_type = STE::SymbolType::integer;
     } else if (symbol_type == "void") {
-        var_type = SMB::SymbolType::void_type;
+        var_type = STE::SymbolType::void_type;
     } else if (symbol_type == "int ptr") {
-        var_type = SMB::SymbolType::pointer;
+        var_type = STE::SymbolType::pointer;
     } else if (symbol_type == "struct") {
-        var_type = SMB::SymbolType::struct_type;
+        var_type = STE::SymbolType::struct_type;
     } else if (symbol_type == "array") {
-        var_type = SMB::SymbolType::array;
+        var_type = STE::SymbolType::array;
     }
-    if (this->symbol_type == SMB::SymbolType::none) {
+    if (this->symbol_type == STE::SymbolType::none) {
         this->symbol_type = var_type;
     }
+    std::cout<<var_type;
     DefineVarNode *cousin = (DefineVarNode *)this->getCousinNode();
     while (cousin != NULL) {
-        if (cousin->symbol_type == SMB::SymbolType::none) {
+        if (cousin->symbol_type == STE::SymbolType::none) {
             cousin->symbol_type = var_type;
         }
         cousin = (DefineVarNode *)cousin->getCousinNode();

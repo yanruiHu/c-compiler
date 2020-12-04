@@ -3,34 +3,24 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include "../Nodes.h"
+#include "../ASTtree/BaseNode.h"
+#include "./SymbolType.h"
+#include "../ASTtree/VarNode.h"
+
 #define INT_OFFSET 4
 namespace SMB {
-
-    enum SymbolType {
-        none = 0, //undefine
-        integer = 1,
-        pointer = 2,
-        boolean = 3,
-        void_type = 4,
-        struct_type = 5, // for struct
-        array = 6,
-        literal = 7,
-        function = 8,
-    };
-
     class Symbol {
     protected:
         std::string name;
-        SymbolType type;
+        STE::SymbolType type;
         int offset;
         int index;
 
     public:
         Symbol();
-        Symbol(std::string name, SymbolType type);
+        Symbol(std::string name, STE::SymbolType type);
         const std::string getName();
-        SymbolType getType();
+        STE::SymbolType getType();
         inline int getOffset() { return offset; }
         inline int getIndex() { return index; }
         inline void setOffset(int offset) { this->offset = offset; }
@@ -40,9 +30,9 @@ namespace SMB {
     class FuncSymbol : public Symbol {
         private:
             std::string dec_name;
-            std::vector<SymbolType> arg_type_list;
+            std::vector<STE::SymbolType> arg_type_list;
             int total_arg_offset;
-            SymbolType rtn_type;
+            STE::SymbolType rtn_type;
         
         public:
             FuncSymbol();
@@ -65,9 +55,9 @@ namespace SMB {
             int total_offset;
             //int argTotalOffset;                     // 参数偏移量  
             //bool isFunctionTable;
-           static SymbolTable *root_table;
+            SymbolTable *root_table;
 
-            SymbolTable(SymbolTable *parent);
+            
             Symbol *findInTable(const std::string name);
             //void visitFuncArgs(AbstractASTNode *arg, int &offset, int &index);
         
@@ -75,6 +65,7 @@ namespace SMB {
             static const int SUCCESS=1;
             static const int FAIL=0;
             SymbolTable();
+            SymbolTable(SymbolTable *parent);
             int addSymbol(AST::BaseNode *node);
             //int addStructSymbol(std::string structTypeName, std::string structIdName);
             //void addFromFunctionArgs(AbstractASTNode *func);

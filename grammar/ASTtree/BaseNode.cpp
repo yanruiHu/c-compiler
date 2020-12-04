@@ -80,15 +80,15 @@ void AST::BaseNode::tree(AST::BaseNode* node, int depth, bool flag, std::vector<
     }
 }
 
-void AST::BaseNode::tree(SMB::SymbolTable* table,AST::BaseNode* node, int depth) {
-    if (!node) return;
-    //node->printInfo(depth);
-    if(node->type==def_var){
-        table->addSymbol(node);
-    }
-    AST::BaseNode::tree(table,node->child, depth + 1);
-    AST::BaseNode::tree(table,node->cousin, depth);
-}
+// void AST::BaseNode::tree(SMB::SymbolTable* table,AST::BaseNode* node, int depth) {
+//     if (!node) return;
+//     //node->printInfo(depth);
+//     if(node->type==def_var){
+//         table->addSymbol(node);
+//     }
+//     AST::BaseNode::tree(table,node->child, depth + 1);
+//     AST::BaseNode::tree(table,node->cousin, depth);
+// }
 
 void AST::BaseNode::printTree() {
     // AST::BaseNode::tree(this, 0);

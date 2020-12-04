@@ -3,10 +3,10 @@
 
 SMB::Symbol::Symbol() {
     this->name = "";
-    this->type = SMB::SymbolType::integer;
+    this->type = STE::SymbolType::integer;
 }
 
-SMB::Symbol::Symbol(std::string name, SMB::SymbolType type) {
+SMB::Symbol::Symbol(std::string name, STE::SymbolType type) {
     this->name = name;
     this->type = type;
 }
@@ -15,7 +15,7 @@ const std::string SMB::Symbol::getName() {
     return this->name;
 }
 
-SMB::SymbolType SMB::Symbol::getType() {
+STE::SymbolType SMB::Symbol::getType() {
     return this->type;
 }
 
@@ -46,7 +46,7 @@ SMB::SymbolTable::SymbolTable() {
     this->parent_table = NULL;
     this->child_table = NULL;
     this->cousin_table = NULL;
-    this->root_table = this;
+    // SymbolTable::root_table = this;
 
     this->total_symbol_count = 0;
     this->total_offset = 4;
@@ -57,6 +57,12 @@ SMB::SymbolTable::SymbolTable(SymbolTable *parent) {
     this->child_table = NULL;
     this->cousin_table = NULL;
     
+    SymbolTable *p = this;
+    while (p->parent_table)
+    {
+        p = p->parent_table;
+    }
+    this->root_table = p;   
     this->total_symbol_count = 0;
     this->total_offset = 4;
 }
@@ -74,26 +80,26 @@ SMB::Symbol* SMB::SymbolTable::findInTable(const std::string name){
 int SMB::SymbolTable::addSymbol(AST::BaseNode *node){
     std::string name = node->getContent();
     AST::ASTNodeType node_type = node->getASTNodeType();
-    if(node_type==AST::def_var){
-        AST::DefineVarNode* tmp = (AST::DefineVarNode*)node;
-        SMB::SymbolType symbol_type = tmp->getSymbolType();
-        Symbol *s = new Symbol(name,symbol_type);
-        if(this->findSymbol(s->getName())){
-            return FAIL;
-        }else{
-            this->root_table->symbol_list->push_back(s);
-            s->setIndex(this->root_table->total_symbol_count++);
-            s->setOffset(this->root_table->total_offset);
-            if(symbol_type == SymbolType::integer || symbol_type == SymbolType::pointer){
-                this->root_table->total_offset += INT_OFFSET;
-            }else if(symbol_type == SymbolType::array){
-                this->root_table->total_offset += 0;//加一个数组长度
-            }
-            this->symbol_hash_map[s->getName()]==s;
-            std::cout<<"add symbol:"<<s->getName();
-            return SUCCESS;
-        }   
-    }
+    AST::DefineVarNode* tmp = (AST::DefineVarNode*)node;
+    STE::SymbolType symbol_type = tmp->getSymbolType();
+    std::cout<<name<<symbol_type;
+    Symbol *s = new Symbol(name,symbol_type);
+    if(this->findSymbol(s->getName())){
+        std::cout<<"FAIL"<<std::endl;
+        return FAIL;
+    }else{
+        this->root_table->symbol_list->push_back(s);
+        s->setIndex(this->root_table->total_symbol_count++);
+        s->setOffset(this->root_table->total_offset);
+        if(symbol_type == STE::SymbolType::integer || symbol_type == STE::SymbolType::pointer){
+            //this->root_table->total_offset += INT_OFFSET;
+        }else if(symbol_type == STE::SymbolType::array){
+            //this->root_table->total_offset += 0;//加一个数组长度
+        }
+        this->symbol_hash_map[s->getName()]==s;
+        std::cout<<"add symbol:"<<s->getName();
+        return SUCCESS;
+    }   
 }
 
 SMB::SymbolTable* SMB::SymbolTable::createChildTable(){

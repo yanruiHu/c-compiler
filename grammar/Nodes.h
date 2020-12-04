@@ -10,5 +10,7 @@
 #include "./ASTtree/StatementNode.h"
 #include "./ASTtree/VarNode.h"
 #include "./symbol/symbol.h"
+#include "./symbol/SymbolType.h"
+#include "./SymbolTableTree.h"
 
 #endif // _NODES_H_

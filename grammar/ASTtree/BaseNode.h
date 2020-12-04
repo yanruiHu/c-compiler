@@ -4,7 +4,6 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "../symbol/symbol.h"
 
 namespace AST {
 
@@ -33,7 +32,6 @@ namespace AST {
 
     protected:
         std::string content;
-        static void tree(SMB::SymbolTable* table,BaseNode*, int);
         static void tree(BaseNode*, int, bool, std::vector<bool>);
 
     public:
