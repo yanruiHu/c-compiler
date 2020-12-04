@@ -273,7 +273,9 @@ statement: expression ';' {
 
 /* Local Definitions 参考代码上注释是这个*/
 defination: specifier declaration_list  {
-        $$ = $2;
+        AST::DefineVarNode* tmp = (AST::DefineVarNode*)($2->getChildNode());
+        tmp->setAllSymbolType($1);
+        $$ = tmp;
     }
     | error ';' { yyerrok; }
     ;
