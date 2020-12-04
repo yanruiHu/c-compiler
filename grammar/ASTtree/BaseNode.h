@@ -20,9 +20,9 @@ namespace AST {
         literal = 9,
     };
 
-    static std::string prefix[2] = {"`- ", "|- "};
-    static std::string separator[2] = {"|  ", "   "};
-
+    static std::string prefix[2] = {"└─ ", "├─ "};
+    static std::string separator[2] = {"│  ", "   "};
+    
     class BaseNode {
     private:
         ASTNodeType type;
