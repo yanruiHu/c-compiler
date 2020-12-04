@@ -10,6 +10,7 @@ namespace AST {
     public:
         LiteralNode();
         LiteralNode(std::string);
+        int getValue();
         virtual void printInfo(int) override;
     };
 

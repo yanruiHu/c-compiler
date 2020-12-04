@@ -14,12 +14,18 @@ namespace AST {
     class LoopNode: public BaseNode {
     private:
         LoopType loop_type;
-        
+        BaseNode *cond; // 条件，for循环中的第二句
+        BaseNode *dec;  // for循环中的第一句
+        BaseNode *action;   // for循环中的第三句
     public:
         LoopNode();
         LoopNode(std::string);
         LoopNode(LoopType);
         LoopNode(std::string, LoopType);
+        // while循环
+        LoopNode(std::string, LoopType, BaseNode*);
+        // for循环
+        LoopNode(std::string, LoopType, BaseNode*, BaseNode*, BaseNode*);
         virtual void printInfo(int) override;
     };
     

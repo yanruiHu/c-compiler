@@ -7,27 +7,30 @@
 namespace AST {
 
     enum OperatorType {
-        add = 0,
-        minus = 1,
-        multi = 2,
-        div = 3,
-        pow = 4,
-        and_op = 5, 
-        or_op = 6,
-        eq = 7,
-        not_op = 8,
-        negative = 9,
-        relop = 10,
-        mod = 11,
+        none = 0,   // 未设置
+        add = 1,    // +
+        minus = 2,  // -
+        multi = 3,  // *
+        div = 4,    // /
+        pow = 5,    // ^
+        and_op = 6, // &&
+        or_op = 7,  // ||
+        eq = 8,     // ==
+        not_op = 9, // !
+        negative = 10,   // -
+        relop = 11, // =
+        mod = 12,   // %
+        get_adress = 13 // &
     };
     
     class OperatorNode: public BaseNode {
     private:
         OperatorType op_type;
-        
     public:
         OperatorNode();
         OperatorNode(std::string);
+        OperatorNode(std::string, OperatorType);
+        inline OperatorType getOpType() {return this->op_type;}
         virtual void printInfo(int) override;
     };
 
