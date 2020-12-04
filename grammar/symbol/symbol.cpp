@@ -27,16 +27,21 @@ SMB::FuncSymbol::FuncSymbol() {
 }
 
 SMB::FuncSymbol::FuncSymbol(AST::BaseNode* node) {
-    this->name = node->getContent();
-    // this->arg_type_list = NULL;
-    // this->rtn_type = rtn_type;
-    // for(size_t i = 0; i < type_list.size();i++){
-    //     if(type_list[i] == SymbolType::integer){
-    //         this->dec_name += "_i";
-    //     }else if(type_list[i]==SymbolType::pointer){
-    //         this->dec_name += "_p";
-    //     }
-    // }
+    AST::DefineFuncNode* tmp_node = (AST::DefineFuncNode*)node;
+    this->dec_name = tmp_node->getContent();
+    this->arg_list =tmp_node->getArgList();
+    this->rtn_type = tmp_node->getReturnSymbolType();
+
+    AST::DefineVarNode* p = (AST::DefineVarNode*)this->arg_list;
+    while(p){
+        STE::SymbolType arg_type = p->getSymbolType();
+        if(arg_type == STE::SymbolType::integer){
+            this->dec_name += "_i";
+        }else if(arg_type == STE::SymbolType::pointer){
+            this->dec_name += "_p";
+        }
+        p = (AST::DefineVarNode*)(p->getCousinNode());
+    }
 }
 
 bool SMB::FuncSymbol::operator==(const SMB::FuncSymbol& second) {
@@ -67,11 +72,14 @@ SMB::SymbolTable::SymbolTable(SymbolTable *parent) {
 
 // 解决重定义问题
 SMB::Symbol* SMB::SymbolTable::findInTable(const std::string name){
+    std::cout<<name<<std::endl;
     std::unordered_map<std::string, SMB::Symbol *>::iterator iter;
     iter = this->symbol_hash_map.find(name);
     if (iter!=this->symbol_hash_map.end()){
+        std::cout<<"find"<<std::endl;
         return iter->second;
     }else{
+        std::cout<<"NULL"<<std::endl;
         return NULL;
     }
 }
@@ -101,6 +109,26 @@ int SMB::SymbolTable::addSymbol(AST::BaseNode *node){
     }   
 }
 
+int SMB::SymbolTable::addFuncSymbol(SMB::FuncSymbol *func_symbol){
+    if((this->findInTable(func_symbol->getDecName()))==NULL){
+        this->root_table->symbol_list->push_back(func_symbol);
+        //func_symbol->setIndex(this->root_table->total_symbol_count++);
+        //offset部分
+        std::string tmp_func_name = func_symbol->getDecName();
+        std::cout<<tmp_func_name<<std::endl;
+        this->symbol_hash_map[tmp_func_name]=func_symbol;
+        if((this->symbol_hash_map[tmp_func_name])==NULL){
+            std::cout<<"wrong"<<std::endl;
+        }
+        std::string tmp = ((SMB::FuncSymbol*)(this->symbol_hash_map[tmp_func_name]))->getDecName();
+        std::cout<<"add function:"<<tmp<<std::endl;
+        return SUCCESS;
+    }else{
+        //重定义
+        return FAIL;
+    }
+}
+
 SMB::SymbolTable* SMB::SymbolTable::createChildTable(){
     SymbolTable *child = new SymbolTable(this);
     if(this->child_table == NULL){
@@ -117,6 +145,7 @@ SMB::SymbolTable* SMB::SymbolTable::createChildTable(){
             }
         }
     }
+    return child;
 }
 
 // 解决undefine的问题

@@ -6,6 +6,7 @@
 #include "../ASTtree/BaseNode.h"
 #include "./SymbolType.h"
 #include "../ASTtree/VarNode.h"
+#include "../ASTtree/FuncNode.h"
 
 #define INT_OFFSET 4
 namespace SMB {
@@ -30,7 +31,7 @@ namespace SMB {
     class FuncSymbol : public Symbol {
         private:
             std::string dec_name;
-            std::vector<STE::SymbolType> arg_type_list;
+            AST::BaseNode* arg_list;
             int total_arg_offset;
             STE::SymbolType rtn_type;
         
@@ -67,6 +68,7 @@ namespace SMB {
             SymbolTable();
             SymbolTable(SymbolTable *parent);
             int addSymbol(AST::BaseNode *node);
+            int addFuncSymbol(FuncSymbol *func_symbol);
             //int addStructSymbol(std::string structTypeName, std::string structIdName);
             //void addFromFunctionArgs(AbstractASTNode *func);
             SymbolTable* createChildTable();

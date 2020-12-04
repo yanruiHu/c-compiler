@@ -16,6 +16,7 @@ namespace AST {
         DefineFuncNode(std::string);
         DefineFuncNode(std::string, BaseNode*);
         inline BaseNode* getArgList() {return this->arg_list;}
+        inline STE::SymbolType getReturnSymbolType(){return this->return_symbol_type;}
         void setReturnSymbolType(std::string);
         virtual void printInfo(int) override;
     };

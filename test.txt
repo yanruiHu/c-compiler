@@ -1,6 +1,4 @@
-int func(int a){
-    int b = 1;
-}
 int main(){
+    int i =1;
     int i =1;
 }
