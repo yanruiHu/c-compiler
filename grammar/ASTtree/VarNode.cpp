@@ -21,7 +21,11 @@ AST::DefineVarNode::DefineVarNode(std::string content) : BaseNode(content, AST::
 }
 
 void AST::DefineVarNode::printInfo(int) {
-    std::cout << "variable defination: " << this->content;
+    if (this->symbol_type == STE::SymbolType::array) {
+        std::cout << "array defination: " << this-> content << "length: " << this->array_length;
+    } else {
+        std::cout << "variable defination: " << this->content;
+    }
 }
 
 void AST::DefineVarNode::setAllSymbolType(std::string symbol_type) {

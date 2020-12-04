@@ -77,20 +77,23 @@ translation_unit: external_declaration {
     }
     ;
 external_declaration: specifier external_declaration_list ';' {
-        // add by zxy
         AST::DefineVarNode* tmp = (AST::DefineVarNode*)$2;
         tmp->setAllSymbolType($1);
         $$ = tmp;
     }
     | specifier ';' {}
     | specifier func_declarator compound_statement {
-        $2->addChildNode($3);
-        $$ = $2;
+        AST::DefineFuncNode* tmp = (AST::DefineFuncNode*) $2;
+        tmp->addChildNode($3);
+        tmp->setReturnSymbolType($1);
+        $$ = tmp;
     }
     | specifier func_declarator ';'  {
-        $$ = $2;
+        AST::DefineFuncNode* tmp = (AST::DefineFuncNode*) $2;
+        tmp->setReturnSymbolType($1);
+        $$ = tmp;
     }
-    | struct_specifier ';' {$$ = $1;}
+    | struct_specifier ';' { $$ = $1;}
     | error ';' { yyerrok; $$ = NULL;}
     ;
 external_declaration_list: direct_declarator { $$ = $1; }
@@ -123,13 +126,16 @@ direct_declarator: ID {
         $$ = new AST::DefineVarNode($1);
     }
     | ID '[' INT ']' {
-        std::string s = "array name: ";
-        s = s + $1 + ", length: " + $3;
-        $$ = new AST::DefineVarNode(s);
+        // std::string s = "array name: ";
+        // s = s + $1 + ", length: " + $3;
+        AST::DefineVarNode* tmp = new AST::DefineVarNode($1);
+        tmp->setAllSymbolType("array");
+        tmp->setArrayLength($3);
+        $$ = tmp;
     }
     ;
 func_declarator: ID '(' parameter_list ')' { 
-        $$ = new AST::DefineFuncNode($1);
+        $$ = new AST::DefineFuncNode($1, $3);
     }
     | ID '(' ')' {
         $$ = new AST::DefineFuncNode($1);
@@ -142,9 +148,15 @@ parameter_list: parameter_list ',' parameter_declaration {
     | parameter_declaration { $$ = $1; }
     ;
 parameter_declaration: specifier ID {
-        $$ = new AST::DefineVarNode($1);
+        AST::DefineVarNode* tmp = new AST::DefineVarNode($2);
+        tmp->setAllSymbolType($1);
+        $$ = tmp;
     }
-    | specifier {}
+    | specifier {
+        AST::DefineVarNode* tmp = new AST::DefineVarNode("");
+        tmp->setAllSymbolType($1);
+        $$ = tmp;
+    }
     ;
 
 
