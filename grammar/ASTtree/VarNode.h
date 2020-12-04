@@ -2,7 +2,7 @@
 #define _VARNODE_H_
 
 #include "./BaseNode.h"
-#include "../../lexical/symbol/symbol.h"
+#include "../symbol/symbol.h"
 
 namespace AST {
 

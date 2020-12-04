@@ -4,6 +4,7 @@
 #include <string.h>
 #include <fstream>
 #include "../grammar/Nodes.h"
+#include "./symbol/symbol.h"
 
 using AST::BaseNode;
 class BaseNode;
@@ -425,6 +426,8 @@ int main(int argc,char * argv[]){  //不确定语法的在哪里输出
 	} while(!feof(yyin));
     fclose(yyin);
     if(root) root->printTree();
+    SymbolTable* root_symbol_table = new SymbolTable();
+    root->tree(root_symbol_table,root,0);
     if(root) delete root;
     return 0;
 }

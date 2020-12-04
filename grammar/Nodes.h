@@ -9,5 +9,6 @@
 #include "./ASTtree/SelectNode.h"
 #include "./ASTtree/StatementNode.h"
 #include "./ASTtree/VarNode.h"
+#include "./symbol/symbol.h"
 
 #endif // _NODES_H_
