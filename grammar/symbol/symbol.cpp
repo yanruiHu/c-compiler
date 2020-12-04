@@ -65,12 +65,15 @@ SMB::SymbolTable::SymbolTable(SymbolTable *parent) {
     this->root_table = p;   
     this->total_symbol_count = 0;
     this->total_offset = 4;
+
+    this->symbol_list = new std::vector<SMB::Symbol *>();
 }
 
+// 解决重定义问题
 SMB::Symbol* SMB::SymbolTable::findInTable(const std::string name){
     std::unordered_map<std::string, SMB::Symbol *>::iterator iter;
     iter = this->symbol_hash_map.find(name);
-    if (iter !=this->symbol_hash_map.end()){
+    if (iter!=this->symbol_hash_map.end()){
         return iter->second;
     }else{
         return NULL;
@@ -82,23 +85,23 @@ int SMB::SymbolTable::addSymbol(AST::BaseNode *node){
     AST::ASTNodeType node_type = node->getASTNodeType();
     AST::DefineVarNode* tmp = (AST::DefineVarNode*)node;
     STE::SymbolType symbol_type = tmp->getSymbolType();
-    std::cout<<name<<symbol_type;
     Symbol *s = new Symbol(name,symbol_type);
-    if(this->findSymbol(s->getName())){
-        std::cout<<"FAIL"<<std::endl;
-        return FAIL;
-    }else{
+    if((this->findInTable(name))==NULL){
         this->root_table->symbol_list->push_back(s);
         s->setIndex(this->root_table->total_symbol_count++);
         s->setOffset(this->root_table->total_offset);
+        //offset的地方可能还需要修改
         if(symbol_type == STE::SymbolType::integer || symbol_type == STE::SymbolType::pointer){
-            //this->root_table->total_offset += INT_OFFSET;
+            this->root_table->total_offset += INT_OFFSET;
         }else if(symbol_type == STE::SymbolType::array){
             //this->root_table->total_offset += 0;//加一个数组长度
         }
-        this->symbol_hash_map[s->getName()]==s;
-        std::cout<<"add symbol:"<<s->getName();
+        this->symbol_hash_map[s->getName()]=s;
+        std::cout<<"add symbol:"<<s->getName()<<std::endl;
         return SUCCESS;
+    }else{
+        // 重定义了
+        return FAIL; 
     }   
 }
 
@@ -120,6 +123,7 @@ SMB::SymbolTable* SMB::SymbolTable::createChildTable(){
     }
 }
 
+// 解决undefine的问题
 SMB::Symbol* SMB::SymbolTable::findSymbol(std::string name){
     SymbolTable *tmp = this;
     while(tmp != NULL){
