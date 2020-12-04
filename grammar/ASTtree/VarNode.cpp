@@ -29,7 +29,6 @@ void AST::DefineVarNode::printInfo(int) {
 }
 
 void AST::DefineVarNode::setAllSymbolType(std::string symbol_type) {
-    std::cout<<"setAllSymbolType"<<std::endl;
     STE::SymbolType var_type;
     if (symbol_type == "int") {
         var_type = STE::SymbolType::integer;
