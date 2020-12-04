@@ -4,7 +4,7 @@
 #include <string.h>
 #include <fstream>
 #include "../grammar/Nodes.h"
-#include "./symbol/symbol.h"
+#include "../grammar/symbol/symbol.h"
 
 using AST::BaseNode;
 class BaseNode;
@@ -78,8 +78,9 @@ translation_unit: external_declaration {
     ;
 external_declaration: specifier external_declaration_list ';' {
         // add by zxy
-        $2.setAllSymbolType($1);
-        $$ = $2;
+        AST::DefineVarNode* tmp = (AST::DefineVarNode*)$2;
+        tmp->setAllSymbolType($1);
+        $$ = tmp;
     }
     | specifier ';' {}
     | specifier func_declarator compound_statement {
@@ -426,8 +427,8 @@ int main(int argc,char * argv[]){  //不确定语法的在哪里输出
 	} while(!feof(yyin));
     fclose(yyin);
     if(root) root->printTree();
-    SymbolTable* root_symbol_table = new SymbolTable();
-    root->tree(root_symbol_table,root,0);
+    SMB::SymbolTable* root_symbol_table = new SMB::SymbolTable(NULL);
+    tree(root_symbol_table,root,0);
     if(root) delete root;
     return 0;
 }
