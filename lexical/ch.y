@@ -96,12 +96,25 @@ external_declaration: specifier external_declaration_list ';' {
     | struct_specifier ';' { $$ = $1;}
     | error ';' { yyerrok; $$ = NULL;}
     ;
-external_declaration_list: direct_declarator { $$ = $1; }
-    | external_declaration_list ',' direct_declarator {
+external_declaration_list: init_declarator_list { $$ = $1; }  //修改
+    | external_declaration_list ',' init_declarator_list {
         $1->getFinalCousinNode()->addCousinNode($3);
         $$ = $1;
     }
     ;
+init_declarator_list:init_declarator{
+
+    }
+    | init_declarator_list ',' init_declarator{
+
+    }
+    ;
+init_declarator: direct_declarator{
+
+    }
+    | direct_declarator '=' INT{
+        
+    }
 /*↑*/
 
 /* specifiers 说明符*/
@@ -221,61 +234,49 @@ statement: expression ';' {
         $$ = temp;
     }
     | WHILE '(' expression ')' statement { //ok
-        BaseNode* temp = new AST::LoopNode(AST::while_loop);
-        temp->addChildNode($3);
-        $3->addCousinNode($5);
+        BaseNode* temp = new AST::LoopNode("", AST::while_loop, $3);
+        temp->addChildNode($5);
         $$ = temp;
     }
 
-    | FOR '(' ';' ';' ')' statement{ //ok
-        BaseNode* temp = new AST::LoopNode(AST::for_loop);
+    | FOR '(' ';' ';' ')' statement{
+        BaseNode* temp = new AST::LoopNode("", AST::for_loop, NULL, NULL, NULL);
         temp->addChildNode($6);
         $$ = temp;
     }
     | FOR '(' declaration_for ';' ';' ')' statement{
         BaseNode* temp = new AST::LoopNode("", AST::for_loop, NULL, $3, NULL);
         temp->addChildNode($7);
-    }
-    | FOR '(' ';' expression ';' ')' statement{ //ok
-        BaseNode* temp = new AST::LoopNode(AST::for_loop);
-        temp->addChildNode($4);
-        $4->addCousinNode($7);
         $$ = temp;
     }
-    | FOR '(' ';' ';' expression ')' statement{ //OK
-        BaseNode* temp = new AST::LoopNode(AST::for_loop);
-        temp->addChildNode($5);
-        $5->addCousinNode($7);
+    | FOR '(' ';' expression ';' ')' statement{ 
+        BaseNode* temp = new AST::LoopNode("", AST::for_loop, $4, NULL, NULL);
+        temp->addChildNode($7);
         $$ = temp;
-
     }
-    | FOR '(' declaration_for ';' expression ';' expression ')' statement { //OK
-        BaseNode* temp = new AST::LoopNode(AST::for_loop);
-        temp->addChildNode($3);
-        $3->addCousinNode($5);
-        $5->addCousinNode($7);
-        $7->addCousinNode($9);
+    | FOR '(' ';' ';' expression ')' statement{
+        BaseNode* temp = new AST::LoopNode("", AST::for_loop, NULL, NULL, $5);
+        temp->addChildNode($7);
+        $$ = temp;
+    }
+    | FOR '(' declaration_for ';' expression ';' expression ')' statement {
+        BaseNode* temp = new AST::LoopNode("", AST::for_loop, $4, $3, $5);
+        temp->addChildNode($9);
         $$ = temp;
     }
     | FOR '(' declaration_for ';' expression ';' ')' statement  { //OK
-        BaseNode* temp = new AST::LoopNode(AST::for_loop);
-        temp->addChildNode($3);
-        $3->addCousinNode($5);
-        $5->addCousinNode($8);
+        BaseNode* temp = new AST::LoopNode("", AST::for_loop, $4, $3, NULL);
+        temp->addChildNode($8);
         $$ = temp;
     }
     | FOR '(' declaration_for ';' ';' expression ')' statement  { //OK
-        BaseNode* temp = new AST::LoopNode(AST::for_loop);
-        temp->addChildNode($3);
-        $3->addCousinNode($6);
-        $6->addCousinNode($8);
+        BaseNode* temp = new AST::LoopNode("", AST::for_loop, NULL, $3, $5);
+        temp->addChildNode($8);
         $$ = temp;
     }
     | FOR '(' ';' expression ';' expression ')' statement { //OK
-        BaseNode* temp = new AST::LoopNode(AST::for_loop);
-        temp->addChildNode($4);
-        $4->addCousinNode($6);
-        $6->addCousinNode($8);
+        BaseNode* temp = new AST::LoopNode("", AST::for_loop, $4, NULL, $5);
+        temp->addChildNode($8);
         $$ = temp;
     }
     | error ';' { yyerrok; }  /*官方没报错 参考代码报错了不知道为啥*/
