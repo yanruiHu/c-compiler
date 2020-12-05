@@ -27,14 +27,14 @@ literal = 9,		// 字面量
 
 ```cpp
 BaseNode();
-BaseNode(ASTNodeType);				// 只传入节点类型
-BaseNode(std::string, ASTNodeType);	 // 传入节点内容和节点类型
-BaseNode(std::string);				// 只传入节点内容
+BaseNode(ASTNodeType);				     // 只传入节点类型
+BaseNode(std::string, ASTNodeType);	     // 传入节点内容和节点类型
+BaseNode(std::string);				     // 只传入节点内容
 
 // setters: 
 void setParentNode(BaseNode *parent);	 // 设置父节点
-void addChildNode(BaseNode*);			// 设置子节点
-void addCousinNode(BaseNode*);			// 设置兄弟节点
+void addChildNode(BaseNode*);			 // 设置子节点
+void addCousinNode(BaseNode*);			 // 设置兄弟节点
 
 // getters:
 BaseNode *getFinalCousinNode();			// 返回最后的兄弟节点
@@ -46,7 +46,7 @@ BaseNode* getCousinNode();				// 返回邻近的兄弟节点
 
 // printers:
 void printTree();						// 输出以当前节点为根节点的子树
-virtual void printInfo(int);			 // 输出节点信息（不同类型节点的信息不同）
+virtual void printInfo(int);			// 输出节点信息（不同类型节点的信息不同）
 ```
 
 
@@ -57,7 +57,7 @@ virtual void printInfo(int);			 // 输出节点信息（不同类型节点的信
 
 ```cpp
 DefineVarNode();
-DefineVarNode(std::string, std::string);      // 结构体变量构造函数，传入1.结构体变量名作为节点内容 2.结构体名
+DefineVarNode(std::string, std::string);    // 结构体变量构造函数，传入1.结构体变量名作为节点内容 2.结构体名
 DefineVarNode(std::string); 				// 普通变量构造函数，只传入变量名作为节点内容
 
 SMB::SymbolType getSymbolType();			// 返回变量symbol类型（int、void、int ptr、struct、array）
@@ -78,7 +78,7 @@ virtual void printInfo(int) override;		// 输出变量名（若是数组，还�
 
 ```cpp
 AssignVarNode();
-AssignVarNode(std::string);				// 传入节点内容
+AssignVarNode(std::string);				 // 传入节点内容
 virtual void printInfo(int) override;	 // 输出节点内容
 ```
 
@@ -90,7 +90,7 @@ virtual void printInfo(int) override;	 // 输出节点内容
 
 ```cpp
 LiteralNode();
-LiteralNode(std::string);				// 传入字面量的值作为节点内容
+LiteralNode(std::string);				 // 传入字面量的值作为节点内容
 int getValue();
 virtual void printInfo(int) override;	 // 输出字面量的值
 ```
@@ -103,9 +103,9 @@ virtual void printInfo(int) override;	 // 输出字面量的值
 
 ```cpp
 DefineFuncNode();
-DefineFuncNode(std::string);			// 传入函数名作为节点内容
+DefineFuncNode(std::string);			 // 传入函数名作为节点内容
 DefineFuncNode(std::string, BaseNode*);	 // 传入1.函数名作为节点内容 2.参数节点列表的头指针
-BaseNode* getArgList();					// 返回参数节点列表的头指针
+BaseNode* getArgList();					 // 返回参数节点列表的头指针
 SMB::SymbolType getReturnSymbolType();	 // 返回返回值的symbol类型（int、void、int ptr）
 void setReturnSymbolType(std::string);	 // 设置返回值的symbolsymbol类型（int、void、int ptr）
 virtual void printInfo(int) override;	 // 输出函数名
@@ -121,7 +121,7 @@ virtual void printInfo(int) override;	 // 输出函数名
 CallFuncNode();
 CallFuncNode(std::string);				 // 传入函数名作为节点内容
 void setVarList(BaseNode *v);   		 // 设置参数节点列表，传入参数节点列表的头指针
-BaseNode* getVarList();					// 返回参数列表的头指针
+BaseNode* getVarList();					 // 返回参数列表的头指针
 virtual void printInfo(int) override;	 // 输出函数名
 ```
 
@@ -147,7 +147,7 @@ LoopNode(std::string, LoopType, BaseNode*, BaseNode*, BaseNode*);// for循环，
 BaseNode *getDecNode();					// 返回定义节点
 BaseNode *getCondNode();				// 返回条件节点
 BaseNode *getActionNode();				// 返回动作节点
-virtual void printInfo(int) override;	 // 输出节点内容
+virtual void printInfo(int) override;	// 输出节点内容
 ```
 
 
@@ -169,7 +169,7 @@ enum OperatorType {
     or_op = 7,  	// ||
     eq = 8,     	// ==
     not_op = 9, 	// !
-    negative = 10,   // -
+    negative = 10,  // -
     relop = 11, 	// =
     mod = 12,   	// %
     get_adress = 13 // &
@@ -178,9 +178,9 @@ enum OperatorType {
 
 ```cpp
 OperatorNode();
-OperatorNode(std::string);					// 传入操作符名作为节点内容
+OperatorNode(std::string);					 // 传入操作符名作为节点内容
 OperatorNode(std::string, OperatorType);	 // 传入1.操作符名 2.操作符类型
-OperatorType getOpType();					// 返回操作符类型
+OperatorType getOpType();					 // 返回操作符类型
 virtual void printInfo(int) override;		 // 输出节点内容
 ```
 
@@ -203,18 +203,18 @@ enum SelectType {
 SelectNode();
 SelectNode(std::string);									// 传入节点内容
 SelectNode(SelectType);										// 传入选择类型
-SelectNode(std::string, SelectType);						 // 传入1.节点内容 2.选择类型
-SelectNode(std::string, SelectType, BaseNode*, BaseNode*);		// if / else if 传入
+SelectNode(std::string, SelectType);						// 传入1.节点内容 2.选择类型
+SelectNode(std::string, SelectType, BaseNode*, BaseNode*);	// if / else if 传入
 // 1.节点内容 
 // 2.选择类型 
 // 3.条件节点 
 // 4.body节点
 
-SelectNode(std::string, SelectType, BaseNode*);				  // else 传入1.节点内容 2.选择类型 3.body节点
+SelectNode(std::string, SelectType, BaseNode*);				// else 传入1.节点内容 2.选择类型 3.body节点
 SelectType getSelectType();									// 返回节点的选择类型
 BaseNode* getCondNode();									// 返回条件节点
 BaseNode* getBodyNode();									// 返回body节点
-virtual void printInfo(int) override;						 // 输出节点信息
+virtual void printInfo(int) override;						// 输出节点信息
 ```
 
 
@@ -238,8 +238,8 @@ enum StatementType {
 StatementNode();
 StatementNode(StatementType);				// 传入语句类型
 StatementNode(std::string);					// 传入节点内容
-StatementNode(std::string, StatementType);	 // 传入1.节点内容 2.语句类型
+StatementNode(std::string, StatementType);	// 传入1.节点内容 2.语句类型
 StatementType getStmtType();				// 返回语句类型
-virtual void printInfo(int) override; 		 // 输出节点信息
+virtual void printInfo(int) override; 		// 输出节点信息
 ```
 
