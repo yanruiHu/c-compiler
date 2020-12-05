@@ -13,15 +13,15 @@ namespace SMB {
     class Symbol {
     protected:
         std::string name;
-        STE::SymbolType type;
+        SMB::SymbolType type;
         int offset;
         int index;
 
     public:
         Symbol();
-        Symbol(std::string name, STE::SymbolType type);
+        Symbol(std::string name, SMB::SymbolType type);
         const std::string getName();
-        STE::SymbolType getType();
+        SMB::SymbolType getType();
         inline int getOffset() { return offset; }
         inline int getIndex() { return index; }
         inline void setOffset(int offset) { this->offset = offset; }
@@ -33,7 +33,7 @@ namespace SMB {
             std::string dec_name;
             AST::BaseNode* arg_list;
             int total_arg_offset;
-            STE::SymbolType rtn_type;
+            SMB::SymbolType rtn_type;
         
         public:
             FuncSymbol();

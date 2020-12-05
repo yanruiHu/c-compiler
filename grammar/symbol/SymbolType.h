@@ -1,7 +1,7 @@
 #ifndef SYMBOLTYPE_H
 #define SYMBOLTYPE_H
 
-namespace STE{
+namespace SMB {
     enum SymbolType {
         none = 0, //undefine
         integer = 1,

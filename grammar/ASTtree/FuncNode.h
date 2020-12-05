@@ -10,13 +10,13 @@ namespace AST {
     class DefineFuncNode: public BaseNode {
     private:
         BaseNode* arg_list; // 参数列表
-        STE::SymbolType return_symbol_type; // 返回值symbol类型
+        SMB::SymbolType return_symbol_type; // 返回值symbol类型
     public:
         DefineFuncNode();
         DefineFuncNode(std::string);
         DefineFuncNode(std::string, BaseNode*);
         inline BaseNode* getArgList() {return this->arg_list;}
-        inline STE::SymbolType getReturnSymbolType(){return this->return_symbol_type;}
+        inline SMB::SymbolType getReturnSymbolType(){return this->return_symbol_type;}
         void setReturnSymbolType(std::string);
         virtual void printInfo(int) override;
     };
