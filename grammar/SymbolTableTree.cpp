@@ -3,6 +3,7 @@
 void tree(SMB::SymbolTable* table, AST::BaseNode* node, int depth){
     if (!node) return;
     if(node->getASTNodeType()==AST::ASTNodeType::def_var){
+        std::cout << "in tree symbol\n";
         if(table->addSymbol(node)==0){
             std::cout << "\033[31mError: \033[0m"
               << "value " << node->getContent() << " is redeclaration" << std::endl;

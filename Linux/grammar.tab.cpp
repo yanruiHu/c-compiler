@@ -559,12 +559,12 @@ static const yytype_int16 yyrline[] =
        0,    60,    60,    65,    68,    79,    84,    85,    91,    96,
       97,    99,   100,   108,   109,   110,   111,   114,   117,   118,
      121,   125,   128,   137,   140,   144,   148,   150,   155,   164,
-     169,   172,   179,   185,   186,   189,   194,   199,   200,   201,
-     206,   210,   216,   225,   232,   237,   240,   246,   253,   261,
-     268,   275,   282,   287,   292,   295,   296,   302,   303,   312,
-     318,   324,   330,   336,   342,   348,   354,   360,   366,   372,
-     375,   380,   385,   390,   393,   396,   399,   406,   407,   410,
-     411,   413,   416
+     169,   172,   179,   183,   184,   187,   192,   197,   198,   199,
+     204,   208,   214,   223,   230,   235,   238,   244,   251,   259,
+     266,   273,   280,   285,   290,   293,   294,   300,   301,   310,
+     316,   322,   328,   334,   340,   346,   352,   358,   364,   370,
+     373,   378,   383,   388,   391,   394,   397,   404,   405,   408,
+     409,   411,   414
 };
 #endif
 
@@ -1871,88 +1871,86 @@ yyreduce:
 
   case 32:
 #line 179 "./lexical/ch.y"
-      {
-        (yyval.ast) = NULL;
-    }
-#line 1878 "./Linux/grammar.tab.cpp"
+      { (yyval.ast) = NULL; }
+#line 1876 "./Linux/grammar.tab.cpp"
     break;
 
   case 33:
-#line 185 "./lexical/ch.y"
+#line 183 "./lexical/ch.y"
                             { (yyval.ast) = (yyvsp[0].ast); }
-#line 1884 "./Linux/grammar.tab.cpp"
+#line 1882 "./Linux/grammar.tab.cpp"
     break;
 
   case 34:
-#line 186 "./lexical/ch.y"
+#line 184 "./lexical/ch.y"
                  { (yyval.ast) = (yyvsp[0].ast); }
-#line 1890 "./Linux/grammar.tab.cpp"
+#line 1888 "./Linux/grammar.tab.cpp"
     break;
 
   case 35:
-#line 189 "./lexical/ch.y"
+#line 187 "./lexical/ch.y"
                           { 
         BaseNode* temp = new AST::StatementNode(AST::expression);
         temp->addChildNode((yyvsp[-1].ast));
         (yyval.ast) = temp;
     }
-#line 1900 "./Linux/grammar.tab.cpp"
+#line 1898 "./Linux/grammar.tab.cpp"
     break;
 
   case 36:
-#line 194 "./lexical/ch.y"
+#line 192 "./lexical/ch.y"
                      { 
         BaseNode* temp = new AST::StatementNode(AST::defination);
         temp->addChildNode((yyvsp[-1].ast));
         (yyval.ast) = temp;
     }
-#line 1910 "./Linux/grammar.tab.cpp"
+#line 1908 "./Linux/grammar.tab.cpp"
     break;
 
   case 37:
-#line 199 "./lexical/ch.y"
+#line 197 "./lexical/ch.y"
                        { (yyval.ast) =NULL; }
-#line 1916 "./Linux/grammar.tab.cpp"
+#line 1914 "./Linux/grammar.tab.cpp"
     break;
 
   case 38:
-#line 200 "./lexical/ch.y"
+#line 198 "./lexical/ch.y"
                          { (yyval.ast)=(yyvsp[0].ast);}
-#line 1922 "./Linux/grammar.tab.cpp"
+#line 1920 "./Linux/grammar.tab.cpp"
     break;
 
   case 39:
-#line 201 "./lexical/ch.y"
+#line 199 "./lexical/ch.y"
                             {
         BaseNode* temp = new AST::StatementNode(AST::return_stmt);
         temp->addChildNode((yyvsp[-1].ast));
         (yyval.ast) = temp;
     }
-#line 1932 "./Linux/grammar.tab.cpp"
+#line 1930 "./Linux/grammar.tab.cpp"
     break;
 
   case 40:
-#line 206 "./lexical/ch.y"
+#line 204 "./lexical/ch.y"
                  {
         BaseNode* temp = new AST::StatementNode(AST::return_stmt);
         (yyval.ast) = temp;
     }
-#line 1941 "./Linux/grammar.tab.cpp"
+#line 1939 "./Linux/grammar.tab.cpp"
     break;
 
   case 41:
-#line 210 "./lexical/ch.y"
+#line 208 "./lexical/ch.y"
                                       {  // ok
         BaseNode* temp = new AST::SelectNode(AST::if_stmt);
         temp->addChildNode((yyvsp[-2].ast));
         (yyvsp[-2].ast)->addCousinNode((yyvsp[0].ast));
         (yyval.ast) = temp;
     }
-#line 1952 "./Linux/grammar.tab.cpp"
+#line 1950 "./Linux/grammar.tab.cpp"
     break;
 
   case 42:
-#line 216 "./lexical/ch.y"
+#line 214 "./lexical/ch.y"
                                                                           {
         BaseNode* temp = new AST::SelectNode(AST::if_stmt);
         temp->addChildNode((yyvsp[-4].ast));
@@ -1962,51 +1960,51 @@ yyreduce:
         temp->addCousinNode(else_node);
         (yyval.ast) = temp;
     }
-#line 1966 "./Linux/grammar.tab.cpp"
+#line 1964 "./Linux/grammar.tab.cpp"
     break;
 
   case 43:
-#line 225 "./lexical/ch.y"
+#line 223 "./lexical/ch.y"
                                          { //ok
         BaseNode* temp = new AST::LoopNode(AST::while_loop);
         temp->addChildNode((yyvsp[-2].ast));
         (yyvsp[-2].ast)->addCousinNode((yyvsp[0].ast));
         (yyval.ast) = temp;
     }
-#line 1977 "./Linux/grammar.tab.cpp"
+#line 1975 "./Linux/grammar.tab.cpp"
     break;
 
   case 44:
-#line 232 "./lexical/ch.y"
+#line 230 "./lexical/ch.y"
                                    { //ok
         BaseNode* temp = new AST::LoopNode(AST::for_loop);
         temp->addChildNode((yyvsp[0].ast));
         (yyval.ast) = temp;
     }
-#line 1987 "./Linux/grammar.tab.cpp"
+#line 1985 "./Linux/grammar.tab.cpp"
     break;
 
   case 45:
-#line 237 "./lexical/ch.y"
+#line 235 "./lexical/ch.y"
                                                    {
 
     }
-#line 1995 "./Linux/grammar.tab.cpp"
+#line 1993 "./Linux/grammar.tab.cpp"
     break;
 
   case 46:
-#line 240 "./lexical/ch.y"
+#line 238 "./lexical/ch.y"
                                               { //ok
         BaseNode* temp = new AST::LoopNode(AST::for_loop);
         temp->addChildNode((yyvsp[-3].ast));
         (yyvsp[-3].ast)->addCousinNode((yyvsp[0].ast));
         (yyval.ast) = temp;
     }
-#line 2006 "./Linux/grammar.tab.cpp"
+#line 2004 "./Linux/grammar.tab.cpp"
     break;
 
   case 47:
-#line 246 "./lexical/ch.y"
+#line 244 "./lexical/ch.y"
                                               { //OK
         BaseNode* temp = new AST::LoopNode(AST::for_loop);
         temp->addChildNode((yyvsp[-2].ast));
@@ -2014,11 +2012,11 @@ yyreduce:
         (yyval.ast) = temp;
 
     }
-#line 2018 "./Linux/grammar.tab.cpp"
+#line 2016 "./Linux/grammar.tab.cpp"
     break;
 
   case 48:
-#line 253 "./lexical/ch.y"
+#line 251 "./lexical/ch.y"
                                                                           { //OK
         BaseNode* temp = new AST::LoopNode(AST::for_loop);
         temp->addChildNode((yyvsp[-6].ast));
@@ -2027,11 +2025,11 @@ yyreduce:
         (yyvsp[-2].ast)->addCousinNode((yyvsp[0].ast));
         (yyval.ast) = temp;
     }
-#line 2031 "./Linux/grammar.tab.cpp"
+#line 2029 "./Linux/grammar.tab.cpp"
     break;
 
   case 49:
-#line 261 "./lexical/ch.y"
+#line 259 "./lexical/ch.y"
                                                                 { //OK
         BaseNode* temp = new AST::LoopNode(AST::for_loop);
         temp->addChildNode((yyvsp[-5].ast));
@@ -2039,11 +2037,11 @@ yyreduce:
         (yyvsp[-3].ast)->addCousinNode((yyvsp[0].ast));
         (yyval.ast) = temp;
     }
-#line 2043 "./Linux/grammar.tab.cpp"
+#line 2041 "./Linux/grammar.tab.cpp"
     break;
 
   case 50:
-#line 268 "./lexical/ch.y"
+#line 266 "./lexical/ch.y"
                                                                 { //OK
         BaseNode* temp = new AST::LoopNode(AST::for_loop);
         temp->addChildNode((yyvsp[-5].ast));
@@ -2051,11 +2049,11 @@ yyreduce:
         (yyvsp[-2].ast)->addCousinNode((yyvsp[0].ast));
         (yyval.ast) = temp;
     }
-#line 2055 "./Linux/grammar.tab.cpp"
+#line 2053 "./Linux/grammar.tab.cpp"
     break;
 
   case 51:
-#line 275 "./lexical/ch.y"
+#line 273 "./lexical/ch.y"
                                                           { //OK
         BaseNode* temp = new AST::LoopNode(AST::for_loop);
         temp->addChildNode((yyvsp[-4].ast));
@@ -2063,236 +2061,236 @@ yyreduce:
         (yyvsp[-2].ast)->addCousinNode((yyvsp[0].ast));
         (yyval.ast) = temp;
     }
-#line 2067 "./Linux/grammar.tab.cpp"
+#line 2065 "./Linux/grammar.tab.cpp"
     break;
 
   case 52:
-#line 282 "./lexical/ch.y"
+#line 280 "./lexical/ch.y"
                 { yyerrok; }
-#line 2073 "./Linux/grammar.tab.cpp"
+#line 2071 "./Linux/grammar.tab.cpp"
     break;
 
   case 53:
-#line 287 "./lexical/ch.y"
+#line 285 "./lexical/ch.y"
                                         {
         AST::DefineVarNode* tmp = (AST::DefineVarNode*)((yyvsp[0].ast)->getChildNode());
-        tmp->setAllSymbolType((yyvsp[-1].str));
-        (yyval.ast) = tmp;
+        if(tmp) tmp->setAllSymbolType((yyvsp[-1].str));
+        (yyval.ast) = (yyvsp[0].ast);
     }
-#line 2083 "./Linux/grammar.tab.cpp"
+#line 2081 "./Linux/grammar.tab.cpp"
     break;
 
   case 54:
-#line 292 "./lexical/ch.y"
+#line 290 "./lexical/ch.y"
                 { yyerrok; }
-#line 2089 "./Linux/grammar.tab.cpp"
+#line 2087 "./Linux/grammar.tab.cpp"
     break;
 
   case 55:
-#line 295 "./lexical/ch.y"
+#line 293 "./lexical/ch.y"
                               { (yyval.ast) = (yyvsp[0].ast); }
-#line 2095 "./Linux/grammar.tab.cpp"
+#line 2093 "./Linux/grammar.tab.cpp"
     break;
 
   case 56:
-#line 296 "./lexical/ch.y"
+#line 294 "./lexical/ch.y"
                                        {
         (yyvsp[-2].ast)->getFinalCousinNode()->addCousinNode((yyvsp[0].ast));
         (yyval.ast) = (yyvsp[-2].ast);
     }
-#line 2104 "./Linux/grammar.tab.cpp"
+#line 2102 "./Linux/grammar.tab.cpp"
     break;
 
   case 57:
-#line 302 "./lexical/ch.y"
+#line 300 "./lexical/ch.y"
                                { (yyval.ast) = (yyvsp[0].ast); }
-#line 2110 "./Linux/grammar.tab.cpp"
+#line 2108 "./Linux/grammar.tab.cpp"
     break;
 
   case 58:
-#line 303 "./lexical/ch.y"
+#line 301 "./lexical/ch.y"
                                        {
         (yyval.ast) = new AST::OperatorNode("=");
         (yyval.ast)->addChildNode((yyvsp[-2].ast));
         (yyvsp[-2].ast)->addCousinNode((yyvsp[0].ast));
     }
-#line 2120 "./Linux/grammar.tab.cpp"
+#line 2118 "./Linux/grammar.tab.cpp"
     break;
 
   case 59:
-#line 312 "./lexical/ch.y"
+#line 310 "./lexical/ch.y"
                                       {
             BaseNode* temp = new AST::OperatorNode("=");
             temp->addChildNode((yyvsp[-2].ast));
             (yyvsp[-2].ast)->addCousinNode((yyvsp[0].ast));
             (yyval.ast) = temp;
         }
-#line 2131 "./Linux/grammar.tab.cpp"
+#line 2129 "./Linux/grammar.tab.cpp"
     break;
 
   case 60:
-#line 318 "./lexical/ch.y"
+#line 316 "./lexical/ch.y"
                                     {
             BaseNode* temp = new AST::OperatorNode("&&");
             temp->addChildNode((yyvsp[-2].ast));
             (yyvsp[-2].ast)->addCousinNode((yyvsp[0].ast));
             (yyval.ast) = temp;
         }
-#line 2142 "./Linux/grammar.tab.cpp"
+#line 2140 "./Linux/grammar.tab.cpp"
     break;
 
   case 61:
-#line 324 "./lexical/ch.y"
+#line 322 "./lexical/ch.y"
                                    {
             BaseNode* temp = new AST::OperatorNode("||");
             temp->addChildNode((yyvsp[-2].ast));
             (yyvsp[-2].ast)->addCousinNode((yyvsp[0].ast));
             (yyval.ast) = temp;
         }
-#line 2153 "./Linux/grammar.tab.cpp"
+#line 2151 "./Linux/grammar.tab.cpp"
     break;
 
   case 62:
-#line 330 "./lexical/ch.y"
+#line 328 "./lexical/ch.y"
                                       {
             BaseNode* temp = new AST::OperatorNode((yyvsp[-1].str));
             temp->addChildNode((yyvsp[-2].ast));
             (yyvsp[-2].ast)->addCousinNode((yyvsp[0].ast));
             (yyval.ast) = temp;
         }
-#line 2164 "./Linux/grammar.tab.cpp"
+#line 2162 "./Linux/grammar.tab.cpp"
     break;
 
   case 63:
-#line 336 "./lexical/ch.y"
+#line 334 "./lexical/ch.y"
                                     {
             BaseNode* temp = new AST::OperatorNode("+");
             temp->addChildNode((yyvsp[-2].ast));
             (yyvsp[-2].ast)->addCousinNode((yyvsp[0].ast));
             (yyval.ast) = temp;
         }
-#line 2175 "./Linux/grammar.tab.cpp"
+#line 2173 "./Linux/grammar.tab.cpp"
     break;
 
   case 64:
-#line 342 "./lexical/ch.y"
+#line 340 "./lexical/ch.y"
                                     {
             BaseNode* temp = new AST::OperatorNode("-");
             temp->addChildNode((yyvsp[-2].ast));
             (yyvsp[-2].ast)->addCousinNode((yyvsp[0].ast));
             (yyval.ast) = temp;
         }
-#line 2186 "./Linux/grammar.tab.cpp"
+#line 2184 "./Linux/grammar.tab.cpp"
     break;
 
   case 65:
-#line 348 "./lexical/ch.y"
+#line 346 "./lexical/ch.y"
                                     {
             BaseNode* temp = new AST::OperatorNode("*");
             temp->addChildNode((yyvsp[-2].ast));
             (yyvsp[-2].ast)->addCousinNode((yyvsp[0].ast));
             (yyval.ast) = temp;
         }
-#line 2197 "./Linux/grammar.tab.cpp"
+#line 2195 "./Linux/grammar.tab.cpp"
     break;
 
   case 66:
-#line 354 "./lexical/ch.y"
+#line 352 "./lexical/ch.y"
                                     {
             BaseNode* temp = new AST::OperatorNode("/");
             temp->addChildNode((yyvsp[-2].ast));
             (yyvsp[-2].ast)->addCousinNode((yyvsp[0].ast));
             (yyval.ast) = temp;
         }
-#line 2208 "./Linux/grammar.tab.cpp"
+#line 2206 "./Linux/grammar.tab.cpp"
     break;
 
   case 67:
-#line 360 "./lexical/ch.y"
+#line 358 "./lexical/ch.y"
                                     {
             BaseNode* temp = new AST::OperatorNode("%");
             temp->addChildNode((yyvsp[-2].ast));
             (yyvsp[-2].ast)->addCousinNode((yyvsp[0].ast));
             (yyval.ast) = temp;
         }
-#line 2219 "./Linux/grammar.tab.cpp"
+#line 2217 "./Linux/grammar.tab.cpp"
     break;
 
   case 68:
-#line 366 "./lexical/ch.y"
+#line 364 "./lexical/ch.y"
                                     {
             BaseNode* temp = new AST::OperatorNode("^");
             temp->addChildNode((yyvsp[-2].ast));
             (yyvsp[-2].ast)->addCousinNode((yyvsp[0].ast));
             (yyval.ast) = temp;
         }
-#line 2230 "./Linux/grammar.tab.cpp"
+#line 2228 "./Linux/grammar.tab.cpp"
     break;
 
   case 69:
-#line 372 "./lexical/ch.y"
+#line 370 "./lexical/ch.y"
                              {
             (yyval.ast) = (yyvsp[-1].ast);
         }
-#line 2238 "./Linux/grammar.tab.cpp"
+#line 2236 "./Linux/grammar.tab.cpp"
     break;
 
   case 70:
-#line 375 "./lexical/ch.y"
+#line 373 "./lexical/ch.y"
                          {
             BaseNode* temp = new AST::OperatorNode("-");
             temp->addChildNode((yyvsp[0].ast));
             (yyval.ast) = temp;
         }
-#line 2248 "./Linux/grammar.tab.cpp"
+#line 2246 "./Linux/grammar.tab.cpp"
     break;
 
   case 71:
-#line 380 "./lexical/ch.y"
+#line 378 "./lexical/ch.y"
                          {
             BaseNode* temp = new AST::OperatorNode("!");
             temp->addChildNode((yyvsp[0].ast));
             (yyval.ast) = temp;
         }
-#line 2258 "./Linux/grammar.tab.cpp"
+#line 2256 "./Linux/grammar.tab.cpp"
     break;
 
   case 72:
-#line 385 "./lexical/ch.y"
+#line 383 "./lexical/ch.y"
                                               {
             BaseNode* temp = new AST::CallFuncNode((yyvsp[-3].str));
             temp->addChildNode((yyvsp[-1].ast));
             (yyval.ast) = temp;
         }
-#line 2268 "./Linux/grammar.tab.cpp"
+#line 2266 "./Linux/grammar.tab.cpp"
     break;
 
   case 73:
-#line 390 "./lexical/ch.y"
+#line 388 "./lexical/ch.y"
                      {
             (yyval.ast) = new AST::CallFuncNode((yyvsp[-2].str));
         }
-#line 2276 "./Linux/grammar.tab.cpp"
+#line 2274 "./Linux/grammar.tab.cpp"
     break;
 
   case 74:
-#line 393 "./lexical/ch.y"
+#line 391 "./lexical/ch.y"
                                         {
             (yyval.ast) = NULL;
         }
-#line 2284 "./Linux/grammar.tab.cpp"
+#line 2282 "./Linux/grammar.tab.cpp"
     break;
 
   case 75:
-#line 396 "./lexical/ch.y"
+#line 394 "./lexical/ch.y"
              {
             (yyval.ast) = new AST::AssignVarNode((yyvsp[0].str));
         }
-#line 2292 "./Linux/grammar.tab.cpp"
+#line 2290 "./Linux/grammar.tab.cpp"
     break;
 
   case 76:
-#line 399 "./lexical/ch.y"
+#line 397 "./lexical/ch.y"
                                 {
             BaseNode* op = new AST::OperatorNode("[]");
             BaseNode* temp = new AST::AssignVarNode((yyvsp[-3].str));
@@ -2300,54 +2298,54 @@ yyreduce:
             op->addChildNode(temp);
             temp->addCousinNode((yyvsp[-1].ast));
         }
-#line 2304 "./Linux/grammar.tab.cpp"
+#line 2302 "./Linux/grammar.tab.cpp"
     break;
 
   case 77:
-#line 406 "./lexical/ch.y"
+#line 404 "./lexical/ch.y"
                     {}
-#line 2310 "./Linux/grammar.tab.cpp"
+#line 2308 "./Linux/grammar.tab.cpp"
     break;
 
   case 78:
-#line 407 "./lexical/ch.y"
+#line 405 "./lexical/ch.y"
               {
             (yyval.ast) = new AST::LiteralNode((yyvsp[0].str));
         }
-#line 2318 "./Linux/grammar.tab.cpp"
+#line 2316 "./Linux/grammar.tab.cpp"
     break;
 
   case 79:
-#line 410 "./lexical/ch.y"
+#line 408 "./lexical/ch.y"
                  {}
-#line 2324 "./Linux/grammar.tab.cpp"
+#line 2322 "./Linux/grammar.tab.cpp"
     break;
 
   case 80:
-#line 411 "./lexical/ch.y"
+#line 409 "./lexical/ch.y"
                     {yyerrok;}
-#line 2330 "./Linux/grammar.tab.cpp"
+#line 2328 "./Linux/grammar.tab.cpp"
     break;
 
   case 81:
-#line 413 "./lexical/ch.y"
+#line 411 "./lexical/ch.y"
                                      {
             (yyval.ast) = (yyvsp[0].ast);
         }
-#line 2338 "./Linux/grammar.tab.cpp"
+#line 2336 "./Linux/grammar.tab.cpp"
     break;
 
   case 82:
-#line 416 "./lexical/ch.y"
+#line 414 "./lexical/ch.y"
                                                   {
             (yyvsp[-2].ast)->getFinalCousinNode()->addCousinNode((yyvsp[0].ast));
             (yyval.ast) = (yyvsp[-2].ast);
         }
-#line 2347 "./Linux/grammar.tab.cpp"
+#line 2345 "./Linux/grammar.tab.cpp"
     break;
 
 
-#line 2351 "./Linux/grammar.tab.cpp"
+#line 2349 "./Linux/grammar.tab.cpp"
 
       default: break;
     }
@@ -2585,7 +2583,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 421 "./lexical/ch.y"
+#line 419 "./lexical/ch.y"
 
 
 
