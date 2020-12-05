@@ -429,7 +429,7 @@ void yyerror(const char* s) {
 int main(int argc,char * argv[]){  //不确定语法的在哪里输出
 
     int c,j=0;
-    yyin=fopen("./test.txt","r");
+    yyin=fopen("./test.c","r");
     // if(argc>=2){
     //     if()==NULL){
     //         printf("Can't open file %s\n",argv[1]);
