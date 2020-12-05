@@ -30,11 +30,13 @@ void SMB::tree(SMB::SymbolTable* table, AST::BaseNode* node, int depth){
         AST::LoopNode *loop_node = (AST::LoopNode*) node;
         SMB::SymbolTable* child_table = table->createChildTable();
         AST::BaseNode *dec = loop_node->getDecNode();
-        if (dec->getASTNodeType() == AST::op) {
-            dec = dec->getChildNode();
-        }
-        if (dec->getASTNodeType() == AST::def_var) {
-            child_table->addSymbol(dec);
+        if (dec) {
+            if (dec->getASTNodeType() == AST::op) {
+                dec = dec->getChildNode();
+            }
+            if (dec->getASTNodeType() == AST::def_var) {
+                child_table->addSymbol(dec);
+            }
         }
         tree(child_table,node->getChildNode(), depth + 1);
         tree(table,node->getCousinNode(), depth);
