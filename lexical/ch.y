@@ -221,16 +221,16 @@ statement: expression ';' {
         $$ = temp;
     }
     | IF '(' expression ')' statement {  // ok
-        BaseNode* temp = new AST::SelectNode(AST::if_stmt);
-        temp->addChildNode($3);
-        $3->addCousinNode($5);
+        AST::SelectNode* temp = new AST::SelectNode(AST::if_stmt);
+        temp->addChildNode($5);
+        temp->setCondNode($3);
         $$ = temp;
     }
     | IF '(' expression ')' statement ELSE statement %prec LOWER_THAN_ELSE{
-        BaseNode* temp = new AST::SelectNode(AST::if_stmt);
-        temp->addChildNode($3);
-        $3->addCousinNode($5);
-        BaseNode* else_node = new AST::SelectNode(AST::else_stmt);
+        AST::SelectNode* temp = new AST::SelectNode(AST::if_stmt);
+        temp->addChildNode($5);
+        temp->setCondNode($3);
+        AST::SelectNode* else_node = new AST::SelectNode(AST::else_stmt);
         else_node->addChildNode($7);
         temp->addCousinNode(else_node);
         $$ = temp;
@@ -385,8 +385,8 @@ expression: expression '=' expression {
             $$ = temp;
         }
         | ID '(' argument_expression_list ')' {
-            BaseNode* temp = new AST::CallFuncNode($1);
-            temp->addChildNode($3);
+            AST::CallFuncNode* temp = new AST::CallFuncNode($1);
+            temp->setVarList($3);
             $$ = temp;
         }
         | ID '(' ')' {

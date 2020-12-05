@@ -1,4 +1,6 @@
 #include "./BaseNode.h"
+#include "./LoopNode.h"
+#include "./SelectNode.h"
 
 AST::BaseNode::BaseNode() {
     this->child = NULL;
@@ -53,29 +55,43 @@ void AST::BaseNode::printInfo(int depth) {
     std::cout << this->content;
 }
 
-void AST::BaseNode::tree(AST::BaseNode* node, int depth, bool flag, std::vector<bool> pre_sep) {
-    std::cout << prefix[!flag] << node->getASTNodeType() << " ";
+void AST::BaseNode::tree(AST::BaseNode* node, int depth, bool flag, std::vector<bool> pre_sep, std::string prefix_str) {
+    for (std::vector<bool>::iterator i = pre_sep.begin(); i != pre_sep.end(); i++) {
+        std::cout << separator[*i];
+    }
+    std::cout << prefix[!flag] << prefix_str;
     node->printInfo(depth);
     std::cout << std::endl;
     ++depth;
     pre_sep.push_back(flag);
 
+    // 打印循环
+    if (node->getASTNodeType() == AST::loop) {
+        bool f = node->child;
+        LoopNode *loop_node = (LoopNode*)node;
+        BaseNode *tmp = loop_node->getDecNode();
+        if(tmp)AST::BaseNode::tree(tmp, depth, !f, pre_sep, "(declare): ");
+        tmp = loop_node->getCondNode();
+        if(tmp)AST::BaseNode::tree(tmp, depth, !f, pre_sep, "(condition): ");
+        tmp = loop_node->getActionNode();
+        if(tmp)AST::BaseNode::tree(tmp, depth, !f, pre_sep, "(action): ");
+    }
+    
+    // 打印选择
+    if (node->getASTNodeType() == AST::select) {
+        bool f = node->child;
+        SelectNode *select_node = (SelectNode*)node;
+        BaseNode *tmp = select_node->getCondNode();
+        if(tmp)AST::BaseNode::tree(tmp, depth, !f, pre_sep, "(condition): ");
+        tmp = select_node->getBodyNode();
+        if(tmp)AST::BaseNode::tree(tmp, depth, !f, pre_sep, "(body): ");
+    }
+
     node = node->child;
     while(node) {
-        for (std::vector<bool>::iterator i = pre_sep.begin(); i != pre_sep.end(); i++) {
-            std::cout << separator[*i];
-        }
         AST::BaseNode* temp = node->child;
-        if (!temp) {
-            bool f = node->cousin;
-            std::cout << prefix[f] << node->getASTNodeType() << " ";
-            node->printInfo(depth);
-            std::cout << std::endl;
-        } else {
-            bool f = node->cousin;
-            std::vector<bool> v(pre_sep);
-            AST::BaseNode::tree(node, depth, !f, v);
-        }
+        bool f = node->cousin;
+        AST::BaseNode::tree(node, depth, !f, pre_sep);
         node = node->cousin;
     }
 }

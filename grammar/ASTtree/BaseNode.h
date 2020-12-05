@@ -32,7 +32,7 @@ namespace AST {
 
     protected:
         std::string content;
-        static void tree(BaseNode*, int, bool, std::vector<bool>);
+        static void tree(BaseNode*, int, bool, std::vector<bool>, std::string="");
 
     public:
         // constructors:

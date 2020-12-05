@@ -45,5 +45,4 @@ void AST::LoopNode::printInfo(int) {
         std::cout << "loop statement(for): ";
         break;
     }
-    std::cout << this->content;
 }

@@ -1,7 +1,22 @@
 #ifndef SYMBOLTYPE_H
 #define SYMBOLTYPE_H
 
+#include<string>
+
 namespace SMB {
+
+    static std::string symbol_string[] = {
+        "none",
+        "int",
+        "ptr",
+        "bool",
+        "void",
+        "struct",
+        "array",
+        "literal",
+        "func",
+    };
+
     enum SymbolType {
         none = 0, //undefine
         integer = 1,

@@ -27,7 +27,7 @@ namespace AST {
         // for循环
         LoopNode(std::string, LoopType, BaseNode*, BaseNode*, BaseNode*);
         inline BaseNode *getDecNode() { return this->dec; }
-        inline BaseNode *getCondNode() { return this->dec; }
+        inline BaseNode *getCondNode() { return this->cond; }
         inline BaseNode *getActionNode() { return this->action; }
         virtual void printInfo(int) override;
     };
