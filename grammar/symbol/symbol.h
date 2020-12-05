@@ -41,6 +41,7 @@ namespace SMB {
             bool operator==(const FuncSymbol& second);
             inline std::string getDecName() { return this->dec_name; }
             inline int getTotalArgOffset() { return this->total_arg_offset; }
+            inline AST::BaseNode *getArgList() { return this->arg_list; }
     };
 
 
@@ -70,7 +71,7 @@ namespace SMB {
             int addSymbol(AST::BaseNode *node);
             int addFuncSymbol(FuncSymbol *func_symbol);
             //int addStructSymbol(std::string structTypeName, std::string structIdName);
-            void addFromFunctionArgs(AST::DefineFuncNode *func);
+            void addFromFunctionArgs(FuncSymbol *func);
             SymbolTable* createChildTable();
 
             Symbol* findSymbol(const std::string name);

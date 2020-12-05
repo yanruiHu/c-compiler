@@ -52,7 +52,7 @@ SMB::SymbolTable::SymbolTable() {
 
 }
 
-void SMB::SymbolTable::addFromFunctionArgs(AST::DefineFuncNode *func_node) {
+void SMB::SymbolTable::addFromFunctionArgs(FuncSymbol *func_node) {
     AST::BaseNode* args = func_node->getArgList();
     while (args) {
         this->addSymbol(args);
