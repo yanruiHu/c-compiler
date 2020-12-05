@@ -102,11 +102,19 @@ external_declaration_list: init_declarator_list { $$ = $1; }  //修改
         $$ = $1;
     }
     ;
-init_declarator_list:init_declarator  //外部定义
-    | init_declarator_list ',' init_declarator
+init_declarator_list:init_declarator{
+
+    }
+    | init_declarator_list ',' init_declarator{
+
+    }
     ;
-init_declarator: direct_declarator  //外部定义
-    | direct_declarator '=' INT
+init_declarator: direct_declarator{
+
+    }
+    | direct_declarator '=' INT{
+        
+    }
 /*↑*/
 
 /* specifiers 说明符*/
