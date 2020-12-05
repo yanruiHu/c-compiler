@@ -3,10 +3,10 @@
 
 SMB::Symbol::Symbol() {
     this->name = "";
-    this->type = STE::SymbolType::integer;
+    this->type = SMB::SymbolType::integer;
 }
 
-SMB::Symbol::Symbol(std::string name, STE::SymbolType type) {
+SMB::Symbol::Symbol(std::string name, SMB::SymbolType type) {
     this->name = name;
     this->type = type;
 }
@@ -15,7 +15,7 @@ const std::string SMB::Symbol::getName() {
     return this->name;
 }
 
-STE::SymbolType SMB::Symbol::getType() {
+SMB::SymbolType SMB::Symbol::getType() {
     return this->type;
 }
 
@@ -34,10 +34,10 @@ SMB::FuncSymbol::FuncSymbol(AST::BaseNode* node) {
 
     AST::DefineVarNode* p = (AST::DefineVarNode*)this->arg_list;
     while(p){
-        STE::SymbolType arg_type = p->getSymbolType();
-        if(arg_type == STE::SymbolType::integer){
+        SMB::SymbolType arg_type = p->getSymbolType();
+        if(arg_type == SMB::SymbolType::integer){
             this->dec_name += "_i";
-        }else if(arg_type == STE::SymbolType::pointer){
+        }else if(arg_type == SMB::SymbolType::pointer){
             this->dec_name += "_p";
         }
         p = (AST::DefineVarNode*)(p->getCousinNode());
@@ -88,16 +88,16 @@ int SMB::SymbolTable::addSymbol(AST::BaseNode *node){
     std::string name = node->getContent();
     AST::ASTNodeType node_type = node->getASTNodeType();
     AST::DefineVarNode* tmp = (AST::DefineVarNode*)node;
-    STE::SymbolType symbol_type = tmp->getSymbolType();
+    SMB::SymbolType symbol_type = tmp->getSymbolType();
     Symbol *s = new Symbol(name,symbol_type);
     if((this->findInTable(name))==NULL){
         this->root_table->symbol_list->push_back(s);
         s->setIndex(this->root_table->total_symbol_count++);
         s->setOffset(this->root_table->total_offset);
         //offset的地方可能还需要修改
-        if(symbol_type == STE::SymbolType::integer || symbol_type == STE::SymbolType::pointer){
+        if(symbol_type == SMB::SymbolType::integer || symbol_type == SMB::SymbolType::pointer){
             this->root_table->total_offset += INT_OFFSET;
-        }else if(symbol_type == STE::SymbolType::array){
+        }else if(symbol_type == SMB::SymbolType::array){
             //this->root_table->total_offset += 0;//加一个数组长度
         }
         this->symbol_hash_map[s->getName()]=s;

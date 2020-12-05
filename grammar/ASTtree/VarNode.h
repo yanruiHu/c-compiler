@@ -8,7 +8,7 @@ namespace AST {
 
     class DefineVarNode : public BaseNode {
     private:
-        STE::SymbolType symbol_type;    // 符号类型
+        SMB::SymbolType symbol_type;    // 符号类型
         int array_length;
         std::string struct_name;    // 结构体名
     public:
@@ -16,9 +16,9 @@ namespace AST {
         // DefineVarNode(std::string, BaseNode*);
         DefineVarNode(std::string, std::string);    // 结构体变量构造函数
         DefineVarNode(std::string); // 普通变量构造函数
-        inline STE::SymbolType getSymbolType() {return this->symbol_type;}
+        inline SMB::SymbolType getSymbolType() {return this->symbol_type;}
         inline std::string getStructName() {return this->struct_name;}
-        inline void setTypeToArray() {this->symbol_type = STE::SymbolType::array;}
+        inline void setTypeToArray() {this->symbol_type = SMB::SymbolType::array;}
         inline int getArrayLength() {return this->array_length;}
         void setAllSymbolType(std::string);
         void setArrayLength(std::string);

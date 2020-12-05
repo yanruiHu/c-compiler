@@ -10,11 +10,11 @@ AST::DefineFuncNode::DefineFuncNode(std::string content, BaseNode* arg_list) : B
 
 void AST::DefineFuncNode::setReturnSymbolType(std::string symbol_type) {
     if (symbol_type == "int") {
-        this->return_symbol_type = STE::SymbolType::integer;
+        this->return_symbol_type = SMB::SymbolType::integer;
     } else if (symbol_type == "void") {
-        this->return_symbol_type = STE::SymbolType::void_type;
+        this->return_symbol_type = SMB::SymbolType::void_type;
     } else if (symbol_type == "int ptr") {
-        this->return_symbol_type = STE::SymbolType::pointer;
+        this->return_symbol_type = SMB::SymbolType::pointer;
     }
 }
 
