@@ -96,12 +96,25 @@ external_declaration: specifier external_declaration_list ';' {
     | struct_specifier ';' { $$ = $1;}
     | error ';' { yyerrok; $$ = NULL;}
     ;
-external_declaration_list: direct_declarator { $$ = $1; }
-    | external_declaration_list ',' direct_declarator {
+external_declaration_list: init_declarator_list { $$ = $1; }  //修改
+    | external_declaration_list ',' init_declarator_list {
         $1->getFinalCousinNode()->addCousinNode($3);
         $$ = $1;
     }
     ;
+init_declarator_list:init_declarator{
+
+    }
+    | init_declarator_list ',' init_declarator{
+
+    }
+    ;
+init_declarator: direct_declarator{
+
+    }
+    | direct_declarator '=' INT{
+        
+    }
 /*↑*/
 
 /* specifiers 说明符*/
