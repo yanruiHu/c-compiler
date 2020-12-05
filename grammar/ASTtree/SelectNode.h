@@ -27,6 +27,8 @@ namespace AST {
         // else
         SelectNode(std::string, SelectType, BaseNode*);
         inline SelectType getSelectType() {return this->select_type;}
+        inline BaseNode* getCondNode() {return this->cond;}
+        inline BaseNode* getBodyNode() {return this->body;}
         virtual void printInfo(int) override;
     };
 
