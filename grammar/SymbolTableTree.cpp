@@ -17,7 +17,10 @@ void tree(SMB::SymbolTable* table, AST::BaseNode* node, int depth){
             exit(1);
         }else{
             SMB::SymbolTable* child_table = table->createChildTable();
-            table = child_table;
+            
+            tree(child_table,node->getChildNode(), depth + 1);
+            tree(table,node->getCousinNode(), depth);
+            return;
         }
     }
     tree(table,node->getChildNode(), depth + 1);
