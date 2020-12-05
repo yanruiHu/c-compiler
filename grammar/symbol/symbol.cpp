@@ -52,6 +52,14 @@ SMB::SymbolTable::SymbolTable() {
 
 }
 
+void SMB::SymbolTable::addFromFunctionArgs(AST::DefineFuncNode *func_node) {
+    AST::BaseNode* args = func_node->getArgList();
+    while (args) {
+        this->addSymbol(args);
+        args = args->getCousinNode();
+    }
+}
+
 SMB::SymbolTable::SymbolTable(SymbolTable *parent) {
     this->parent_table = parent;
     this->child_table = NULL;
