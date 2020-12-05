@@ -3,7 +3,6 @@
 void SMB::tree(SMB::SymbolTable* table, AST::BaseNode* node, int depth){
     if (!node) return;
     if (node->getASTNodeType() == AST::ASTNodeType::def_var){
-        std::cout << "in tree symbol\n";
         if(table->addSymbol(node) == 0){
             std::cout << "\033[31mError: \033[0m"
               << "value " << node->getContent() << " is redeclaration" << std::endl;
@@ -30,11 +29,16 @@ void SMB::tree(SMB::SymbolTable* table, AST::BaseNode* node, int depth){
     } else if (node->getASTNodeType() == AST::loop) {
         AST::LoopNode *loop_node = (AST::LoopNode*) node;
         SMB::SymbolTable* child_table = table->createChildTable();
-        if (loop_node->getDecNode()) {
-            child_table->addSymbol(loop_node->getDecNode());
+        AST::BaseNode *dec = loop_node->getDecNode();
+        if (dec->getASTNodeType() == AST::op) {
+            dec = dec->getChildNode();
+        }
+        if (dec->getASTNodeType() == AST::def_var) {
+            child_table->addSymbol(dec);
         }
         tree(child_table,node->getChildNode(), depth + 1);
         tree(table,node->getCousinNode(), depth);
+        return;
     }
     tree(table,node->getChildNode(), depth + 1);
     tree(table,node->getCousinNode(), depth);

@@ -50,8 +50,9 @@ extern int yylineno;
 %type <str> specifier
 %type <ast> struct_specifier struct_declaration_list struct_declaration
 %type <ast> direct_declarator func_declarator parameter_list parameter_declaration
-%type <ast> compound_statement block_item_list declaration_for  statement defination declaration_list declaration
-%type <ast> expression argument_expression_list
+%type <ast> compound_statement block_item_list declaration_for 
+%type <ast> expression argument_expression_list statement defination declaration_list declaration
+%type <ast> init_declarator_list 
 // %
 // %start program
 
@@ -112,9 +113,10 @@ init_declarator_list:init_declarator{
 init_declarator: direct_declarator{
 
     }
-    | direct_declarator '=' INT{
-        
+    | direct_declarator '=' INT {
+
     }
+    ;
 /*↑*/
 
 /* specifiers 说明符*/
@@ -260,22 +262,22 @@ statement: expression ';' {
         $$ = temp;
     }
     | FOR '(' declaration_for ';' expression ';' expression ')' statement {
-        BaseNode* temp = new AST::LoopNode("", AST::for_loop, $4, $3, $5);
+        BaseNode* temp = new AST::LoopNode("", AST::for_loop, $5, $3, $7);
         temp->addChildNode($9);
         $$ = temp;
     }
     | FOR '(' declaration_for ';' expression ';' ')' statement  { //OK
-        BaseNode* temp = new AST::LoopNode("", AST::for_loop, $4, $3, NULL);
+        BaseNode* temp = new AST::LoopNode("", AST::for_loop, $5, $3, NULL);
         temp->addChildNode($8);
         $$ = temp;
     }
     | FOR '(' declaration_for ';' ';' expression ')' statement  { //OK
-        BaseNode* temp = new AST::LoopNode("", AST::for_loop, NULL, $3, $5);
+        BaseNode* temp = new AST::LoopNode("", AST::for_loop, NULL, $3, $6);
         temp->addChildNode($8);
         $$ = temp;
     }
     | FOR '(' ';' expression ';' expression ')' statement { //OK
-        BaseNode* temp = new AST::LoopNode("", AST::for_loop, $4, NULL, $5);
+        BaseNode* temp = new AST::LoopNode("", AST::for_loop, $4, NULL, $6);
         temp->addChildNode($8);
         $$ = temp;
     }
@@ -285,8 +287,8 @@ statement: expression ';' {
 
 /* Local Definitions 参考代码上注释是这个*/
 defination: specifier declaration_list  {
-        AST::DefineVarNode* tmp = (AST::DefineVarNode*)($2->getChildNode());
-        if(tmp) tmp->setAllSymbolType($1);
+        AST::DefineVarNode* tmp = (AST::DefineVarNode*)$2;
+        tmp->setAllSymbolType($1);
         $$ = $2;
     }
     | error ';' { yyerrok; }

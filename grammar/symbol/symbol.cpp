@@ -98,7 +98,7 @@ int SMB::SymbolTable::addSymbol(AST::BaseNode *node){
     AST::DefineVarNode* tmp = (AST::DefineVarNode*)node;
     SMB::SymbolType symbol_type = tmp->getSymbolType();
     Symbol *s = new Symbol(name,symbol_type);
-    if((this->findInTable(name))==NULL){
+    if((this->findInTable(name)) == NULL){
         this->root_table->symbol_list->push_back(s);
         s->setIndex(this->root_table->total_symbol_count++);
         s->setOffset(this->root_table->total_offset);
