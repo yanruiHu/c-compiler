@@ -70,7 +70,7 @@ namespace SMB {
             int addSymbol(AST::BaseNode *node);
             int addFuncSymbol(FuncSymbol *func_symbol);
             //int addStructSymbol(std::string structTypeName, std::string structIdName);
-            //void addFromFunctionArgs(AbstractASTNode *func);
+            void addFromFunctionArgs(AST::DefineFuncNode *func);
             SymbolTable* createChildTable();
 
             Symbol* findSymbol(const std::string name);

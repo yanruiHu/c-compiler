@@ -24,7 +24,7 @@ void AST::StatementNode::printInfo(int) {
         std::cout << "return statement: ";
         break;
     case defination:
-        std::cout << "difine statement: ";
+        std::cout << "define statement: ";
         break;
     case expression:
         std::cout << "expression: ";

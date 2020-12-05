@@ -181,9 +181,7 @@ block_item_list: block_item_list statement {
             $1->getFinalCousinNode()->addCousinNode($2);
         }
     }
-    | {
-        $$ = NULL;
-    }
+    | { $$ = NULL; }
     ;
 
   /*这个不知道是啥*/
@@ -240,7 +238,8 @@ statement: expression ';' {
         $$ = temp;
     }
     | FOR '(' declaration_for ';' ';' ')' statement{
-
+        BaseNode* temp = new AST::LoopNode("", AST::for_loop, NULL, $3, NULL);
+        temp->addChildNode($7);
     }
     | FOR '(' ';' expression ';' ')' statement{ //ok
         BaseNode* temp = new AST::LoopNode(AST::for_loop);
@@ -291,8 +290,8 @@ statement: expression ';' {
 /* Local Definitions 参考代码上注释是这个*/
 defination: specifier declaration_list  {
         AST::DefineVarNode* tmp = (AST::DefineVarNode*)($2->getChildNode());
-        tmp->setAllSymbolType($1);
-        $$ = tmp;
+        if(tmp) tmp->setAllSymbolType($1);
+        $$ = $2;
     }
     | error ';' { yyerrok; }
     ;
@@ -434,7 +433,7 @@ void yyerror(const char* s) {
 int main(int argc,char * argv[]){  //不确定语法的在哪里输出
 
     int c,j=0;
-    yyin=fopen("./test.txt","r");
+    yyin=fopen("./test.c","r");
     // if(argc>=2){
     //     if()==NULL){
     //         printf("Can't open file %s\n",argv[1]);
