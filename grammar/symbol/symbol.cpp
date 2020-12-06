@@ -49,7 +49,7 @@ bool SMB::FuncSymbol::operator==(const SMB::FuncSymbol& second) {
 }
 
 SMB::SymbolTable::SymbolTable() {
-
+    this->table_name = "Global";
 }
 
 void SMB::SymbolTable::addFromFunctionArgs(FuncSymbol *func_node) {
@@ -64,6 +64,7 @@ SMB::SymbolTable::SymbolTable(SymbolTable *parent) {
     this->parent_table = parent;
     this->child_table = NULL;
     this->cousin_table = NULL;
+    this->table_name = "Unnamed";
     
     // 遍历找到根作用域
     SymbolTable *p = this;
@@ -80,14 +81,13 @@ SMB::SymbolTable::SymbolTable(SymbolTable *parent) {
 
 // 解决重定义问题
 SMB::Symbol* SMB::SymbolTable::findInTable(const std::string name){
-    std::cout<<name<<std::endl;
     std::unordered_map<std::string, SMB::Symbol *>::iterator iter;
     iter = this->symbol_hash_map.find(name);
     if (iter!=this->symbol_hash_map.end()){
-        std::cout<<"find"<<std::endl;
+        std::cout<<"find "<< name << " in " << this->getTableName() <<std::endl;
         return iter->second;
     }else{
-        std::cout<<"NULL"<<std::endl;
+        std::cout<<"no "<< name << " in " << this->getTableName() <<std::endl;
         return NULL;
     }
 }
@@ -109,7 +109,7 @@ int SMB::SymbolTable::addSymbol(AST::BaseNode *node){
             //this->root_table->total_offset += 0;//加一个数组长度
         }
         this->symbol_hash_map[s->getName()]=s;
-        std::cout<<"add symbol:"<<s->getName()<<std::endl;
+        std::cout<< "add symbol:" << s->getName() << " in " << this->getTableName() <<std::endl;
         return SUCCESS;
     }else{
         // 重定义了
@@ -123,13 +123,12 @@ int SMB::SymbolTable::addFuncSymbol(SMB::FuncSymbol *func_symbol){
         //func_symbol->setIndex(this->root_table->total_symbol_count++);
         //offset部分
         std::string tmp_func_name = func_symbol->getDecName();
-        std::cout<<tmp_func_name<<std::endl;
         this->symbol_hash_map[tmp_func_name]=func_symbol;
         if((this->symbol_hash_map[tmp_func_name])==NULL){
             std::cout<<"wrong"<<std::endl;
         }
         std::string tmp = ((SMB::FuncSymbol*)(this->symbol_hash_map[tmp_func_name]))->getDecName();
-        std::cout<<"add function:"<<tmp<<std::endl;
+        std::cout<< "add function:" << tmp << " in " << this->getTableName() << std::endl;
         return SUCCESS;
     }else{
         //重定义

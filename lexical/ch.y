@@ -444,6 +444,7 @@ int main(int argc,char * argv[]){  //不确定语法的在哪里输出
     fclose(yyin);
     if(root) root->printTree();
     SMB::SymbolTable* root_symbol_table = new SMB::SymbolTable(NULL);
+    root_symbol_table->setTableName("GLOBAL");
     SMB::tree(root_symbol_table,root,0);
     if(root) delete root;
     return 0;

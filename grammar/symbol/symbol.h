@@ -58,7 +58,7 @@ namespace SMB {
             //int argTotalOffset;                     // 参数偏移量  
             //bool isFunctionTable;
             SymbolTable *root_table;
-
+            std::string table_name;
             
             Symbol *findInTable(const std::string name);
             //void visitFuncArgs(AbstractASTNode *arg, int &offset, int &index);
@@ -77,11 +77,12 @@ namespace SMB {
             Symbol* findSymbol(const std::string name);
             inline void setChild(SymbolTable* child) { this->child_table = child; };
             inline void setParent(SymbolTable* parent) { this->parent_table = parent; };
-
+            inline void setTableName(std::string name) { this->table_name = name; }
 
             inline SymbolTable* getParent() { return this->parent_table; };
             inline SymbolTable* getChild() { return this->child_table; };
-            inline SymbolTable* getPeer() { return this->cousin_table; }
+            inline SymbolTable* getCousin() { return this->cousin_table; }
+            inline std::string getTableName() { return this->table_name; }
             inline int getTotalOffset() { return this->total_offset; }
             //inline int getArgTotalOffset() { return this->argTotalOffset; }
             //inline StructTable *getStructTable() { return this->structTable; }
