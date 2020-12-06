@@ -18,7 +18,8 @@ namespace AST {
         inline BaseNode* getArgList() { return this->arg_list; }
         inline SMB::SymbolType getReturnSymbolType(){ return this->return_symbol_type; }
         void setReturnSymbolType(std::string);
-        virtual void printInfo(int) override;
+        void printInfo(int);
+        ~DefineFuncNode();
     };
 
     class CallFuncNode: public BaseNode {
@@ -29,7 +30,8 @@ namespace AST {
         CallFuncNode(std::string);
         inline void setVarList(BaseNode *v) {this->var_list = v;}
         inline BaseNode* getVarList() {return this->var_list;}
-        virtual void printInfo(int) override;
+        void printInfo(int);
+        ~CallFuncNode();
     };
 
 } // namespace AST

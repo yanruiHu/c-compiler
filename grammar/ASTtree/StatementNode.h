@@ -24,7 +24,7 @@ namespace AST {
         StatementNode(std::string);
         StatementNode(std::string, StatementType);
         inline StatementType getStmtType() {return this->stmt_type;}
-        virtual void printInfo(int) override; 
+        void printInfo(int); 
     };
 
 } // namespace AST

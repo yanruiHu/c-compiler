@@ -11,7 +11,7 @@ namespace AST {
         LiteralNode();
         LiteralNode(std::string);
         int getValue();
-        virtual void printInfo(int) override;
+        void printInfo(int);
     };
 
 } // namespace ASD

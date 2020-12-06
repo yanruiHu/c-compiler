@@ -31,7 +31,7 @@ namespace AST {
         OperatorNode(std::string);
         OperatorNode(std::string, OperatorType);
         inline OperatorType getOpType() {return this->op_type;}
-        virtual void printInfo(int) override;
+        void printInfo(int);
     };
 
 } // namespace AST

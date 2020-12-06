@@ -89,7 +89,6 @@ void AST::BaseNode::tree(AST::BaseNode* node, int depth, bool flag, std::vector<
 
     node = node->child;
     while(node) {
-        AST::BaseNode* temp = node->child;
         bool f = node->cousin;
         AST::BaseNode::tree(node, depth, !f, pre_sep);
         node = node->cousin;

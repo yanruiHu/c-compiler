@@ -44,7 +44,6 @@ void AST::DefineVarNode::setAllSymbolType(std::string symbol_type) {
     if (this->symbol_type == SMB::SymbolType::none) {
         this->symbol_type = var_type;
     }
-    std::cout<<var_type;
     DefineVarNode *cousin = (DefineVarNode *)this->getCousinNode();
     while (cousin != NULL) {
         if (cousin->symbol_type == SMB::SymbolType::none) {

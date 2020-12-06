@@ -18,18 +18,18 @@ namespace AST {
         DefineVarNode(std::string); // 普通变量构造函数
         inline SMB::SymbolType getSymbolType() {return this->symbol_type;}
         inline std::string getStructName() {return this->struct_name;}
-        inline void setTypeToArray() {this->symbol_type = SMB::SymbolType::array;}
+        inline void setTypeToArray() {this->symbol_type = SMB::array;}
         inline int getArrayLength() {return this->array_length;}
         void setAllSymbolType(std::string);
         void setArrayLength(std::string);
-        virtual void printInfo(int) override;
+        void printInfo(int);
     };
 
     class AssignVarNode : public BaseNode {
     public:
         AssignVarNode();
         AssignVarNode(std::string);
-        virtual void printInfo(int) override;
+        void printInfo(int);
     };
 
 } // namespace AST

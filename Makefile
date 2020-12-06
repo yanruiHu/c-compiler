@@ -17,7 +17,7 @@ CXXVER = c++11
 $(PROGRAM): $(OBJ)
 	$(CXX) -o $(PROGRAM) $(OBJ) -std=$(CXXVER) -g
 
-grammara: ./lexical/lexical.l ./lexical/ch.y
+syntactic: ./lexical/lexical.l ./lexical/ch.y
 ifeq ($(GRAMMAREXIST),notexist)
 	mkdir $(GRAMMARFOLDER)
 endif
@@ -30,17 +30,3 @@ endif
 
 clean:
 	rm -rf $(GRAMMARFOLDER) $(OBJ) $(PROGRAM) $(BUILDFOLDER) common/util/io/asm_io.o
-
-build:
-ifeq ($(BUILDEXIST),notexist)
-	mkdir $(BUILDFOLDER)
-endif
-ifeq ($(BUILDIOEXIST),notexist)
-	mkdir $(BUILDIO)
-endif
-	$(NASM) -f elf -d ELF_TYPE common/util/io/asm_io.asm -o common/util/io/asm_io.o
-	cp $(PROGRAM) $(BUILDFOLDER)
-	cp common/util/io/asm_io.o $(BUILDIO)
-	cp common/util/io/asm_io.inc $(BUILDIO)
-	cp -r test/ $(BUILDFOLDER)
-	cp example/Makefile $(BUILDFOLDER)

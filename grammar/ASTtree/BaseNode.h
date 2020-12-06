@@ -59,7 +59,7 @@ namespace AST {
         virtual void printInfo(int);
 
         // deconstructor:
-        ~BaseNode();
+        virtual ~BaseNode();
     };
 
 }

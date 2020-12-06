@@ -31,7 +31,8 @@ namespace AST {
         inline BaseNode* getBodyNode() { return this->body; }
         inline void setCondNode(BaseNode* c) { this->cond = c; }
         inline void setBodyNode(BaseNode* b) { this->body = b; }
-        virtual void printInfo(int) override;
+        void printInfo(int);
+        ~SelectNode();
     };
 
 } // namespace AST

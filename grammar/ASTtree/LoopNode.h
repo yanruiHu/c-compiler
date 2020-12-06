@@ -29,7 +29,8 @@ namespace AST {
         inline BaseNode *getDecNode() { return this->dec; }
         inline BaseNode *getCondNode() { return this->cond; }
         inline BaseNode *getActionNode() { return this->action; }
-        virtual void printInfo(int) override;
+        void printInfo(int);
+        ~LoopNode();
     };
     
 } // namespace AST

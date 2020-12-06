@@ -1,14 +1,28 @@
 #include "./LoopNode.h"
 
-AST::LoopNode::LoopNode() : BaseNode(AST::loop) {}
+AST::LoopNode::LoopNode() : BaseNode(AST::loop) {
+    this->cond = NULL;
+    this->dec = NULL;
+    this->action = NULL;
+}
 
-AST::LoopNode::LoopNode(std::string content) : BaseNode(content, AST::loop) {}
+AST::LoopNode::LoopNode(std::string content) : BaseNode(content, AST::loop) {
+    this->cond = NULL;
+    this->dec = NULL;
+    this->action = NULL;
+}
 
 AST::LoopNode::LoopNode(LoopType tp) : BaseNode(AST::loop) {
+    this->cond = NULL;
+    this->dec = NULL;
+    this->action = NULL;
     this->loop_type = tp;
 }
 
 AST::LoopNode::LoopNode(std::string content, LoopType tp) : BaseNode(content, AST::loop) {
+    this->cond = NULL;
+    this->dec = NULL;
+    this->action = NULL;
     this->loop_type = tp;
 }
 
@@ -45,4 +59,10 @@ void AST::LoopNode::printInfo(int) {
         std::cout << "loop statement(for): ";
         break;
     }
+}
+
+AST::LoopNode::~LoopNode() {
+    if (dec) delete dec;
+    if (cond) delete cond;
+    if (action) delete action;
 }
