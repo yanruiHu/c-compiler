@@ -52,7 +52,7 @@ extern int yylineno;
 %type <ast> direct_declarator func_declarator parameter_list parameter_declaration
 %type <ast> compound_statement block_item_list declaration_for 
 %type <ast> expression argument_expression_list statement defination declaration_list declaration
-%type <ast> init_declarator_list 
+%type <ast> init_declarator_list init_declarator
 // %
 // %start program
 
@@ -78,9 +78,11 @@ translation_unit: external_declaration {
     }
     ;
 external_declaration: specifier external_declaration_list ';' {
+        AST::BaseNode* stmt = new AST::StatementNode(AST::defination);
         AST::DefineVarNode* tmp = (AST::DefineVarNode*)$2;
         tmp->setAllSymbolType($1);
-        $$ = tmp;
+        stmt->addChildNode(tmp);
+        $$ = stmt;
     }
     | specifier ';' {}
     | specifier func_declarator compound_statement {
@@ -103,18 +105,19 @@ external_declaration_list: init_declarator_list { $$ = $1; }  //修改
         $$ = $1;
     }
     ;
-init_declarator_list:init_declarator{
-
-    }
-    | init_declarator_list ',' init_declarator{
-
+init_declarator_list:init_declarator { $$ = $1; }
+    | init_declarator_list ',' init_declarator {
+        $1->getFinalCousinNode()->addCousinNode($3);
+        $$ = $1;
     }
     ;
-init_declarator: direct_declarator{
-
-    }
+init_declarator: direct_declarator { $$ = $1; }
     | direct_declarator '=' INT {
-
+        AST::BaseNode* op = new AST::OperatorNode("=");
+        AST::BaseNode* tmp = new AST::LiteralNode($3);
+        op->addChildNode($1);
+        $1->addCousinNode(tmp);
+        $$ = op;
     }
     ;
 /*↑*/
