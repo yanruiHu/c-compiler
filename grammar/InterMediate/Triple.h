@@ -2,10 +2,11 @@
 #define _TRIPLE_H_
 
 #include "../symbol/symbol.h"
+#include <vector>
 
 namespace IM {
 
-    enum OpCode {
+    enum OperatorType {
         NONE,
         JUMP,
         JUMP_SMALL,
@@ -38,13 +39,17 @@ namespace IM {
     };
 
     class BaseTriple {
-    private:
-        OpCode op;
+    protected:
+        static std::vector<BaseTriple*> all_args;
+        OperatorType op;    // None 表示读取 symbol, 即当前类型为 Arg
+        int index;          // 三元式在all_args的坐标
     public:
-        BaseTriple();
-        BaseTriple(OpCode);
-        inline OpCode getOperator() { return this->op; }
-        inline void setOperator(OpCode op) { this->op = op; }
+        BaseTriple(OperatorType);
+        inline OperatorType getOperatorType() { return this->op; }
+        inline void setOperatorType(OperatorType op) { this->op = op; }
+        inline int getIndex() { return this->index; }
+        inline void setIndex(int index) { this->index = index; }
+        static void pushBack(BaseTriple *triple);
     };
 
     class Arg : public BaseTriple {
@@ -53,26 +58,21 @@ namespace IM {
     public:
         Arg();
         Arg(SMB::Symbol*);
-        inline SMB::Symbol* getSymbol() { return this->symbol; }
-        inline void setSymbol(SMB::Symbol *symbol) { this->symbol = symbol; }
+        inline SMB::Symbol *getSymbol() { return this->symbol; }
+        inline void *setSymbol(SMB::Symbol *symbol) { this->symbol = symbol; }
     };
 
     class Triple : public BaseTriple {
     private:
-        BaseTriple *arg1;
-        BaseTriple *arg2;
-        BaseTriple *nxt;
-    public:
-        Triple();
-        Triple(OpCode);
-        Triple(BaseTriple*, BaseTriple*);
-        Triple(OpCode, BaseTriple*, BaseTriple*);
-        inline BaseTriple* getNextTriple() { return this->nxt; }
-        inline void setNextTriple(BaseTriple *nxt) { this->nxt = nxt; }
-        inline BaseTriple* getArg1() { return this->arg1; }
-        inline void setArg2(BaseTriple* arg1) { this->arg1 = arg1; }
-        inline BaseTriple* getArg2() { return this->arg2; }
-        inline void setArg2(BaseTriple* arg2) { this->arg2 = arg2; }
+        int arg1;  // 三元式的参数 
+        int arg2;
+    public: 
+        Triple(OperatorType);
+        Triple(OperatorType, BaseTriple*, BaseTriple*);
+        inline BaseTriple *getArg1() { return this->all_args[this->arg1]; }
+        inline BaseTriple *getArg2() { return this->all_args[this->arg2]; }
+        inline void setArg1(BaseTriple *arg1) { this->arg1 = arg1->getIndex(); }
+        inline void setArg2(BaseTriple *arg2) { this->arg2 = arg2->getIndex(); }
     };
     
 } // namespace IM
