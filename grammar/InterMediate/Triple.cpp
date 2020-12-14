@@ -1,5 +1,7 @@
 #include "./Triple.h"
 
+std::vector<IM::BaseTriple*> IM::BaseTriple::all_args;
+
 IM::BaseTriple::BaseTriple(OperatorType op) {
     this->op = op;
 }

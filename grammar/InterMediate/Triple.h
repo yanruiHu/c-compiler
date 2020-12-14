@@ -59,7 +59,7 @@ namespace IM {
         Arg();
         Arg(SMB::Symbol*);
         inline SMB::Symbol *getSymbol() { return this->symbol; }
-        inline void *setSymbol(SMB::Symbol *symbol) { this->symbol = symbol; }
+        inline void setSymbol(SMB::Symbol *symbol) { this->symbol = symbol; }
     };
 
     class Triple : public BaseTriple {
