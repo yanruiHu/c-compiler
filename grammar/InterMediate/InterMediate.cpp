@@ -1,11 +1,10 @@
 #include "./InterMediate.h"
 #include <typeinfo>
 #include <cstdio>
-IM::InterMediate::InterMediate(AST::BaseNode *rootNode, SMB::structTable *structTable)
-{
+IM::InterMediate::InterMediate(AST::BaseNode *rootNode, SMB::StructTable *structTable) {
     temp_vars.reserve(100);
     this->root = rootNode;
-    this->symbol_table = new SMB::SymbolTable(false, structTable);
+    this->symbol_table = new SMB::SymbolTable(structTable);
 }
 
 void InterMediate::Generate(AbstractASTNode *node, SymbolTable *symbolTable)

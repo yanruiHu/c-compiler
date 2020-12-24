@@ -48,6 +48,19 @@ bool SMB::FuncSymbol::operator==(const SMB::FuncSymbol& second) {
     return this->dec_name == second.dec_name;
 }
 
+// Struct
+SMB::StructDefSymbol::StructDefSymbol(std::string struct_type_name, std::string id_name){
+    this->stuct_type_name=struct_type_name;
+}
+
+SMB::StructSymbol::StructSymbol(){
+
+}
+
+SMB::StructSymbol::StructSymbol(std::string name, AST::BaseNode* node){
+    this->total_member_offset
+}
+
 SMB::SymbolTable::SymbolTable() {
     this->table_name = "Global";
 }

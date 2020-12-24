@@ -44,6 +44,35 @@ namespace SMB {
             inline AST::BaseNode *getArgList() { return this->arg_list; }
     };
 
+    class StructDefSymbol : public Symbol {
+        private:
+            std::string stuct_type_name;
+        public:
+            StructDefSymbol(std::string struct_type_name, std::string id_name);
+            inline std::string getTypeName() { return this->stuct_type_name; }
+    };
+
+    class StructSymbol : public Symbol {
+        private:
+            std::unordered_map<std::string, int> offset_table;
+            int total_member_offset;
+
+        public:
+            StructSymbol();
+            StructSymbol(std::string name, AST::BaseNode* node);
+            inline int getTotalMemberOffset() { return this->total_member_offset; }
+            int getMemberOffset(std::string member_name);
+    };
+
+    class StructTable{
+        private:
+            std::unordered_map<std::string, StructSymbol*> struct_hash_table;
+            static int num;
+        public:
+            StructTable();
+            bool addStruct(StructSymbol *curr_struct);
+            StructSymbol *findStruct(std::string id_name);
+    };
 
     class SymbolTable {
         private:
@@ -87,41 +116,6 @@ namespace SMB {
             //inline int getArgTotalOffset() { return this->argTotalOffset; }
             //inline StructTable *getStructTable() { return this->structTable; }
     };
-
-    class structSymbol : public Symbol
-    {
-        std::unordered_map<std::string, int> offsetTable;
-        int totalOffsets;
-
-    public:
-        structSymbol();
-        //structSymbol(std::string name, AbstractASTNode *node);
-        std::string getStructName() { return this->name; }
-        int getTotalOffsets() { return this->totalOffsets; }
-        int getMemberOffset(std::string key);
-    };
-
-    class decorationStructSymbol : public Symbol
-    {
-    private:
-        std::string structTypeName;
-    public:
-        decorationStructSymbol(std::string structTypeName, std::string name);
-        std::string getStructTypeName() { return this->structTypeName; }
-    };
-
-    class structTable
-    {
-    private:
-        std::unordered_map<std::string, structSymbol*> structHashTable;
-        static int num;
-
-    public:
-        structTable();
-        bool addStructSymbol(structSymbol *func);
-        structSymbol *searchStructSymbol(std::string symbolName);
-    };
-
 } // namespace SMB
 
 #endif
