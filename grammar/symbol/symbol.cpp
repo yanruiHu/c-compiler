@@ -115,10 +115,11 @@ void SMB::SymbolTable::addFromFunctionArgs(FuncSymbol *func_node) {
     }
 }
 
-SMB::SymbolTable::SymbolTable(SymbolTable *parent) {
+SMB::SymbolTable::SymbolTable(SymbolTable *parent, bool is_func) {
     this->parent_table = parent;
     this->child_table = NULL;
     this->cousin_table = NULL;
+    this->is_func = is_func;
     this->table_name = "Unnamed";
     
     // 遍历找到根作用域
@@ -131,7 +132,25 @@ SMB::SymbolTable::SymbolTable(SymbolTable *parent) {
     this->total_symbol_count = 0;
     this->total_offset = 4;
 
-    this->symbol_list = new std::vector<SMB::Symbol *>();
+    if(is_func){
+        this->symbol_list = new std::vector<SMB::Symbol *>();
+        this->arg_list = new std::vector<SMB::Symbol *>();
+    }
+    
+}
+
+SMB::SymbolTable::SymbolTable(SMB::StructTable *struct_table, bool is_func){
+    this->struct_list = struct_table;
+    this->child_table = NULL;
+    this->parent_table = NULL;
+    this->root_table = this;
+    this->total_symbol_count = 0;
+    this->total_offset = 4;
+    this->is_func = is_func;
+    if(is_func){
+        this->symbol_list = new std::vector<SMB::Symbol *>();
+        this->arg_list = new std::vector<SMB::Symbol *>();
+    }
 }
 
 // 解决重定义问题
@@ -172,6 +191,7 @@ int SMB::SymbolTable::addSymbol(AST::BaseNode *node){
     }   
 }
 
+
 int SMB::SymbolTable::addFuncSymbol(SMB::FuncSymbol *func_symbol){
     if((this->findInTable(func_symbol->getDecName()))==NULL){
         this->root_table->symbol_list->push_back(func_symbol);
@@ -191,8 +211,42 @@ int SMB::SymbolTable::addFuncSymbol(SMB::FuncSymbol *func_symbol){
     }
 }
 
-SMB::SymbolTable* SMB::SymbolTable::createChildTable(){
-    SymbolTable *child = new SymbolTable(this);
+int SMB::SymbolTable::addStructSymbol(std::string struct_type, std::string id_name){
+    StructDefSymbol *s = new StructDefSymbol(struct_type, id_name);
+    if(this->findInTable(id_name)!=NULL)
+        return FAIL;
+    else{
+        StructSymbol *target = this->struct_list->findStruct(id_name);
+        if(target == NULL){
+            return FAIL;
+        }else{
+            this->root_table->symbol_list->push_back(s);
+            s->setIndex(this->root_table->total_symbol_count++);
+            s->setOffset(this->root_table->total_offset);
+            this->root_table->total_offset += target->getTotalMemberOffset();
+            return SUCCESS;
+        }
+    }
+}
+
+int SMB::SymbolTable::addArraySymbol(AST::BaseNode *array_node){
+    AST::DefineVarNode *curr_array = (AST::DefineVarNode *)array_node;
+    std::string array_name = array_node->getContent();
+    if(this->findInTable(array_name)!=NULL)
+        return FAIL;
+    else{
+        Symbol *s = new Symbol(array_name, SymbolType::array);
+        this->root_table->symbol_list->push_back(s);
+        s->setIndex(this->root_table->total_symbol_count++);
+        s->setOffset(this->root_table->total_offset);
+        this->root_table->total_offset += curr_array->getArrayLength()*4;
+        this->symbol_hash_map[array_name] = s;
+        return SUCCESS;
+    }
+}
+
+SMB::SymbolTable* SMB::SymbolTable::createChildTable(bool is_func){
+    SMB::SymbolTable *child = new SMB::SymbolTable(this, is_func);
     if(this->child_table == NULL){
         this->setChild(child);
     }else if(this->child_table->cousin_table == NULL){

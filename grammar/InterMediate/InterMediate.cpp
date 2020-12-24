@@ -4,7 +4,7 @@
 IM::InterMediate::InterMediate(AST::BaseNode *rootNode, SMB::StructTable *structTable) {
     temp_vars.reserve(100);
     this->root = rootNode;
-    this->symbol_table = new SMB::SymbolTable(structTable);
+    this->symbol_table = new SMB::SymbolTable(structTable, false);
 }
 
 void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbolTable)
@@ -25,7 +25,7 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbolTab
         temp = new Quaternion(IM::FUNC_DEF, temp_symbol, (SMB::Symbol *)NULL);
         this->quads.push_back(*temp);
         while (p != NULL) {
-            SMB::SymbolTable *childTable = symbolTable->createChildTable();
+            SMB::SymbolTable *childTable = symbolTable->createChildTable(true);
             childTable->addFromFunctionArgs(func);
             generate(p, childTable);
             p = p->getCousinNode();
@@ -44,7 +44,7 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbolTab
             if (var->getASTNodeType() == AST::assign_var) {
                 SMB::Symbol *arg1 = symbolTable->findSymbol(var->getContent());
                 temp = new Quaternion(IM::PARAM, arg1, (SMB::Symbol *)NULL);
-                switch (arg1->getOpType()) {
+                switch (arg1->getType()) {
                 case SMB::integer:
                     add_on = add_on + "-i";
                     break;
@@ -63,7 +63,7 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbolTab
             else if (var->getASTNodeType() == AST::op) {
                 SMB::Symbol *arg1 = generateOperator((AST::OperatorNode*)var, symbolTable);
                 temp = new Quaternion(IM::PARAM, arg1, (SMB::Symbol*)NULL);
-                switch (arg1->getOpType())
+                switch (arg1->getType())
                 {
                 case SMB::integer:
                     add_on = add_on + "-i";
@@ -168,13 +168,13 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbolTab
         AST::DefineVarNode *tempNode = (AST::DefineVarNode*)node;
         if (tempNode->getSymbolType() == SMB::struct_type) {
             // TODO: addStructSymbol
-            symbolTable->addStructSymbol(tempNode->getStructType(), tempNode->getContent());
+            symbolTable->addStructSymbol(tempNode->getStructName(), tempNode->getContent());
         }
         else if (tempNode->getSymbolType() == SMB::array) {
             symbolTable->addArraySymbol(tempNode);
         }
         else {
-            symbolTable->addSymbol(tempNode->getContent(), tempNode->getSymbolType());
+            symbolTable->addSymbol(tempNode);
         }
         SMB::Symbol *varSymbol = symbolTable->findSymbol(node->getContent());
         if (p != NULL) {
@@ -233,7 +233,7 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbolTab
         AST::LoopNode *loop = (AST::LoopNode*)node;
         if (loop->getLoopType() == AST::for_loop)
         {
-            SMB::SymbolTable *childTable = symbolTable->createChildTable();
+            SMB::SymbolTable *childTable = symbolTable->createChildTable(false);
             generate(((AST::LoopNode*)node)->getDecNode(), childTable);
             int start = quads.size();
             generate(((AST::LoopNode*)node)->getCondNode(), childTable);
@@ -265,7 +265,7 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbolTab
             backpatch(&JudgeTrue, JudgeTrue.back() + 2);
             while (p != NULL)
             {
-                generate(p, symbolTable->createChildTable());
+                generate(p, symbolTable->createChildTable(false));
                 p = p->getCousinNode();
             }
 
@@ -326,7 +326,7 @@ SMB::SymbolTable *IM::InterMediate::generateStatement(AST::StatementNode *node, 
             return symbolTable;
         if (node->getParentNode()->getASTNodeType() == AST::def_func)
             return symbolTable;
-        return symbolTable->createChildTable();
+        return symbolTable->createChildTable(false);
     }
     break;
     default:
@@ -776,7 +776,7 @@ SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::Sy
         {
             if (arg2Node->getASTNodeType() == AST::assign_var) {
                 // TODO: struct table
-                std::string typeName = ((structDecSymbol *)arg1)->getTypeName();
+                std::string typeName = ((SMB::StructDefSymbol *)arg1)->getTypeName();
                 int offset = this->symbol_table->getStructTable()->findStruct(typeName)->getMemberOffset(arg2Node->getContent());
                 SMB::Symbol *arg2 = new SMB::Symbol(std::to_string(offset), SMB::literal);
                 childValue.push(arg2);
@@ -789,7 +789,7 @@ SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::Sy
             return arg1;
         } else {
             if (arg2Node->getASTNodeType() == AST::assign_var) {
-                std::string typeName = ((structDecSymbol *)arg1)->getTypeName();
+                std::string typeName = ((SMB::StructDefSymbol *)arg1)->getTypeName();
                 int offset = this->symbol_table->getStructTable()->findStruct(typeName)->getMemberOffset(arg2Node->getContent());
                 SMB::Symbol *arg2 = new SMB::Symbol(std::to_string(offset), SMB::literal);
                 temp = new Quaternion(IM::GET_STRUCT, arg1, arg2, result);

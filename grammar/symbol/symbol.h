@@ -77,15 +77,16 @@ namespace SMB {
     class SymbolTable {
         private:
             std::unordered_map<std::string, Symbol*> symbol_hash_map;
+            std::vector<Symbol *> *arg_list;
             std::vector<Symbol*> *symbol_list;
             SymbolTable *parent_table;
             SymbolTable *child_table;
             SymbolTable *cousin_table;
-            //结构体Table
+            StructTable *struct_list;
             int total_symbol_count;
             int total_offset;
             //int argTotalOffset;                     // 参数偏移量  
-            //bool isFunctionTable;
+            bool is_func;
             SymbolTable *root_table;
             std::string table_name;
             
@@ -96,12 +97,14 @@ namespace SMB {
             static const int SUCCESS=1;
             static const int FAIL=0;
             SymbolTable();
-            SymbolTable(SymbolTable *parent);
+            SymbolTable(SymbolTable*, bool);
+            SymbolTable(StructTable*, bool);
             int addSymbol(AST::BaseNode *node);
             int addFuncSymbol(FuncSymbol *func_symbol);
-            //int addStructSymbol(std::string structTypeName, std::string structIdName);
+            int addStructSymbol(std::string, std::string);
+            int addArraySymbol(AST::BaseNode *array_node);
             void addFromFunctionArgs(FuncSymbol *func);
-            SymbolTable* createChildTable();
+            SymbolTable* createChildTable(bool);
 
             Symbol* findSymbol(const std::string name);
             inline void setChild(SymbolTable* child) { this->child_table = child; };
@@ -114,7 +117,7 @@ namespace SMB {
             inline std::string getTableName() { return this->table_name; }
             inline int getTotalOffset() { return this->total_offset; }
             //inline int getArgTotalOffset() { return this->argTotalOffset; }
-            //inline StructTable *getStructTable() { return this->structTable; }
+            inline StructTable *getStructTable() { return this->struct_list; }
     };
 } // namespace SMB
 
