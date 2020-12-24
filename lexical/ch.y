@@ -129,7 +129,9 @@ specifier: INT { $$ = strdup("int"); }
     | VOID '*' { $$ = strdup("void ptr"); }
     ;
 
-struct_specifier: STRUCT ID '{' struct_declaration_list '}' { $$ = NULL; }
+struct_specifier: STRUCT ID '{' struct_declaration_list '}' { 
+        
+    }
     ;
 
 struct_declaration_list: struct_declaration { $$ = NULL; }

@@ -87,20 +87,8 @@ namespace SMB {
             //inline int getArgTotalOffset() { return this->argTotalOffset; }
             //inline StructTable *getStructTable() { return this->structTable; }
     };
-/*
-    class structTable
-    {
-    private:
-        std::unordered_map<std::string, structSymbol *> structHashTable;
-        static int num;
 
-    public:
-        structTable();
-        bool addStructSymbol(structSymbol *func);
-        structSymbol *searchStructSymbol(std::string symbolName);
-    };
-
-    class structSymbol : public symbol
+    class structSymbol : public Symbol
     {
         std::unordered_map<std::string, int> offsetTable;
         int totalOffsets;
@@ -113,7 +101,7 @@ namespace SMB {
         int getMemberOffset(std::string key);
     };
 
-    class decorationStructSymbol : public symbol
+    class decorationStructSymbol : public Symbol
     {
     private:
         std::string structTypeName;
@@ -121,7 +109,19 @@ namespace SMB {
         decorationStructSymbol(std::string structTypeName, std::string name);
         std::string getStructTypeName() { return this->structTypeName; }
     };
-*/
+
+    class structTable
+    {
+    private:
+        std::unordered_map<std::string, structSymbol*> structHashTable;
+        static int num;
+
+    public:
+        structTable();
+        bool addStructSymbol(structSymbol *func);
+        structSymbol *searchStructSymbol(std::string symbolName);
+    };
+
 } // namespace SMB
 
 #endif
