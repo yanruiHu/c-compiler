@@ -32,7 +32,7 @@ public:
     // inline FuncTable &getFuncTable() { return this->funcTable; }
     inline std::vector<Quaternion> &getQuads() { return this->quads; }
     inline std::vector<SMB::Symbol*> &getTempVars() { return this->temp_vars; }
-    InterMediate(AST::BaseNode *rootNode, SMB::structTable*);
+    InterMediate(AST::BaseNode *rootNode, SMB::StructTable*);
     void generate(AST::BaseNode *node, SMB::SymbolTable*);
     // Create a child symbol table to generate follow code.
     SMB::SymbolTable *generateStatement(AST::StatementNode*, SMB::SymbolTable*);

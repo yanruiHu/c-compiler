@@ -29,6 +29,7 @@ namespace AST {
         inline BaseNode *getDecNode() { return this->dec; }
         inline BaseNode *getCondNode() { return this->cond; }
         inline BaseNode *getActionNode() { return this->action; }
+        inline LoopType getLoopType() { return this->loop_type; }
         void printInfo(int);
         ~LoopNode();
     };

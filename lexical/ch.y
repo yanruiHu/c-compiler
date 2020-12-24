@@ -114,7 +114,7 @@ init_declarator_list:init_declarator { $$ = $1; }
     ;
 init_declarator: direct_declarator { $$ = $1; }
     | direct_declarator '=' INT {
-        AST::BaseNode* op = new AST::OperatorNode("=");
+        AST::BaseNode* op = new AST::OperatorNode("=", AST::assign);
         AST::BaseNode* tmp = new AST::LiteralNode($3);
         op->addChildNode($1);
         $1->addCousinNode(tmp);
@@ -309,7 +309,7 @@ declaration_list: declaration { $$ = $1; }
 
 declaration: direct_declarator { $$ = $1; }
     | direct_declarator '=' expression {
-        $$ = new AST::OperatorNode("=");
+        $$ = new AST::OperatorNode("=", AST::assign);
         $$->addChildNode($1);
         $1->addCousinNode($3);
     }
@@ -318,61 +318,61 @@ declaration: direct_declarator { $$ = $1; }
 
 /* expressionression */
 expression: expression '=' expression {
-            BaseNode* temp = new AST::OperatorNode("=");
+            BaseNode* temp = new AST::OperatorNode("=", AST::assign);
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
         | expression AND expression {
-            BaseNode* temp = new AST::OperatorNode("&&");
+            BaseNode* temp = new AST::OperatorNode("&&", AST::and_op);
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
         | expression OR expression {
-            BaseNode* temp = new AST::OperatorNode("||");
+            BaseNode* temp = new AST::OperatorNode("||", AST::or_op);
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
         | expression RELOP expression {
-            BaseNode* temp = new AST::OperatorNode($2);
+            BaseNode* temp = new AST::OperatorNode($2, AST::relop);
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
         | expression '+' expression {
-            BaseNode* temp = new AST::OperatorNode("+");
+            BaseNode* temp = new AST::OperatorNode("+", AST::add);
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
         | expression '-' expression {
-            BaseNode* temp = new AST::OperatorNode("-");
+            BaseNode* temp = new AST::OperatorNode("-", AST::minus);
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
         | expression '*' expression {
-            BaseNode* temp = new AST::OperatorNode("*");
+            BaseNode* temp = new AST::OperatorNode("*", AST::multi);
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
         | expression '/' expression {
-            BaseNode* temp = new AST::OperatorNode("/");
+            BaseNode* temp = new AST::OperatorNode("/", AST::div);
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
         | expression '%' expression {
-            BaseNode* temp = new AST::OperatorNode("%");
+            BaseNode* temp = new AST::OperatorNode("%", AST::mod);
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
         }
         | expression '^' expression {
-            BaseNode* temp = new AST::OperatorNode("^");
+            BaseNode* temp = new AST::OperatorNode("^", AST::pow);
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
@@ -381,17 +381,17 @@ expression: expression '=' expression {
             $$ = $2;
         }
         | '-' expression {
-            BaseNode* temp = new AST::OperatorNode("-");
+            BaseNode* temp = new AST::OperatorNode("-", AST::negative);
             temp->addChildNode($2);
             $$ = temp;
         }
         | '!' expression {
-            BaseNode* temp = new AST::OperatorNode("!");
+            BaseNode* temp = new AST::OperatorNode("!", AST::not_op);
             temp->addChildNode($2);
             $$ = temp;
         }
         | '&' ID {
-            BaseNode* op = new AST::OperatorNode("&");
+            BaseNode* op = new AST::OperatorNode("&", AST::get_address);
             BaseNode* temp = new AST::AssignVarNode($2);
             $$ = op;
             op->addChildNode(temp);
@@ -411,7 +411,7 @@ expression: expression '=' expression {
             $$ = new AST::AssignVarNode($1);
         }
         | ID '[' expression ']' {
-            BaseNode* op = new AST::OperatorNode("[]");
+            BaseNode* op = new AST::OperatorNode("[]", AST::get_arr_var);
             BaseNode* temp = new AST::AssignVarNode($1);
             $$ = op;
             op->addChildNode(temp);
