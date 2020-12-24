@@ -2,7 +2,7 @@
 #include <stdio.h>
 // #include "hdr.h"
 #include <string.h>
-#include <fstream>
+#include <fstream>s
 #include "../grammar/Nodes.h"
 #include "../grammar/symbol/symbol.h"
 
@@ -28,6 +28,7 @@ extern int yylineno;
 %right <ast> '='
 %left <ast> OR
 %left <ast> AND
+%left <ast> '&'
 %left <str> RELOP
 %left <ast> '-' '+'
 %left <ast> '*' '/' '%'
@@ -388,6 +389,12 @@ expression: expression '=' expression {
             BaseNode* temp = new AST::OperatorNode("!");
             temp->addChildNode($2);
             $$ = temp;
+        }
+        | '&' ID {
+            BaseNode* op = new AST::OperatorNode("&");
+            BaseNode* temp = new AST::AssignVarNode($2);
+            $$ = op;
+            op->addChildNode(temp);
         }
         | ID '(' argument_expression_list ')' {
             AST::CallFuncNode* temp = new AST::CallFuncNode($1);
