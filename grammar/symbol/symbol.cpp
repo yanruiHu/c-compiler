@@ -54,12 +54,54 @@ SMB::StructDefSymbol::StructDefSymbol(std::string struct_type_name, std::string 
 }
 
 SMB::StructSymbol::StructSymbol(){
-
+    
 }
 
 SMB::StructSymbol::StructSymbol(std::string name, AST::BaseNode* node){
-    this->total_member_offset
+    this->total_member_offset = 0;
+    int offset = 0;
+    this->name = name;
+    AST::BaseNode *curr_node = node;
+    while(curr_node){
+        AST::DefineVarNode *var = (AST::DefineVarNode*)curr_node;
+        offset_table[var->getContent()] = offset;
+        offset+=4;
+        curr_node = curr_node->getCousinNode();
+    }
+    this->total_member_offset = offset;
 }
+
+int SMB::StructSymbol::getMemberOffset(std::string member_name){
+    if(this->offset_table.count(member_name) == 0){
+        return -1;
+    }else{
+        return this->offset_table[member_name];
+    }
+}
+
+SMB::StructTable::StructTable(){
+
+}
+
+SMB::StructSymbol *SMB::StructTable::findStruct(std::string id_name){
+    std::unordered_map<std::string, SMB::StructSymbol *>::iterator iter;
+    iter = this->struct_hash_table.find(id_name);
+    if(iter != this->struct_hash_table.end())
+        return iter->second;
+    else
+        return NULL;
+}
+
+bool SMB::StructTable::addStruct(StructSymbol *curr_struct){
+    if(this->findStruct(curr_struct->getName())){
+        return false;
+    }else{
+        this->struct_hash_table[curr_struct->getName()]=curr_struct;
+        return true;
+    }
+}
+
+
 
 SMB::SymbolTable::SymbolTable() {
     this->table_name = "Global";

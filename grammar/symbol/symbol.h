@@ -70,8 +70,8 @@ namespace SMB {
             static int num;
         public:
             StructTable();
-            bool addStruct(StructSymbol *curr_struct);
             StructSymbol *findStruct(std::string id_name);
+            bool addStruct(StructSymbol *curr_struct);
     };
 
     class SymbolTable {
