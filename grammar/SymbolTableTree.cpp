@@ -15,7 +15,7 @@ void SMB::tree(SMB::SymbolTable* table, AST::BaseNode* node, int depth){
               << "function " << func_node->getDecName() << " is redeclaration" << std::endl;
             exit(1);
         } else {
-            SMB::SymbolTable* child_table = table->createChildTable();
+            SMB::SymbolTable* child_table = table->createChildTable(true);
             child_table->setTableName(func_node->getDecName());
             child_table->addFromFunctionArgs(func_node);
             tree(child_table,node->getChildNode(), depth + 1);
@@ -23,14 +23,14 @@ void SMB::tree(SMB::SymbolTable* table, AST::BaseNode* node, int depth){
             return;
         }
     } else if (node->getASTNodeType() == AST::select) {
-        SMB::SymbolTable* child_table = table->createChildTable();
+        SMB::SymbolTable* child_table = table->createChildTable(false);
         child_table->setTableName("select");
         tree(child_table,node->getChildNode(), depth + 1);
         tree(table,node->getCousinNode(), depth);
         return;
     } else if (node->getASTNodeType() == AST::loop) {
         AST::LoopNode *loop_node = (AST::LoopNode*) node;
-        SMB::SymbolTable* child_table = table->createChildTable();
+        SMB::SymbolTable* child_table = table->createChildTable(false);
         child_table->setTableName("loop");
         AST::BaseNode *dec = loop_node->getDecNode();
         if (dec) {

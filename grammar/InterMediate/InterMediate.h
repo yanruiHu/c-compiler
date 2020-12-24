@@ -40,7 +40,7 @@ public:
     SMB::Symbol *generateOperator(AST::OperatorNode*, SMB::SymbolTable*);
     Quaternion *caculateOperator(OperatorCode, AST::BaseNode*, AST::BaseNode*, SMB::Symbol*, SMB::SymbolTable*);
     void relopOperator(Quaternion*, Quaternion*, OperatorCode, AST::BaseNode*, AST::BaseNode*, SMB::SymbolTable*);
-    void printQuads();
+    void print();
 };
 
 } // namespace IM

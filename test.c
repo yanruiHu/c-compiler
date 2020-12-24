@@ -1,6 +1,3 @@
-int i = 1;
-int a, b;
-
 int print_int(int i) {
     int a = 1, b = 2;
 }

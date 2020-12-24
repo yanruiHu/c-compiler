@@ -21,7 +21,7 @@ namespace AST {
         negative = 10, // -
         relop = 11, // <=
         mod = 12,   // %
-        get_adress = 13, // &
+        get_address = 13, // &
         get_var = 15,// *
         get_arr_var = 16, //[]
         get_member = 17, // a.b

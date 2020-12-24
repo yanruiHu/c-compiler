@@ -2,17 +2,20 @@
 #include <stdio.h>
 // #include "hdr.h"
 #include <string.h>
-#include <fstream>s
+#include <fstream>
 #include "../grammar/Nodes.h"
 #include "../grammar/symbol/symbol.h"
+#include "../grammar/InterMediate/InterMediate.h"
 
 using AST::BaseNode;
+using SMB::StructTable;
 class BaseNode;
 extern char *yytext;
 extern int yylex();
 extern FILE * yyin;
 void yyerror(const char* s);
 BaseNode* root = NULL;
+StructTable *struct_table;
 extern int yylineno;
 %}
 
@@ -131,15 +134,25 @@ specifier: INT { $$ = strdup("int"); }
     ;
 
 struct_specifier: STRUCT ID '{' struct_declaration_list '}' { 
-        
+        if(struct_table == NULL){
+            struct_table = new SMB::StructTable();
+        }
+        SMB::StructSymbol* curr_struct = new SMB::StructSymbol($2,$4);
+        struct_table->addStruct(curr_struct);
+        $$ = NULL;
     }
     ;
 
-struct_declaration_list: struct_declaration { $$ = NULL; }
-    | struct_declaration_list struct_declaration{ $$ = NULL; }
+struct_declaration_list: struct_declaration { $$ = $1; }
+    | struct_declaration_list struct_declaration{
+        $1->getFinalCousinNode()->addCousinNode($2); 
+        $$ = $1; }
     ;
 
-struct_declaration: specifier ID ';' { $$ = NULL; }
+struct_declaration: specifier ID ';' { 
+        AST::DefineVarNode* var = new AST::DefineVarNode($2);
+        var->setAllSymbolType($1);
+        $$ = var; }
     ;
 
 /* declarationorator 装饰符 声明？格式*/
@@ -215,7 +228,11 @@ statement: expression ';' {
         temp->addChildNode($1);
         $$ = temp;
     }
-    | STRUCT ID ID ';' { $$ =NULL; }
+    | STRUCT ID ID ';' { 
+        BaseNode* temp = new AST::StatementNode(AST::defination);
+        BaseNode* struct_def = new AST::DefineVarNode($2,$3);
+        temp->addChildNode(struct_def);
+        $$ = temp; }
     | compound_statement { $$=$1;}
     | RETURN expression ';' {
         BaseNode* temp = new AST::StatementNode(AST::return_stmt);
@@ -455,9 +472,11 @@ int main(int argc,char * argv[]){  //不确定语法的在哪里输出
 	} while(!feof(yyin));
     fclose(yyin);
     if(root) root->printTree();
-    SMB::SymbolTable* root_symbol_table = new SMB::SymbolTable(NULL);
+    SMB::SymbolTable* root_symbol_table = new SMB::SymbolTable(NULL,false);
     root_symbol_table->setTableName("GLOBAL");
-    SMB::tree(root_symbol_table,root,0);
+    // SMB::tree(root_symbol_table,root,0);
+    IM::InterMediate *im = new IM::InterMediate(root, struct_table);
+    im->generate(root, root_symbol_table);
     if(root) delete root;
     return 0;
 }

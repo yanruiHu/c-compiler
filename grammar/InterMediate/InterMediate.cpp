@@ -4,17 +4,15 @@
 IM::InterMediate::InterMediate(AST::BaseNode *rootNode, SMB::StructTable *structTable) {
     temp_vars.reserve(100);
     this->root = rootNode;
-    this->symbol_table = new SMB::SymbolTable(structTable, false);
+    this->symbol_table = new SMB::SymbolTable(false, structTable);
 }
 
 void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbolTable)
 {
-    if (node == NULL)
-    {
+    if (node == NULL) {
         std::cout << "NULL" << std::endl;
-    }
-    if (node == NULL)
         return;
+    }
     AST::BaseNode *p = node->getChildNode();
     switch (node->getASTNodeType()) {
     case AST::def_func: {
@@ -26,6 +24,7 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbolTab
         this->quads.push_back(*temp);
         while (p != NULL) {
             SMB::SymbolTable *childTable = symbolTable->createChildTable(true);
+            childTable->setTableName(func->getDecName());
             childTable->addFromFunctionArgs(func);
             generate(p, childTable);
             p = p->getCousinNode();
@@ -174,7 +173,11 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbolTab
             symbolTable->addArraySymbol(tempNode);
         }
         else {
-            symbolTable->addSymbol(tempNode);
+            if(symbolTable->addSymbol(node) == 0){
+                std::cout << "\033[31mError: \033[0m"
+                << "value " << node->getContent() << " is redeclaration" << std::endl;
+                exit(1);
+            }
         }
         SMB::Symbol *varSymbol = symbolTable->findSymbol(node->getContent());
         if (p != NULL) {
@@ -234,6 +237,7 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbolTab
         if (loop->getLoopType() == AST::for_loop)
         {
             SMB::SymbolTable *childTable = symbolTable->createChildTable(false);
+            childTable->setTableName("for");
             generate(((AST::LoopNode*)node)->getDecNode(), childTable);
             int start = quads.size();
             generate(((AST::LoopNode*)node)->getCondNode(), childTable);
@@ -263,9 +267,10 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbolTab
             true_list.pop();
             false_list.pop();
             backpatch(&JudgeTrue, JudgeTrue.back() + 2);
-            while (p != NULL)
-            {
-                generate(p, symbolTable->createChildTable(false));
+            while (p != NULL) {
+                SMB::SymbolTable *childTable = symbolTable->createChildTable(false);
+                childTable->setTableName("while");
+                generate(p, childTable);
                 p = p->getCousinNode();
             }
 
@@ -280,6 +285,7 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbolTab
     {
         AST::SelectNode *select = (AST::SelectNode*)node;
         generate(select->getCondNode(), symbolTable);
+        // std::cout << "generate finished!\n";
         int start = quads.size();
         std::list<int> JudgeTrue = true_list.top();
         std::list<int> JudgeFalse = false_list.top();
@@ -287,20 +293,21 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbolTab
         false_list.pop();
 
         backpatch(&JudgeTrue, start);
+        // Body:
+        // std::cout << "body: " << select->getBodyNode() << "\n";
         generate(select->getBodyNode(), symbolTable);
-        // TODO: getElse
         if (select->getElse() != NULL) {
+            // std::cout << "else if\n";
             Quaternion *temp = new Quaternion(IM::JUMP, (int)NULL);
             this->quads.push_back(*temp);
             temp = &quads.back();
             int elseStart = quads.size();
             generate(select->getElse(), symbolTable);
+            // std::cout << "generate finished\n";
             backpatch(&JudgeFalse, elseStart);
             int end = quads.size();
             temp->backpatch(end);
-        }
-        else
-        {
+        } else {
             int end = quads.size();
             backpatch(&JudgeFalse, end);
         }
@@ -326,7 +333,9 @@ SMB::SymbolTable *IM::InterMediate::generateStatement(AST::StatementNode *node, 
             return symbolTable;
         if (node->getParentNode()->getASTNodeType() == AST::def_func)
             return symbolTable;
-        return symbolTable->createChildTable(false);
+        SMB::SymbolTable *childTable = symbolTable->createChildTable(false);
+        childTable->setTableName("comparation");
+        return childTable;
     }
     break;
     default:
@@ -371,6 +380,7 @@ SMB::SymbolTable *IM::InterMediate::generateReturn(AST::StatementNode *node, SMB
 
 SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::SymbolTable *symbolTable)
 {
+    std::cout << "op begin\n";
     Quaternion *temp;
     AST::BaseNode *arg1Node, *arg2Node;
     switch (node->getOpType()) {
@@ -385,10 +395,17 @@ SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::Sy
         }
         else {
             op = IM::ASSIGN;
-            if (node->getChildNode()->getASTNodeType() != AST::assign_var) {
+            if (node->getChildNode()->getASTNodeType() != AST::assign_var
+            &&  node->getChildNode()->getASTNodeType() != AST::def_var) {
                 std::cout << "\033[31mError: \033[0m"
                           << node->getChildNode()->getContent() << " is not a variable. What are u doing?" << std::endl;
                 exit(1);
+            } else if (node->getChildNode()->getASTNodeType() == AST::def_var) {
+                if(symbolTable->addSymbol(node->getChildNode()) == 0){
+                    std::cout << "\033[31mError: \033[0m"
+                    << "value " << node->getContent() << " is redeclaration" << std::endl;
+                    exit(1);
+                }
             }
             result = symbolTable->findSymbol(node->getChildNode()->getContent());
         }
@@ -498,11 +515,11 @@ SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::Sy
 
         break;
     }
-    case AST::relop:
-    {
+    case AST::relop: {
         Quaternion *tempTrue, *tempFalse;
         arg1Node = node->getChildNode();
         arg2Node = arg1Node->getCousinNode();
+        std::cout<<"relop:"<<std::endl;
         if (node->getContent() == ">") {
             relopOperator(tempTrue, tempFalse, IM::JUMP_GREAT, arg1Node, arg2Node, symbolTable);
         }
@@ -611,7 +628,7 @@ SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::Sy
         return result;
         break;
     }
-    case AST::get_adress: {
+    case AST::get_address: {
         SMB::Symbol *result = new SMB::Symbol("Temp" + std::to_string(temp_vars.size()), SMB::pointer);
         arg1Node = node->getChildNode();
         temp_vars.push_back(result);
@@ -960,7 +977,7 @@ void IM::InterMediate::backpatch(std::list<int> *backList, int target) {
     }
     return;
 }
-void IM::InterMediate::printQuads() {
+void IM::InterMediate::print() {
     std::vector<Quaternion>::iterator it;
     std::cout << "\t   Operator   \targ1\targ2\tresult" << std::endl;
     int count = 0;

@@ -131,15 +131,14 @@ SMB::SymbolTable::SymbolTable(SymbolTable *parent, bool is_func) {
     this->root_table = p;   
     this->total_symbol_count = 0;
     this->total_offset = 4;
-
+    this->symbol_list = new std::vector<SMB::Symbol *>();
     if(is_func){
-        this->symbol_list = new std::vector<SMB::Symbol *>();
         this->arg_list = new std::vector<SMB::Symbol *>();
     }
     
 }
 
-SMB::SymbolTable::SymbolTable(SMB::StructTable *struct_table, bool is_func){
+SMB::SymbolTable::SymbolTable(bool is_func, SMB::StructTable *struct_table){
     this->struct_list = struct_table;
     this->child_table = NULL;
     this->parent_table = NULL;
@@ -147,8 +146,8 @@ SMB::SymbolTable::SymbolTable(SMB::StructTable *struct_table, bool is_func){
     this->total_symbol_count = 0;
     this->total_offset = 4;
     this->is_func = is_func;
+    this->symbol_list = new std::vector<SMB::Symbol *>();
     if(is_func){
-        this->symbol_list = new std::vector<SMB::Symbol *>();
         this->arg_list = new std::vector<SMB::Symbol *>();
     }
 }
@@ -171,7 +170,7 @@ int SMB::SymbolTable::addSymbol(AST::BaseNode *node){
     AST::ASTNodeType node_type = node->getASTNodeType();
     AST::DefineVarNode* tmp = (AST::DefineVarNode*)node;
     SMB::SymbolType symbol_type = tmp->getSymbolType();
-    Symbol *s = new Symbol(name,symbol_type);
+    Symbol *s = new Symbol(name, symbol_type);
     if((this->findInTable(name)) == NULL){
         this->root_table->symbol_list->push_back(s);
         s->setIndex(this->root_table->total_symbol_count++);
@@ -179,10 +178,10 @@ int SMB::SymbolTable::addSymbol(AST::BaseNode *node){
         //offset的地方可能还需要修改
         if(symbol_type == SMB::SymbolType::integer || symbol_type == SMB::SymbolType::pointer){
             this->root_table->total_offset += INT_OFFSET;
-        }else if(symbol_type == SMB::SymbolType::array){
+        } else if(symbol_type == SMB::SymbolType::array) {
             //this->root_table->total_offset += 0;//加一个数组长度
         }
-        this->symbol_hash_map[s->getName()]=s;
+        this->symbol_hash_map[s->getName()] = s;
         std::cout<< "add symbol:" << s->getName() << " in " << this->getTableName() <<std::endl;
         return SUCCESS;
     }else{
@@ -269,7 +268,7 @@ SMB::Symbol* SMB::SymbolTable::findSymbol(std::string name){
     SymbolTable *tmp = this;
     while(tmp != NULL){
         Symbol *final = tmp->findInTable(name);
-        if(final ==NULL){
+        if(final == NULL){
             tmp = tmp->parent_table;
         }else{
             return final;

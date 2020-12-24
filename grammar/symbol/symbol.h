@@ -98,7 +98,7 @@ namespace SMB {
             static const int FAIL=0;
             SymbolTable();
             SymbolTable(SymbolTable*, bool);
-            SymbolTable(StructTable*, bool);
+            SymbolTable(bool, StructTable*);
             int addSymbol(AST::BaseNode *node);
             int addFuncSymbol(FuncSymbol *func_symbol);
             int addStructSymbol(std::string, std::string);
