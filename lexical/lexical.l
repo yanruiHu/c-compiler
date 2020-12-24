@@ -38,7 +38,7 @@ int   ([1-9]|[1-9]([0-9])+|0)
 "."                                 {return(GETMEMBER);}
 (>=)|(<=)|(==)|(!=)|<|>             {yylval.str=strdup(yytext);return(RELOP);}
 
-
+"&"                                 {return('&'); }
 "&&"                                {return(AND);}
 "||"                                {return(OR);}
 "="                                 {return('=');}
