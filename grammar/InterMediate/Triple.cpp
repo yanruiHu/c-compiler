@@ -14,7 +14,13 @@ void IM::BaseTriple::pushBack(BaseTriple *triple) {
 IM::Arg::Arg() : BaseTriple(IM::NONE) {}
 
 IM::Arg::Arg(SMB::Symbol *symbol) : BaseTriple(IM::NONE) {
+    this->is_symbol = true;
     this->symbol = symbol;
+}
+
+IM::Arg::Arg(int i) : BaseTriple(IM::NONE) {
+    this->num = i;
+    this->is_symbol = false;
 }
 
 IM::Triple::Triple(OperatorType op) : BaseTriple(op) {}
