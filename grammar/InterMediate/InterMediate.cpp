@@ -7,8 +7,7 @@ IM::InterMediate::InterMediate(AST::BaseNode *rootNode, SMB::StructTable *struct
     this->symbol_table = new SMB::SymbolTable(false, structTable);
 }
 
-void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbolTable)
-{
+void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbolTable) {
     if (node == NULL) {
         std::cout << "NULL" << std::endl;
         return;
@@ -41,8 +40,10 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbolTab
             count = count + 1;
             Quaternion *temp;
             if (var->getASTNodeType() == AST::assign_var) {
+                std::cout<<"var_content: "<<var->getContent()<<std::endl;
                 SMB::Symbol *arg1 = symbolTable->findSymbol(var->getContent());
                 temp = new Quaternion(IM::PARAM, arg1, (SMB::Symbol *)NULL);
+                std::cout<<"arg1_name: "<<arg1->getName()<<" arg1_type: "<<arg1->getType()<<std::endl;
                 switch (arg1->getType()) {
                 case SMB::integer:
                     add_on = add_on + "-i";
@@ -51,6 +52,7 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbolTab
                     add_on = add_on + "-p";
                     break;
                 default:
+                    std::cout << "Wrong Type!\n";
                     break;
                 }
             }
@@ -126,8 +128,7 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbolTab
         }
         break;
     }
-    case AST::op:
-    {
+    case AST::op: {
         if (((AST::OperatorNode*)node)->getOpType() == AST::and_op 
         || ((AST::OperatorNode *)node)->getOpType() == AST::or_op)
         {
@@ -146,17 +147,13 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbolTab
         this->generateOperator((AST::OperatorNode *)node, symbolTable);
         break;
     }
-    case AST::stmt:
-    {
+    case AST::stmt: {
         AST::StatementNode *ret = (AST::StatementNode *)node;
-        if (ret->getStmtType() == AST::return_stmt)
-        {
+        if (ret->getStmtType() == AST::return_stmt) {
             generateReturn((AST::StatementNode *)node, symbolTable);
         }
-        else
-        {
-            while (p != NULL)
-            {
+        else {
+            while (p != NULL) {
                 generate(p, this->generateStatement((AST::StatementNode *)node, symbolTable));
                 p = p->getCousinNode();
             }
@@ -168,11 +165,9 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbolTab
         if (tempNode->getSymbolType() == SMB::struct_type) {
             // TODO: addStructSymbol
             symbolTable->addStructSymbol(tempNode->getStructName(), tempNode->getContent());
-        }
-        else if (tempNode->getSymbolType() == SMB::array) {
+        } else if (tempNode->getSymbolType() == SMB::array) {
             symbolTable->addArraySymbol(tempNode);
-        }
-        else {
+        } else {
             if(symbolTable->addSymbol(node) == 0){
                 std::cout << "\033[31mError: \033[0m"
                 << "value " << node->getContent() << " is redeclaration" << std::endl;
@@ -208,8 +203,7 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbolTab
         }
         break;
     }
-    case AST::assign_var:
-    {
+    case AST::assign_var: {
         if (node->getParentNode()->getASTNodeType() == AST::op) {
             AST::OperatorNode *par = (AST::OperatorNode *)node->getParentNode();
             if (par->getOpType() == AST::and_op 
@@ -287,6 +281,7 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbolTab
         generate(select->getCondNode(), symbolTable);
         // std::cout << "generate finished!\n";
         int start = quads.size();
+        std::cout << "true_list pop!\n";
         std::list<int> JudgeTrue = true_list.top();
         std::list<int> JudgeFalse = false_list.top();
         true_list.pop();
@@ -324,6 +319,7 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbolTab
         std::cout << "Hello! Something Wrong happened!\n";
         break;
     }
+    return;
 }
 
 SMB::SymbolTable *IM::InterMediate::generateStatement(AST::StatementNode *node, SMB::SymbolTable *symbolTable) {
@@ -403,7 +399,7 @@ SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::Sy
             } else if (node->getChildNode()->getASTNodeType() == AST::def_var) {
                 if(symbolTable->addSymbol(node->getChildNode()) == 0){
                     std::cout << "\033[31mError: \033[0m"
-                    << "value " << node->getContent() << " is redeclaration" << std::endl;
+                    << "value " << node->getChildNode()->getContent() << " is redeclaration" << std::endl;
                     exit(1);
                 }
             }
@@ -519,7 +515,7 @@ SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::Sy
         Quaternion *tempTrue, *tempFalse;
         arg1Node = node->getChildNode();
         arg2Node = arg1Node->getCousinNode();
-        std::cout<<"relop:"<<std::endl;
+        std::cout<<"relop:"<<node->getContent()<<std::endl;
         if (node->getContent() == ">") {
             relopOperator(tempTrue, tempFalse, IM::JUMP_GREAT, arg1Node, arg2Node, symbolTable);
         }
@@ -537,6 +533,9 @@ SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::Sy
         }
         else if (node->getContent() == "==") {
             relopOperator(tempTrue, tempFalse, IM::JUMP_EQUAL, arg1Node, arg2Node, symbolTable);
+        } else {
+            std::cout << "Wrong Content in RELOP\n";
+            exit(1);
         }
         break;
     }
@@ -956,6 +955,7 @@ void IM::InterMediate::relopOperator(Quaternion *trueQuad,
     std::list<int> falseL; // Same as the upper one
     falseL.push_back(quads.size());
     this->quads.push_back(*falseQuad);
+    std::cout << "true_list add\n";
     true_list.push(trueL);
     false_list.push(falseL);
     return;

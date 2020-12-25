@@ -17,6 +17,7 @@ namespace AST {
         SelectType select_type;
         BaseNode *cond; // if条件
         BaseNode *body;
+        BaseNode *else_node;
     public:
         SelectNode();
         SelectNode(std::string);
@@ -28,10 +29,12 @@ namespace AST {
         SelectNode(std::string, SelectType, BaseNode*);
         inline SelectType getSelectType() { return this->select_type; }
         inline BaseNode *getCondNode() { return this->cond; }
-        inline BaseNode *getBodyNode() { return this->getChildNode(); }
-        inline BaseNode *getElse() { return this->getCousinNode(); }
+        // inline BaseNode *getBodyNode() { return this->getChildNode(); }
+        inline BaseNode *getBodyNode() { return this->body; }
+        inline BaseNode *getElse() { return this->else_node; }
         inline void setCondNode(BaseNode* c) { this->cond = c; }
         inline void setBodyNode(BaseNode* b) { this->body = b; }
+        inline void setElseNode(BaseNode* e) { this->else_node = e; }
         void printInfo(int);
         ~SelectNode();
     };

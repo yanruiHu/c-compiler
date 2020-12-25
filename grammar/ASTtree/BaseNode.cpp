@@ -79,12 +79,12 @@ void AST::BaseNode::tree(AST::BaseNode* node, int depth, bool flag, std::vector<
     
     // 打印选择
     if (node->getASTNodeType() == AST::select) {
-        bool f = node->child;
         SelectNode *select_node = (SelectNode*)node;
         BaseNode *tmp = select_node->getCondNode();
+        bool f = select_node->getBodyNode();
         if(tmp)AST::BaseNode::tree(tmp, depth, !f, pre_sep, "(condition): ");
         tmp = select_node->getBodyNode();
-        if(tmp)AST::BaseNode::tree(tmp, depth, !f, pre_sep, "(body): ");
+        if(tmp)AST::BaseNode::tree(tmp, depth, true, pre_sep, "(body): ");
     }
 
     node = node->child;

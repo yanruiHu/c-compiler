@@ -245,17 +245,20 @@ statement: expression ';' {
     }
     | IF '(' expression ')' statement {  // ok
         AST::SelectNode* temp = new AST::SelectNode(AST::if_stmt);
-        temp->addChildNode($5);
+        temp->setBodyNode($5);
+        // temp->addChildNode($5);
         temp->setCondNode($3);
         $$ = temp;
     }
     | IF '(' expression ')' statement ELSE statement %prec LOWER_THAN_ELSE{
         AST::SelectNode* temp = new AST::SelectNode(AST::if_stmt);
-        temp->addChildNode($5);
+        temp->setBodyNode($5);
+        // temp->addChildNode($5);
         temp->setCondNode($3);
-        AST::SelectNode* else_node = new AST::SelectNode(AST::else_stmt);
-        else_node->addChildNode($7);
-        temp->addCousinNode(else_node);
+        // AST::SelectNode* else_node = new AST::SelectNode(AST::else_stmt);
+        // else_node->addChildNode($7);
+        // temp->addCousinNode(else_node);
+        temp->setElseNode($7);
         $$ = temp;
     }
     | WHILE '(' expression ')' statement { //ok

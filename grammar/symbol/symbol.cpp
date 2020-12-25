@@ -170,6 +170,7 @@ int SMB::SymbolTable::addSymbol(AST::BaseNode *node){
     AST::ASTNodeType node_type = node->getASTNodeType();
     AST::DefineVarNode* tmp = (AST::DefineVarNode*)node;
     SMB::SymbolType symbol_type = tmp->getSymbolType();
+    // std::cout<<"name:"<<name<<"node_type:"<<node_type<<std::endl;
     Symbol *s = new Symbol(name, symbol_type);
     if((this->findInTable(name)) == NULL){
         this->root_table->symbol_list->push_back(s);
