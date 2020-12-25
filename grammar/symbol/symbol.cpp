@@ -149,6 +149,8 @@ SMB::SymbolTable::SymbolTable(bool is_func, SMB::StructTable *struct_table){
     this->symbol_list = new std::vector<SMB::Symbol *>();
     if(is_func){
         this->arg_list = new std::vector<SMB::Symbol *>();
+    }else{
+        this->table_name = "GLOBAL";
     }
 }
 
