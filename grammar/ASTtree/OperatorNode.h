@@ -37,6 +37,7 @@ namespace AST {
         OperatorNode(std::string);
         OperatorNode(std::string, OperatorType);
         inline OperatorType getOpType() {return this->op_type;}
+        void setAllSymbolType(std::string);
         void printInfo(int);
     };
 

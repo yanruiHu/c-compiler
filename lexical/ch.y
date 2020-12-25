@@ -313,8 +313,13 @@ statement: expression ';' {
 
 /* Local Definitions 参考代码上注释是这个*/
 defination: specifier declaration_list  {
-        AST::DefineVarNode* tmp = (AST::DefineVarNode*)$2;
-        tmp->setAllSymbolType($1);
+        if ($2->getASTNodeType() == AST::op) {
+            AST::OperatorNode* tmp = (AST::OperatorNode*)$2;
+            tmp->setAllSymbolType($1);
+        } else {
+            AST::DefineVarNode* tmp = (AST::DefineVarNode*)$2;
+            tmp->setAllSymbolType($1);
+        }
         $$ = $2;
     }
     | error ';' { yyerrok; }
