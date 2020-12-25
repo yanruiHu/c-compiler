@@ -2,6 +2,10 @@ int print_int(int i) {
     int a = 1, b = 2;
 }
 
+struct A{
+    int key;
+};
+
 int main() {
     int a = 1, b = 2;
     int c = 2;
@@ -20,5 +24,8 @@ int main() {
         a = a + 1;
     }
     print_int(a);
+    struct A test;
+    test.key = 1;
+    print_int(test.key);
     return 0;
 }

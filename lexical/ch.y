@@ -442,7 +442,14 @@ expression: expression '=' expression {
             op->addChildNode(temp);
             temp->addCousinNode($3);
         }
-        | ID '.' ID {}
+        | ID GETMEMBER ID {
+            BaseNode* op = new AST::OperatorNode(".", AST::get_member);
+            AST::AssignVarNode * var1 = new AST::AssignVarNode($1);
+            AST::AssignVarNode * var2 = new AST::AssignVarNode($3);
+            op->addChildNode(var1);
+            var1->addCousinNode(var2);
+            $$ = op;
+        }
         | INT {
             $$ = new AST::LiteralNode($1);
         }
