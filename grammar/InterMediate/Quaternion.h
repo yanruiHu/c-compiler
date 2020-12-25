@@ -109,7 +109,7 @@ public:
         this->args[2].literal = result;
     }
 
-    inline void backpatch(int target) { this->args[2].literal = target; }
+    inline void backPatch(int target) { this->args[2].literal = target; }
     inline bool getResult() { return this->args[2].literal == 0 ? true : false; }
     inline OperatorCode getOperator() { return this->op; }
     inline bool isSymbol() { return this->op != NONE; }
