@@ -24,7 +24,7 @@ void AST::OperatorNode::setAllSymbolType(std::string tp) {
     }
     AST::BaseNode *cousin = this->getCousinNode();
     if (cousin->getASTNodeType() == AST::op) {
-        AST::OperatorNode *tmp = (AST::OperatorNode*)c;
+        AST::OperatorNode *tmp = (AST::OperatorNode*)cousin;
         tmp->setAllSymbolType(tp);
     }
 }
