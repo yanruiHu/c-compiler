@@ -694,12 +694,11 @@ void AsmGenerator::generateCallFunction(IM::Quaternion& q) {
 }
 
 void AsmGenerator::generateSetArg(IM::Quaternion& q) {
-    int flag = q.isSymbol();
+    int flag = q.getFlag();
     std::string varName = "";
     if (flag == 7) {
         varName = q[0].var->getName();
         if (varName[0] != 'T') {
-            std::cout<<"varName[0]: "<<varName[0]<<std::endl;
             int offset = q[0].var->getOffset();
             std::string varEbpOffset = this->asmcode.generateVar(offset);
             this->asmcode.push(DOUBLE_WORD + varEbpOffset);
@@ -707,11 +706,12 @@ void AsmGenerator::generateSetArg(IM::Quaternion& q) {
             asmRegister reg = this->findRegister(varName);
             this->releaseRegister(reg);
             this->asmcode.push(reg);
-        }
+        } 
     } else {
         int value = q[0].literal;
         std::string instanceNumber = this->asmcode.generateInstanceNumber(value);
         this->asmcode.push(instanceNumber);
+        std::cout<<"here!"<<instanceNumber<<std::endl;
     }
 }
 
@@ -1107,7 +1107,7 @@ void AsmGenerator::generate() {
     this->asmcode.addCode("\%include \"grammar/InterMediate/asm_io.inc\"\nsection .text\nglobal main\n");
     for (size_t i = 0; i < this->Quaternions.size(); i++) {
         IM::Quaternion& q = Quaternions[i];
-        IM::OperatorCode opcode = q.getOperator();
+        IM::OperatorCode opcode = q.getOperator();  // 返回操作符
         if (opcode == IM::OperatorCode::FUNC_DEF) {
             if (currentTable == rootTable) {
                 currentTable = currentTable->getChild();

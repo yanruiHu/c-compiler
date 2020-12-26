@@ -25,11 +25,11 @@ mov edx,ebp
 sub edx,4
 mov [edx],dword 2
 mov ebx,[ebp-4]
-push dword -781080912
+push ebx
 call func-i
-mov ecx,eax
+mov ebx,eax
 add esp,4
-mov [ebp-12],dword -781080688
+mov [ebp-12],dword -697088112
 pop ecx
 pop ebx
 leave
