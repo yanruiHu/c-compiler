@@ -1,5 +1,6 @@
 #include "./symbol.h"
 #include <string>
+#include <stack>
 
 SMB::SymbolTable* SMB::SymbolTable::global_table;
 
@@ -119,20 +120,25 @@ void SMB::SymbolTable::addFromFunctionArgs(FuncSymbol *func_node) {
     AST::BaseNode* args = func_node->getArgList();
     int offset = -4;
     int index = -1;
+    std::stack<AST::BaseNode*> tmp_stack;
     while (args) {
+        tmp_stack.push(args);
+        args = args->getCousinNode();
+    }
+    while (tmp_stack.size()) {
         // this->addSymbol(args);
-        AST::DefineVarNode *arg = (AST::DefineVarNode *)args;
+        AST::DefineVarNode *arg = (AST::DefineVarNode *)tmp_stack.top();
         if(arg->getSymbolType() == SMB::SymbolType::integer || arg->getSymbolType() == SMB::SymbolType::pointer){
             offset -= 4;
             SMB::Symbol *arg_symbol = new SMB::Symbol(arg->getContent(),arg->getSymbolType());
             arg_symbol->setIndex(index--);
             arg_symbol->setOffset(offset);
-            // std::cout<< "add symbol:" << arg_symbol->getName() << " in " << this->getTableName() <<std::endl;
+            std::cout<< "add symbol:" << arg_symbol->getName() << " in " << this->getTableName() <<std::endl;
             symbol_hash_map[arg_symbol->getName()] = arg_symbol;
-            args = args->getCousinNode();
         }
+        tmp_stack.pop();
     }
-    this->total_arg_offset = offset;
+    this->total_arg_offset = -(offset+4);
 }
 
 SMB::SymbolTable::SymbolTable(SymbolTable *parent, bool is_func) {

@@ -40,7 +40,7 @@ enum OperatorCode
 };
 
 union Arg {
-    SMB::Symbol *var;
+    SMB::Symbol *var=NULL;
     int literal;
 };
 

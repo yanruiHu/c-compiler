@@ -568,7 +568,7 @@ static const yytype_int16 yyrline[] =
      281,   286,   291,   296,   301,   306,   311,   316,   326,   329,
      330,   336,   337,   346,   360,   366,   372,   378,   384,   390,
      396,   402,   408,   414,   417,   422,   427,   433,   438,   441,
-     444,   447,   454,   462,   465,   466,   468,   471
+     444,   447,   454,   462,   465,   471,   473,   476
 };
 #endif
 
@@ -2410,35 +2410,40 @@ yyreduce:
 
   case 84:
 #line 465 "./lexical/ch.y"
-                 {}
-#line 2415 "./Linux/grammar.tab.cpp"
+                 {
+            AST::OperatorNode *star = new AST::OperatorNode("*", AST::get_var);
+            AST::AssignVarNode *var = new AST::AssignVarNode((yyvsp[0].str));
+            (yyval.ast) = star;
+            star->addChildNode(var);
+        }
+#line 2420 "./Linux/grammar.tab.cpp"
     break;
 
   case 85:
-#line 466 "./lexical/ch.y"
+#line 471 "./lexical/ch.y"
                     {yyerrok;}
-#line 2421 "./Linux/grammar.tab.cpp"
+#line 2426 "./Linux/grammar.tab.cpp"
     break;
 
   case 86:
-#line 468 "./lexical/ch.y"
+#line 473 "./lexical/ch.y"
                                      {
             (yyval.ast) = (yyvsp[0].ast);
         }
-#line 2429 "./Linux/grammar.tab.cpp"
+#line 2434 "./Linux/grammar.tab.cpp"
     break;
 
   case 87:
-#line 471 "./lexical/ch.y"
+#line 476 "./lexical/ch.y"
                                                   {
             (yyvsp[-2].ast)->getFinalCousinNode()->addCousinNode((yyvsp[0].ast));
             (yyval.ast) = (yyvsp[-2].ast);
         }
-#line 2438 "./Linux/grammar.tab.cpp"
+#line 2443 "./Linux/grammar.tab.cpp"
     break;
 
 
-#line 2442 "./Linux/grammar.tab.cpp"
+#line 2447 "./Linux/grammar.tab.cpp"
 
       default: break;
     }
@@ -2676,7 +2681,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 476 "./lexical/ch.y"
+#line 481 "./lexical/ch.y"
 
 
 

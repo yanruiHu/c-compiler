@@ -1,14 +1,14 @@
-struct test {
-    int a;
-    int b;
-    int c;
-    int d;
-};
+void swap(int* a1, int* b) {
+    int t = *a1;
+    *a1 = *b;
+    *b = t;
+}
 
-int main() {
-    struct test t;
-    t.a = 1;
-    t.b = 2;
-    t.c = 3;
-    t.d = t.b * t.c;
+int main()
+{
+    int a = 2;
+    int b = 3;
+    int* pa = &a;
+    int* pb = &b;
+    swap(pa, pb);
 }

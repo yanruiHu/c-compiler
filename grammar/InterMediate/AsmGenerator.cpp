@@ -951,6 +951,7 @@ void AsmGenerator::generateGetArrayValue(IM::Quaternion& q) {
     std::string resultName = q[2].var->getName();
     asmRegister reg = this->getRegister(resultName);
     int baseOffset = q[0].var->getOffset();
+    std::cout<<"q[0].var = "<<baseOffset<<"q[0].name = "<<q[0].var->getName()<<std::endl;
     int totalOffset = baseOffset;
     if (q.getOperator() == IM::OperatorCode::GET_ARRAY) {
         asmRegister offsetReg = asmRegister::unset;

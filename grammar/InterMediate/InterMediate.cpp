@@ -714,7 +714,7 @@ SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::Sy
             temp = new Quaternion(IM::GET_VALUE, arg1, result);
         }
         else {
-            std::cout << "\033[31mError: \033[0m"
+            std::cout << "\033[31mError sbjx: \033[0m"
                       << " lvalue required as unary ‘&’ operand" << std::endl;
             exit(1);
         }
@@ -988,13 +988,15 @@ void IM::InterMediate::backPatch(std::list<int> *backList, int target) {
     return;
 }
 void IM::InterMediate::print() {
-    std::vector<Quaternion>::iterator it;
+    std::vector<Quaternion>::iterator it = this->quads.begin();
     std::cout << "\t   Operator   \targ1\targ2\tresult" << std::endl;
     int count = 0;
-    for (it = this->quads.begin(); it != this->quads.end(); it++)
+    // std::cout << "quads begin: " << &(quads.begin()) << "\n";
+    for (; it != this->quads.end(); it++)
     {
         std::cout << count++ << "\t";
-        it->print();
+        if(&(*it) == NULL ) std::cout<<"NULL \n";
+        else it->print();
     }
     return;
 }

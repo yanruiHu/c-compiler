@@ -142,7 +142,7 @@ void IM::Quaternion::print() {
     }
     break;
     case 7:
-    {
+    {   
         if (args[0].var == NULL)
             std::cout << this->__str__() << "\t-\t";
         else

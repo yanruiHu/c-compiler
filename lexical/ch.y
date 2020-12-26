@@ -462,7 +462,12 @@ expression: expression '=' expression {
         | INT {
             $$ = new AST::LiteralNode($1);
         }
-        | '*' ID {}
+        | '*' ID {
+            AST::OperatorNode *star = new AST::OperatorNode("*", AST::get_var);
+            AST::AssignVarNode *var = new AST::AssignVarNode($2);
+            $$ = star;
+            star->addChildNode(var);
+        }
         | error ')' {yyerrok;}  /*当不可计算的表达式被读入后，上述第三条规则将识别出这个错误，解析将继续。yyerror 仍将被调用以打印出一条消息。第三条规则对应的动作是一个宏 yyerrok*/
         ;
 argument_expression_list: expression {
