@@ -5,6 +5,7 @@ IM::InterMediate::InterMediate(AST::BaseNode *root_node, SMB::StructTable *struc
     temp_vars.reserve(100);
     this->root = root_node;
     this->root_symbol_table = new SMB::SymbolTable(false, struct_table);
+    SMB::SymbolTable::setGlobalTable(this->root_symbol_table);
     std::cout << "root_symbol_table: " << this->root_symbol_table << std::endl;
     std::cout << "struct_table: " << struct_table << std::endl;
 }
