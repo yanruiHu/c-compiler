@@ -210,9 +210,9 @@ AsmGenerator::AsmGenerator(std::vector<IM::Quaternion>& quads, std::vector<SMB::
     this->tempVar = tempVar;
     this->rootTable = rootTable;
     // this->funcTable = funcTable;
-    std::cout<<"before preSetLabel\n";
+    // std::cout<<"before preSetLabel\n";
     this->preSetLabel();
-    std::cout<<"after preSetLabel\n";
+    // std::cout<<"after preSetLabel\n";
     eax = 0;
     ebx = 0;
     ecx = 0;
@@ -1069,7 +1069,7 @@ void AsmGenerator::generateAssignArray(IM::Quaternion& q) {
 void AsmGenerator::preSetLabel() {
     std::vector<IM::Quaternion> quad;
     int labelNumber = 0;
-    std::cout<<"preSetLabel - before for1\n";
+    // std::cout<<"preSetLabel - before for1\n";
     for (size_t i = 0; i < Quaternions.size(); i++) {
         IM::OperatorCode opcode = Quaternions[i].getOperator();
         if (this->isJumpQuaternion(opcode)) {
@@ -1080,18 +1080,18 @@ void AsmGenerator::preSetLabel() {
             }
         }
     }
-    std::cout<<"preSetLabel - after for1\n";
-    std::cout<<"preSetLabel - before for2\n";
+    // std::cout<<"preSetLabel - after for1\n";
+    // std::cout<<"preSetLabel - before for2\n";
     for (size_t i = 0; i < Quaternions.size(); i++) {
         if (labelMap.count(i) > 0) {
             IM::Quaternion q(IM::OperatorCode::LABEL, labelMap[i], (SMB::Symbol*)NULL, (SMB::Symbol*)NULL);
             quad.push_back(q);
         }
-        std::cout << "i: " << i << ", size(): " << Quaternions.size() << std::endl;
+        // std::cout << "i: " << i << ", size(): " << Quaternions.size() << std::endl;
         quad.push_back(Quaternions[i]);
     }
     Quaternions=quad;
-    std::cout<<"preSetLabel - after for2\n";
+    // std::cout<<"preSetLabel - after for2\n";
 }
 
 bool AsmGenerator::isJumpQuaternion(IM::OperatorCode opcode) {
@@ -1114,9 +1114,9 @@ void AsmGenerator::generate() {
             } else {
                 currentTable = currentTable->getCousin();
             }
-            std::cout << "before generateDefFunction\n";
+            // std::cout << "before generateDefFunction\n";
             this->generateDefFunction(q);
-            std::cout << "after generateDefFunction\n";
+            // std::cout << "after generateDefFunction\n";
         }
         else if (opcode == IM::OperatorCode::PLUS || opcode == IM::OperatorCode::MINUS ||
                  opcode == IM::OperatorCode::DIV || opcode == IM::OperatorCode::TIMES ||
