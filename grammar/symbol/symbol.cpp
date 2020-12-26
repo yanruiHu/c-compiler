@@ -36,9 +36,9 @@ SMB::FuncSymbol::FuncSymbol(AST::BaseNode* node) {
     while(p){
         SMB::SymbolType arg_type = p->getSymbolType();
         if(arg_type == SMB::SymbolType::integer){
-            this->dec_name += "-i";
+            this->dec_name += "_i";
         }else if(arg_type == SMB::SymbolType::pointer){
-            this->dec_name += "-p";
+            this->dec_name += "_p";
         }
         total_arg_offset += 4;
         p = (AST::DefineVarNode*)(p->getCousinNode());

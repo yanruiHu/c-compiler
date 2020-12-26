@@ -1104,7 +1104,7 @@ bool AsmGenerator::isJumpQuaternion(IM::OperatorCode opcode) {
 void AsmGenerator::generate() {
     currentTable = rootTable;
     // Set header info
-    this->asmcode.addCode("\%include \"grammar/InterMediate/asm_io.inc\"\nsection .text\nglobal main\n");
+    this->asmcode.addCode("\%include \"io/asm_io.inc\"\nsection .text\nglobal main\n");
     for (size_t i = 0; i < this->Quaternions.size(); i++) {
         IM::Quaternion& q = Quaternions[i];
         IM::OperatorCode opcode = q.getOperator();  // 返回操作符

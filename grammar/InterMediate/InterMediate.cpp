@@ -48,10 +48,10 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbol_ta
                 // std::cout<<"arg1_name: "<<arg1->getName()<<" arg1_type: "<<arg1->getType()<<std::endl;
                 switch (arg1->getType()) {
                 case SMB::integer:
-                    add_on = add_on + "-i";
+                    add_on = add_on + "_i";
                     break;
                 case SMB::pointer:
-                    add_on = add_on + "-p";
+                    add_on = add_on + "_p";
                     break;
                 default:
                     std::cout << "Wrong Type!\n";
@@ -61,7 +61,7 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbol_ta
             else if (var->getASTNodeType() == AST::literal) {
                 int arg1 = std::stoi(var->getContent());
                 temp = new Quaternion(IM::PARAM, arg1, (SMB::Symbol*)NULL);
-                add_on = add_on + "-i";
+                add_on = add_on + "_i";
             }
             else if (var->getASTNodeType() == AST::op) {
                 SMB::Symbol *arg1 = generateOperator((AST::OperatorNode*)var, symbol_table);
@@ -70,10 +70,10 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbol_ta
                 switch (arg1->getType())
                 {
                 case SMB::integer:
-                    add_on = add_on + "-i";
+                    add_on = add_on + "_i";
                     break;
                 case SMB::pointer:
-                    add_on = add_on + "-p";
+                    add_on = add_on + "_p";
                     break;
                 default:
                     break;

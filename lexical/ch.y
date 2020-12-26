@@ -480,11 +480,28 @@ void yyerror(const char* s) {
 	fprintf(stderr, "Parse error: At line %d. %s\n", yylineno, s);
 	exit(1);
 }
-
+std::string replaceExtName(char* filename) {
+    int dotIndex = 0;
+    int nameLength = strlen(filename);
+    for (int i = nameLength - 1; i >= 0; i--) {
+        if (filename[i] == '.') {
+            dotIndex = i;
+            break;
+        }
+    }
+    char* buf = new char[dotIndex];
+    strncpy(buf, filename, dotIndex);
+    std::string rev(buf);
+    rev += ".asm";
+    return rev;
+}
 int main(int argc,char * argv[]){  //不确定语法的在哪里输出
 
     int c,j=0;
-    yyin=fopen("./test.c","r");
+    char * filename =NULL;
+    filename=argv[1];
+    std::cout<<"filename"<<filename<<std::endl;
+    yyin=fopen(filename,"r");
     // if(argc>=2){
     //     if()==NULL){
     //         printf("Can't open file %s\n",argv[1]);
@@ -509,9 +526,11 @@ int main(int argc,char * argv[]){  //不确定语法的在哪里输出
     std::cout << asmgenerator->getAsmCode();
     // }
 
-    std::string outFileName = "test.asm";
-    std::ofstream outasm(outFileName);
+    std::string outfilename = replaceExtName(filename);
+    std::ofstream outasm(outfilename);
+
     outasm << asmgenerator->getAsmCode();
+
     if(root) delete root;
     return 0;
 }
