@@ -24,3 +24,8 @@ larra: test/larra.c
 	$(PROGRAM) test/larra.c
 	$(NASM) -f elf test/larra.asm -o larra.o
 	$(CC) -o larra larra.o io/asm_io.o -m32
+
+struct: test/struct.c
+	$(PROGRAM) test/struct.c
+	$(NASM) -f elf test/struct.asm -o struct.o
+	$(CC) -o struct struct.o io/asm_io.o -m32
