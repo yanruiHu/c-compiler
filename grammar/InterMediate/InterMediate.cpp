@@ -42,10 +42,10 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbol_ta
             count = count + 1;
             Quaternion *temp;
             if (var->getASTNodeType() == AST::assign_var) {
-                std::cout<<"var_content: "<<var->getContent()<<std::endl;
+                // std::cout<<"var_content: "<<var->getContent()<<std::endl;
                 SMB::Symbol *arg1 = symbol_table->findSymbol(var->getContent());
                 temp = new Quaternion(IM::PARAM, arg1, (SMB::Symbol *)NULL);
-                std::cout<<"arg1_name: "<<arg1->getName()<<" arg1_type: "<<arg1->getType()<<std::endl;
+                // std::cout<<"arg1_name: "<<arg1->getName()<<" arg1_type: "<<arg1->getType()<<std::endl;
                 switch (arg1->getType()) {
                 case SMB::integer:
                     add_on = add_on + "-i";
@@ -520,7 +520,7 @@ SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::Sy
         Quaternion *temp_true, *temp_false;
         arg1_node = node->getChildNode();
         arg2_node = arg1_node->getCousinNode();
-        std::cout<<"relop:"<<node->getContent()<<std::endl;
+        // std::cout<<"relop:"<<node->getContent()<<std::endl;
         if (node->getContent() == ">") {
             relopOperator(temp_true, temp_false, IM::JUMP_GREAT, arg1_node, arg2_node, symbol_table);
         }
@@ -800,7 +800,7 @@ SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::Sy
             if (arg2_node->getASTNodeType() == AST::assign_var) {
                 // TODO: struct table
                 std::string type_name = ((SMB::StructDefSymbol *)arg1)->getTypeName();
-                std::cout<<"struct_list:"<<this->root_symbol_table->getStructTable()<<std::endl;
+                // std::cout<<"struct_list:"<<this->root_symbol_table->getStructTable()<<std::endl;
                 int offset = this->root_symbol_table->getStructTable()->findStruct(type_name)->getMemberOffset(arg2_node->getContent());
                 SMB::Symbol *arg2 = new SMB::Symbol(std::to_string(offset), SMB::literal);
                 child_value.push(arg2);

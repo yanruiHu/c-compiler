@@ -501,7 +501,7 @@ int main(int argc,char * argv[]){  //不确定语法的在哪里输出
     IM::InterMediate *im = new IM::InterMediate(root, struct_table);
     im->generate(root, im->getTable());
    
-
+    im->print();
     //add ASM
     AsmGenerator* asmgenerator = new AsmGenerator(im->getQuads(), im->getTempVars(), im->getTable());
     asmgenerator->generate();

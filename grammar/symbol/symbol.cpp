@@ -87,8 +87,8 @@ SMB::StructTable::StructTable(){
 }
 
 SMB::StructSymbol *SMB::StructTable::findStruct(std::string id_name){
-    std::cout<<"findStruct"<<std::endl;
-    std::cout<<&this->struct_hash_table<<std::endl;
+    // std::cout<<"findStruct"<<std::endl;
+    // std::cout<<&this->struct_hash_table<<std::endl;
     // return NULL;
     std::unordered_map<std::string, SMB::StructSymbol*>::iterator iter;
     iter = this->struct_hash_table.find(id_name);
@@ -125,7 +125,7 @@ void SMB::SymbolTable::addFromFunctionArgs(FuncSymbol *func_node) {
             SMB::Symbol *arg_symbol = new SMB::Symbol(arg->getContent(),arg->getSymbolType());
             arg_symbol->setIndex(index--);
             arg_symbol->setOffset(offset);
-            std::cout<< "add symbol:" << arg_symbol->getName() << " in " << this->getTableName() <<std::endl;
+            // std::cout<< "add symbol:" << arg_symbol->getName() << " in " << this->getTableName() <<std::endl;
             symbol_hash_map[arg_symbol->getName()] = arg_symbol;
             args = args->getCousinNode();
         }
@@ -142,7 +142,7 @@ SMB::SymbolTable::SymbolTable(SymbolTable *parent, bool is_func) {
     
     // 遍历找到根作用域
     SymbolTable *p = this;
-    while (p->parent_table)
+    while (!p->is_func)
     {
         p = p->parent_table;
     }
@@ -177,10 +177,10 @@ SMB::Symbol* SMB::SymbolTable::findInTable(const std::string name){
     std::unordered_map<std::string, SMB::Symbol *>::iterator iter;
     iter = this->symbol_hash_map.find(name);
     if (iter != this->symbol_hash_map.end()) {
-        std::cout<<"find "<< name << " in " << this->getTableName() <<std::endl;
+        // std::cout<<"find "<< name << " in " << this->getTableName() <<std::endl;
         return iter->second;
     } else {
-        std::cout<<"no "<< name << " in " << this->getTableName() <<std::endl;
+        // std::cout<<"no "<< name << " in " << this->getTableName() <<std::endl;
         return NULL;
     }
 }
@@ -204,7 +204,7 @@ int SMB::SymbolTable::addSymbol(AST::BaseNode *node){
         //     this->root_table->total_offset += tmp->getArrayLength()*4;
         // }
         this->symbol_hash_map[s->getName()] = s;
-        std::cout<< "add symbol:" << s->getName() << " in " << this->getTableName() <<std::endl;
+        // std::cout<< "add symbol:" << s->getName() << " in " << this->getTableName() <<std::endl;
         return SUCCESS;
     }else{
         // 重定义了
@@ -221,10 +221,10 @@ int SMB::SymbolTable::addFuncSymbol(SMB::FuncSymbol *func_symbol){
         std::string tmp_func_name = func_symbol->getDecName();
         this->symbol_hash_map[tmp_func_name]=func_symbol;
         if((this->symbol_hash_map[tmp_func_name])==NULL){
-            std::cout<<"wrong"<<std::endl;
+            // std::cout<<"wrong"<<std::endl;
         }
         std::string tmp = ((SMB::FuncSymbol*)(this->symbol_hash_map[tmp_func_name]))->getDecName();
-        std::cout<< "add function:" << tmp << " in " << this->getTableName() << std::endl;
+        // std::cout<< "add function:" << tmp << " in " << this->getTableName() << std::endl;
         return SUCCESS;
     }else{
         //重定义
@@ -248,7 +248,7 @@ int SMB::SymbolTable::addStructSymbol(std::string struct_type, std::string id_na
             s->setOffset(this->root_table->total_offset);
             this->root_table->total_offset += target->getTotalMemberOffset();
             this->symbol_hash_map[s->getName()] = s;
-            std::cout<< "add struct symbol:" << s->getName() << " in " << this->getTableName() <<std::endl;
+            // std::cout<< "add struct symbol:" << s->getName() << " in " << this->getTableName() <<std::endl;
             return SUCCESS;
         }
     }
@@ -265,8 +265,9 @@ int SMB::SymbolTable::addArraySymbol(AST::BaseNode *array_node){
         s->setIndex(this->root_table->total_symbol_count++);
         s->setOffset(this->root_table->total_offset);
         this->root_table->total_offset += curr_array->getArrayLength()*4;
+        //std::cout<<"total_offset:"<<this->root_table->total_offset<<std::endl<<"total_:"<<this->total_offset<<std::endl;
         this->symbol_hash_map[array_name] = s;
-        std::cout<< "add array:" << s->getName() << " in " << this->getTableName() <<std::endl;
+        //std::cout<< "add array:" << s->getName() << " in " << this->getTableName() <<std::endl;
         return SUCCESS;
     }
 }
