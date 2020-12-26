@@ -1,4 +1,5 @@
 PROGRAM = parser
+PROGRAM1 = ./parser
 GRAMMARFOLDER = ./Linux/
 BUILDFOLDER = build/
 BUILDIO = build/io
@@ -29,4 +30,22 @@ endif
 	$(CXX) -c $< -o $@ -std=$(CXXVER) -g
 
 clean:
-	rm -rf $(GRAMMARFOLDER) $(OBJ) $(PROGRAM) $(BUILDFOLDER) common/util/io/asm_io.o
+	rm -rf $(GRAMMARFOLDER) $(OBJ) $(PROGRAM) $(BUILDFOLDER) grammar/InterMediate/asm_io.o
+
+build:
+	$(NASM) -f elf -d ELF_TYPE grammar/InterMediate/asm_io.asm -o grammar/InterMediate/asm_io.o
+		# cp $(PROGRAM) $(BUILDFOLDER)
+		# cp grammar/InterMediate/asm_io.o $(BUILDIO)
+		# cp grammar/InterMediate/asm_io.inc $(BUILDIO)
+		# cp ./test.c $(BUILDFOLDER)
+	# cp Makefile $(BUILDFOLDER)
+	$(PROGRAM1) ./test.c
+	$(NASM) -f elf test.asm -o test.o
+	$(CXX) -o test test.o grammar/InterMediate/asm_io.o -m32
+# ifeq ($(BUILDEXIST),notexist)
+# 	mkdir $(BUILDFOLDER)
+# endif
+# ifeq ($(BUILDIOEXIST),notexist)
+# 	mkdir $(BUILDIO)
+
+	
