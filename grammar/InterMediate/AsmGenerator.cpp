@@ -205,11 +205,11 @@ std::ostream& operator<<(std::ostream& os, const AsmCode& code) {
 }
 
 // 构造函数
-AsmGenerator::AsmGenerator(std::vector<IM::Quaternion>& quads, std::vector<SMB::Symbol*>& tempVar, SMB::SymbolTable* rootTable, SMB::SymbolTable& funcTable) {
+AsmGenerator::AsmGenerator(std::vector<IM::Quaternion>& quads, std::vector<SMB::Symbol*>& tempVar, SMB::SymbolTable* rootTable) {
     this->Quaternions = quads;
     this->tempVar = tempVar;
     this->rootTable = rootTable;
-    this->funcTable = funcTable;
+    // this->funcTable = funcTable;
     this->preSetLabel();
     eax = 0;
     ebx = 0;
@@ -685,7 +685,7 @@ void AsmGenerator::generateCallFunction(IM::Quaternion& q) {
         this->asmcode.mov(tempReg, asmRegister::eax);
     }
     // Protect the esp
-    SMB::FuncSymbol* func = (SMB::FuncSymbol*)(funcTable.findSymbol(funcName));  //?
+    SMB::FuncSymbol* func = (SMB::FuncSymbol*)(rootTable->findSymbol(funcName));  //?
     int offset = func->getTotalArgOffset();
     if (offset != 0) this->asmcode.add(asmRegister::esp, std::to_string(offset));
 }
