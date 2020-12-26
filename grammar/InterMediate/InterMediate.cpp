@@ -8,7 +8,7 @@ IM::InterMediate::InterMediate(AST::BaseNode *root_node, SMB::StructTable *struc
     SMB::SymbolTable::setGlobalTable(this->root_symbol_table);
     std::cout << "root_symbol_table: " << this->root_symbol_table << std::endl;
     std::cout << "struct_table: " << struct_table << std::endl;
-    this->functionRegister();
+    this->buildInFunctionRegister();
 }
 
 void IM::InterMediate::buildInFunctionRegister() {
