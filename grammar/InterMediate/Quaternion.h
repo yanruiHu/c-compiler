@@ -49,64 +49,75 @@ private:
     OperatorCode op;
     // 0: arg1, 1: arg2, 2: result
     Arg args[3];
+    int flag;
     std::string __str__();
 
 public:
     inline Quaternion(OperatorCode op, int result) {
         this->op = op;
         this->args[2].literal = result;
+        this->flag = 3;
     }
     inline Quaternion(OperatorCode op, SMB::Symbol* arg1, SMB::Symbol* result) {
         this->op = op;
         this->args[0].var = arg1;
         this->args[2].var = result;
+        this->flag = 7;
     }
     inline Quaternion(OperatorCode op, int arg1, SMB::Symbol* result) {
         this->op = op;
         this->args[0].literal = arg1;
         this->args[2].var = result;
+        this->flag = 6;
     }
     inline Quaternion(OperatorCode op, SMB::Symbol *arg1, SMB::Symbol *arg2, SMB::Symbol *result) {
         this->op = op;
         this->args[0].var = arg1;
         this->args[1].var = arg2;
         this->args[2].var = result;
+        this->flag = 7;
     }
     inline Quaternion(OperatorCode op, int arg1, SMB::Symbol *arg2, SMB::Symbol *result) {
         this->op = op;
         this->args[0].literal = arg1;
         this->args[1].var = arg2;
         this->args[2].var = result;
+        this->flag = 6;
     }
     inline Quaternion(OperatorCode op, SMB::Symbol *arg1, int arg2, SMB::Symbol *result) {
         this->op = op;
         this->args[0].var = arg1;
         this->args[1].literal = arg2;
         this->args[2].var = result;
+        this->flag = 5;
     }
     inline Quaternion(OperatorCode op, int arg1, int arg2, SMB::Symbol *result) {
         this->op = op;
         this->args[0].literal = arg1;
         this->args[1].literal = arg2;
         this->args[2].var = result;
+        this->flag = 4;
     }
     inline Quaternion(OperatorCode op, SMB::Symbol *arg1, SMB::Symbol *arg2, int result) {
         this->op = op;
         this->args[0].var = arg1;
         this->args[1].var = arg2;
         this->args[2].literal = result;
+        this->flag = 3;
     }
     inline Quaternion(OperatorCode op, SMB::Symbol *arg1, int arg2, int result) {
         this->op = op;
         this->args[0].var = arg1;
         this->args[1].literal = arg2;
         this->args[2].literal = result;
+        this->flag = 1;
     }
     inline Quaternion(OperatorCode op, int arg1, int arg2, int result) {
         this->op = op;
         this->args[0].literal = arg1;
         this->args[1].literal = arg2;
         this->args[2].literal = result;
+        this->flag = 0;
     }
 
     inline void backPatch(int target) { this->args[2].literal = target; }
@@ -114,6 +125,7 @@ public:
     inline OperatorCode getOperator() { return this->op; }
     inline bool isSymbol() { return this->op != NONE; }
     inline Arg operator[](int index) { return this->args[index]; }
+    inline int getFlag() { return this->flag; }
     void print();
 };
 
