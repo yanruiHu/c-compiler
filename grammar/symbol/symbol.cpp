@@ -51,6 +51,7 @@ bool SMB::FuncSymbol::operator==(const SMB::FuncSymbol& second) {
 // Struct
 SMB::StructDefSymbol::StructDefSymbol(std::string struct_type_name, std::string id_name){
     this->stuct_type_name=struct_type_name;
+    this->name = id_name;
 }
 
 SMB::StructSymbol::StructSymbol(){
@@ -61,6 +62,7 @@ SMB::StructSymbol::StructSymbol(std::string name, AST::BaseNode* node){
     this->total_member_offset = 0;
     int offset = 0;
     this->name = name;
+    std::cout << "struct_name: " << name << std::endl;
     AST::BaseNode *curr_node = node;
     while(curr_node){
         AST::DefineVarNode *var = (AST::DefineVarNode*)curr_node;
@@ -84,7 +86,10 @@ SMB::StructTable::StructTable(){
 }
 
 SMB::StructSymbol *SMB::StructTable::findStruct(std::string id_name){
-    std::unordered_map<std::string, SMB::StructSymbol *>::iterator iter;
+    std::cout<<"findStruct"<<std::endl;
+    std::cout<<&this->struct_hash_table<<std::endl;
+    // return NULL;
+    std::unordered_map<std::string, SMB::StructSymbol*>::iterator iter;
     iter = this->struct_hash_table.find(id_name);
     if(iter != this->struct_hash_table.end())
         return iter->second;
@@ -93,7 +98,7 @@ SMB::StructSymbol *SMB::StructTable::findStruct(std::string id_name){
 }
 
 bool SMB::StructTable::addStruct(StructSymbol *curr_struct){
-    if(this->findStruct(curr_struct->getName())){
+    if(this->findStruct(curr_struct->getName())!=NULL){
         return false;
     }else{
         this->struct_hash_table[curr_struct->getName()]=curr_struct;
@@ -158,10 +163,10 @@ SMB::SymbolTable::SymbolTable(bool is_func, SMB::StructTable *struct_table){
 SMB::Symbol* SMB::SymbolTable::findInTable(const std::string name){
     std::unordered_map<std::string, SMB::Symbol *>::iterator iter;
     iter = this->symbol_hash_map.find(name);
-    if (iter!=this->symbol_hash_map.end()){
+    if (iter != this->symbol_hash_map.end()) {
         std::cout<<"find "<< name << " in " << this->getTableName() <<std::endl;
         return iter->second;
-    }else{
+    } else {
         std::cout<<"no "<< name << " in " << this->getTableName() <<std::endl;
         return NULL;
     }
@@ -218,14 +223,17 @@ int SMB::SymbolTable::addStructSymbol(std::string struct_type, std::string id_na
     if(this->findInTable(id_name)!=NULL)
         return FAIL;
     else{
-        StructSymbol *target = this->struct_list->findStruct(id_name);
+        std::cout << "root_table: " << this->root_table << std::endl;
+        std::cout << "struct_list: " << this->root_table->struct_list << std::endl;
+        StructSymbol *target = this->root_table->struct_list->findStruct(struct_type);
         if(target == NULL){
             return FAIL;
         }else{
-            this->root_table->symbol_list->push_back(s);
+            this->symbol_list->push_back(s);
             s->setIndex(this->root_table->total_symbol_count++);
             s->setOffset(this->root_table->total_offset);
             this->root_table->total_offset += target->getTotalMemberOffset();
+            this->symbol_hash_map[s->getName()] = s;
             return SUCCESS;
         }
     }
@@ -249,6 +257,7 @@ int SMB::SymbolTable::addArraySymbol(AST::BaseNode *array_node){
 
 SMB::SymbolTable* SMB::SymbolTable::createChildTable(bool is_func){
     SMB::SymbolTable *child = new SMB::SymbolTable(this, is_func);
+    // child->root_table = this->root_table;
     if(this->child_table == NULL){
         this->setChild(child);
     }else if(this->child_table->cousin_table == NULL){

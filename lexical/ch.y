@@ -15,7 +15,7 @@ extern int yylex();
 extern FILE * yyin;
 void yyerror(const char* s);
 BaseNode* root = NULL;
-StructTable *struct_table;
+StructTable *struct_table = NULL;
 extern int yylineno;
 %}
 
@@ -230,7 +230,7 @@ statement: expression ';' {
     }
     | STRUCT ID ID ';' { 
         BaseNode* temp = new AST::StatementNode(AST::defination);
-        BaseNode* struct_def = new AST::DefineVarNode($2,$3);
+        BaseNode* struct_def = new AST::DefineVarNode($3, $2);
         temp->addChildNode(struct_def);
         $$ = temp; }
     | compound_statement { $$=$1;}
@@ -343,7 +343,13 @@ declaration: direct_declarator { $$ = $1; }
 
 /* expressionression */
 expression: expression '=' expression {
-            BaseNode* temp = new AST::OperatorNode("=", AST::assign);
+            AST::OperatorNode* temp = new AST::OperatorNode("=", AST::assign);
+            if ($1->getASTNodeType() == AST::op) {
+                AST::OperatorNode *tmp = (AST::OperatorNode *)$1;
+                if (tmp->getOpType() == AST::get_member) {
+                    temp->setOpType(AST::assign_member);
+                }
+            }
             temp->addChildNode($1);
             $1->addCousinNode($3);
             $$ = temp;
@@ -487,11 +493,10 @@ int main(int argc,char * argv[]){  //不确定语法的在哪里输出
 	} while(!feof(yyin));
     fclose(yyin);
     if(root) root->printTree();
-    SMB::SymbolTable* root_symbol_table = new SMB::SymbolTable(NULL,false);
-    root_symbol_table->setTableName("GLOBAL");
+    // SMB::SymbolTable* root_symbol_table = new SMB::SymbolTable(NULL,false);
     // SMB::tree(root_symbol_table,root,0);
     IM::InterMediate *im = new IM::InterMediate(root, struct_table);
-    im->generate(root, root_symbol_table);
+    im->generate(root, im->getTable());
     if(root) delete root;
     return 0;
 }

@@ -32,9 +32,9 @@ namespace AST {
         // inline BaseNode *getBodyNode() { return this->getChildNode(); }
         inline BaseNode *getBodyNode() { return this->body; }
         inline BaseNode *getElse() { return this->else_node; }
-        inline void setCondNode(BaseNode* c) { this->cond = c; }
-        inline void setBodyNode(BaseNode* b) { this->body = b; }
-        inline void setElseNode(BaseNode* e) { this->else_node = e; }
+        inline void setCondNode(BaseNode* c) { this->cond = c; c->setParentNode(this); }
+        inline void setBodyNode(BaseNode* b) { this->body = b; b->setParentNode(this); }
+        inline void setElseNode(BaseNode* e) { this->else_node = e; e->setParentNode(this); }
         void printInfo(int);
         ~SelectNode();
     };

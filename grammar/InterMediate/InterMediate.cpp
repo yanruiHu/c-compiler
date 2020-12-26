@@ -4,7 +4,9 @@
 IM::InterMediate::InterMediate(AST::BaseNode *root_node, SMB::StructTable *struct_table) {
     temp_vars.reserve(100);
     this->root = root_node;
-    this->root_table = new SMB::SymbolTable(false, struct_table);
+    this->root_symbol_table = new SMB::SymbolTable(false, struct_table);
+    std::cout << "root_symbol_table: " << this->root_symbol_table << std::endl;
+    std::cout << "struct_table: " << struct_table << std::endl;
 }
 
 void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbol_table) {
@@ -16,7 +18,7 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbol_ta
     switch (node->getASTNodeType()) {
     case AST::def_func: {
         SMB::FuncSymbol *func = new SMB::FuncSymbol(node);
-        this->root_table->addFuncSymbol(func);
+        this->root_symbol_table->addFuncSymbol(func);
         Quaternion *temp;
         SMB::Symbol *temp_symbol = new SMB::Symbol(func->getDecName(), SMB::void_type);
         temp = new Quaternion(IM::FUNC_DEF, temp_symbol, (SMB::Symbol *)NULL);
@@ -63,6 +65,7 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbol_ta
             }
             else if (var->getASTNodeType() == AST::op) {
                 SMB::Symbol *arg1 = generateOperator((AST::OperatorNode*)var, symbol_table);
+                std::cout << "generate op finished!\n";
                 temp = new Quaternion(IM::PARAM, arg1, (SMB::Symbol*)NULL);
                 switch (arg1->getType())
                 {
@@ -79,7 +82,7 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbol_ta
             this->quads.push_back(*temp);
             var = var->getCousinNode();
         }
-        SMB::FuncSymbol *fun_sym = (SMB::FuncSymbol*)this->root_table->findSymbol(node->getContent() + add_on);
+        SMB::FuncSymbol *fun_sym = (SMB::FuncSymbol*)this->root_symbol_table->findSymbol(node->getContent() + add_on);
         if (fun_sym == NULL) {
             std::cout << "\033[31mError: \033[0m"
                       << " function is not decleared." << std::endl;
@@ -164,7 +167,11 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbol_ta
         AST::DefineVarNode *temp_node = (AST::DefineVarNode*)node;
         if (temp_node->getSymbolType() == SMB::struct_type) {
             // TODO: addStructSymbol
-            symbol_table->addStructSymbol(temp_node->getStructName(), temp_node->getContent());
+            if (symbol_table->addStructSymbol(temp_node->getStructName(), temp_node->getContent()) == 0) {
+                std::cout << "\033[31mError: \033[0m"
+                << "struct " << temp_node->getStructName() << " is not defined" << std::endl;
+                exit(1);
+            }
         } else if (temp_node->getSymbolType() == SMB::array) {
             symbol_table->addArraySymbol(temp_node);
         } else {
@@ -376,7 +383,7 @@ SMB::SymbolTable *IM::InterMediate::generateReturn(AST::StatementNode *node, SMB
 
 SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::SymbolTable *symbol_table)
 {
-    std::cout << "op begin\n";
+    std::cout << "op begin, type: " << node->getOpType() << "\n";
     Quaternion *temp;
     AST::BaseNode *arg1_node, *arg2_node;
     switch (node->getOpType()) {
@@ -394,6 +401,7 @@ SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::Sy
             if (node->getChildNode()->getASTNodeType() != AST::assign_var
             &&  node->getChildNode()->getASTNodeType() != AST::def_var) {
                 std::cout << "\033[31mError: \033[0m"
+                          << "node_type:"<<node->getChildNode()->getASTNodeType()
                           << node->getChildNode()->getContent() << " is not a variable. What are u doing?" << std::endl;
                 exit(1);
             } else if (node->getChildNode()->getASTNodeType() == AST::def_var) {
@@ -488,16 +496,13 @@ SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::Sy
         if (arg1_node->getASTNodeType() == AST::assign_var) {
             SMB::Symbol *arg1 = symbol_table->findSymbol(arg1_node->getContent());
             temp = new Quaternion(IM::ASSIGN_STRUCT, arg1, arg2, result);
-        }
-        else if (arg1_node->getASTNodeType() == AST::op) {
+        } else if (arg1_node->getASTNodeType() == AST::op) {
             SMB::Symbol *arg1 = generateOperator((AST::OperatorNode *)arg1_node, symbol_table);
             temp = new Quaternion(IM::ASSIGN_STRUCT, arg1, arg2, result);
-        }
-        else if (arg1_node->getASTNodeType() == AST::literal) {
+        } else if (arg1_node->getASTNodeType() == AST::literal) {
             int arg1 = std::stoi(arg1_node->getContent());
             temp = new Quaternion(IM::ASSIGN_STRUCT, arg1, arg2, result);
-        }
-        else if (arg1_node->getASTNodeType() == AST::call_func) {
+        } else if (arg1_node->getASTNodeType() == AST::call_func) {
             generate(arg1_node, symbol_table);
             SMB::Symbol *arg1 = temp_vars.back();
             temp = new Quaternion(IM::ASSIGN_STRUCT, arg1, arg2, result);
@@ -781,19 +786,22 @@ SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::Sy
     }
     case AST::get_member:
     {
+        std::cout << "get_member\n";
         Quaternion *temp;
         SMB::Symbol *result = new SMB::Symbol("Temp" + std::to_string(temp_vars.size()), SMB::integer);
         AST::BaseNode *arg1_node = node->getChildNode();
         AST::BaseNode *arg2_node = arg1_node->getCousinNode();
         SMB::Symbol *arg1 = symbol_table->findSymbol(arg1_node->getContent());
         // 短路写法，应该没啥问题，不行再改
+        std::cout << "parent: " << node->getParentNode() << std::endl;
         if (node->getParentNode()->getASTNodeType() == AST::op 
         && ((AST::OperatorNode *)node->getParentNode())->getOpType() == AST::assign_member)
         {
             if (arg2_node->getASTNodeType() == AST::assign_var) {
                 // TODO: struct table
                 std::string type_name = ((SMB::StructDefSymbol *)arg1)->getTypeName();
-                int offset = this->root_table->getStructTable()->findStruct(type_name)->getMemberOffset(arg2_node->getContent());
+                std::cout<<"struct_list:"<<this->root_symbol_table->getStructTable()<<std::endl;
+                int offset = this->root_symbol_table->getStructTable()->findStruct(type_name)->getMemberOffset(arg2_node->getContent());
                 SMB::Symbol *arg2 = new SMB::Symbol(std::to_string(offset), SMB::literal);
                 child_value.push(arg2);
             }
@@ -806,7 +814,8 @@ SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::Sy
         } else {
             if (arg2_node->getASTNodeType() == AST::assign_var) {
                 std::string type_name = ((SMB::StructDefSymbol *)arg1)->getTypeName();
-                int offset = this->root_table->getStructTable()->findStruct(type_name)->getMemberOffset(arg2_node->getContent());
+                // std::cout<<"struct_list:"<<this->root_symbol_table->getStructTable()<<std::endl;
+                int offset = this->root_symbol_table->getStructTable()->findStruct(type_name)->getMemberOffset(arg2_node->getContent());
                 SMB::Symbol *arg2 = new SMB::Symbol(std::to_string(offset), SMB::literal);
                 temp = new Quaternion(IM::GET_STRUCT, arg1, arg2, result);
             } else {
