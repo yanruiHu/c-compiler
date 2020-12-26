@@ -5,5 +5,5 @@ std::string IM::Quaternion::__str__() {
 }
 
 void IM::Quaternion::print() {
-
+  // print quaternion use __str__
 }

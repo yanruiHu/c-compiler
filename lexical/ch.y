@@ -6,6 +6,7 @@
 #include "../grammar/Nodes.h"
 #include "../grammar/symbol/symbol.h"
 #include "../grammar/InterMediate/InterMediate.h"
+#include "../grammar/InterMediate/AsmGenerator.h"
 
 using AST::BaseNode;
 using SMB::StructTable;
@@ -500,5 +501,16 @@ int main(int argc,char * argv[]){  //不确定语法的在哪里输出
     IM::InterMediate *im = new IM::InterMediate(root, struct_table);
     im->generate(root, im->getTable());
     if(root) delete root;
+
+    //add ASM
+    AsmGenerator* asmgenerator = new AsmGenerator(im->getQuads(), im->getTempVars(), im->getTable(), im->getFuncTable());
+    asmgenerator->generate();
+    if (flag_print_asm) {
+        std::cout << asmgenerator->getAsmCode();
+    }
+
+    std::string outFileName = replaceExtName(filename);
+    std::ofstream outasm(outFileName);
+    outasm << asmgenerator->getAsmCode();
     return 0;
 }
