@@ -2,7 +2,7 @@ CC = gcc
 NASM = nasm
 PROGRAM = ./parser
 
-all: fibo array larra swap struct loop
+all: fibo larra swap struct loop
 
 swap: test/swap.c
 	$(PROGRAM) test/swap.c
@@ -19,18 +19,12 @@ fibo: test/fibo.c
 	$(NASM) -f elf test/fibo.asm -o fibo.o
 	$(CC) -o fibo fibo.o io/asm_io.o -m32
 
-# scd 
-
-array: test/array.c
-	$(PROGRAM) test/array.c
-	$(NASM) -f elf test/array.asm -o array.o
-	$(CC) -o array array.o io/asm_io.o -m32
 
 larra: test/larra.c
 	$(PROGRAM) test/larra.c
 	$(NASM) -f elf test/larra.asm -o larra.o
 	$(CC) -o larra larra.o io/asm_io.o -m32
-	
+
 struct: test/struct.c
 	$(PROGRAM) test/struct.c
 	$(NASM) -f elf test/struct.asm -o struct.o
