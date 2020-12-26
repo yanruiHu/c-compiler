@@ -18,7 +18,7 @@ CXXVER = c++11
 $(PROGRAM): $(OBJ)
 	$(CXX) -o $(PROGRAM) $(OBJ) -std=$(CXXVER) -g
 
-syntactic: ./lexical/lexical.l ./lexical/ch.y
+run: ./lexical/lexical.l ./lexical/ch.y
 ifeq ($(GRAMMAREXIST),notexist)
 	mkdir $(GRAMMARFOLDER)
 endif
@@ -33,19 +33,21 @@ clean:
 	rm -rf $(GRAMMARFOLDER) $(OBJ) $(PROGRAM) $(BUILDFOLDER) grammar/InterMediate/asm_io.o
 
 build:
+ifeq ($(BUILDEXIST),notexist)
+	mkdir $(BUILDFOLDER)
+endif
+ifeq ($(BUILDIOEXIST),notexist)
+	mkdir $(BUILDIO)
+endif
 	$(NASM) -f elf -d ELF_TYPE grammar/InterMediate/asm_io.asm -o grammar/InterMediate/asm_io.o
-		# cp $(PROGRAM) $(BUILDFOLDER)
-		# cp grammar/InterMediate/asm_io.o $(BUILDIO)
-		# cp grammar/InterMediate/asm_io.inc $(BUILDIO)
-		# cp ./test.c $(BUILDFOLDER)
-	# cp Makefile $(BUILDFOLDER)
-	$(PROGRAM1) ./test.c
-	$(NASM) -f elf test.asm -o test.o
-	$(CXX) -o test test.o grammar/InterMediate/asm_io.o -m32
-# ifeq ($(BUILDEXIST),notexist)
-# 	mkdir $(BUILDFOLDER)
-# endif
-# ifeq ($(BUILDIOEXIST),notexist)
-# 	mkdir $(BUILDIO)
+	cp $(PROGRAM) $(BUILDFOLDER)
+	cp grammar/InterMediate/asm_io.o $(BUILDIO)
+	cp grammar/InterMediate/asm_io.inc $(BUILDIO)
+	cp -r test/ $(BUILDFOLDER)
+	cp example/Makefile $(BUILDFOLDER)
+	# $(PROGRAM1) ./test.c
+	# $(NASM) -f elf test.asm -o test.o
+	# $(CXX) -o test test.o grammar/InterMediate/asm_io.o -m32
+
 
 	
