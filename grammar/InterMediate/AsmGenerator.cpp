@@ -261,7 +261,7 @@ asmRegister AsmGenerator::findRegister(std::string var) {
 void AsmGenerator::generateArithmetic(IM::Quaternion& q) {
     std::string instructor;
     IM::OperatorCode opcode = q.getOperator();// 拿到四元式的code
-    int flag = q.isSymbol(); //　这个flag表示了不同的情况
+    int flag = q.getFlag(); //　这个flag表示了不同的情况
     // Special case, assign operate is unary operator. 单元运算符
     if (opcode == IM::OperatorCode::ASSIGN) {
         SMB::Symbol* result = q[2].var;
@@ -613,7 +613,7 @@ void AsmGenerator::generateReturn(IM::Quaternion& q) {
         this->generateEndFunction(q);
         return;
     }
-    int flag = q.isSymbol();
+    int flag = q.getFlag();
     if (flag == 7) {
         SMB::Symbol* s = q[0].var;
         std::string name = s->getName();
@@ -646,7 +646,7 @@ void AsmGenerator::generateCallBuildInFunction(IM::Quaternion& q, IM::Quaternion
     std::string funcName = q[0].var->getName();
     int tempVar = 0;
     int varOffSet = 0;
-    if (arg.isSymbol() == 6) {
+    if (arg.getFlag() == 6) {
         int argValue = arg[0].literal;
         std::string value = std::to_string(argValue);
         if (funcName == "print_int_i") {
@@ -721,7 +721,7 @@ void AsmGenerator::generateJump(IM::Quaternion& q) {
     if (opcode == IM::OperatorCode::JUMP) {
         this->asmcode.generateUnaryInstructor(ASM_JUMP, label);
     } else {
-        int flag = q.isSymbol();
+        int flag = q.getFlag();
         if (flag == 0) {
             std::string value1 = std::to_string(q[0].literal);
             std::string value2 = std::to_string(q[1].literal);
@@ -829,7 +829,7 @@ void AsmGenerator::generateNeg(IM::Quaternion& q) {
 }
 
 void AsmGenerator::generatePower(IM::Quaternion& q) {
-    int flag = q.isSymbol();
+    int flag = q.getFlag();
     if (flag == 7) {
         std::string var1Name = q[0].var->getName();
         std::string var2Name = q[1].var->getName();
@@ -916,7 +916,7 @@ void AsmGenerator::generateAssignMember(IM::Quaternion& q) {
     int totalOffset = offsetOfMember + offsetOfStruct;
     this->asmcode.mov(asmRegister::edx, asmRegister::ebp);
     this->asmcode.sub(asmRegister::edx, std::to_string(totalOffset));
-    int flag = q.isSymbol();
+    int flag = q.getFlag();
     if (flag == 7) {
         std::string tempValue = q[0].var->getName();
         asmRegister reg;
@@ -955,7 +955,7 @@ void AsmGenerator::generateGetArrayValue(IM::Quaternion& q) {
     if (q.getOperator() == IM::OperatorCode::GET_ARRAY) {
         asmRegister offsetReg = asmRegister::unset;
         std::string offsetEbpStr = "";
-        int flag = q.isSymbol();
+        int flag = q.getFlag();
         if (flag == 7) {
             std::string offsetName = q[1].var->getName();
             if (offsetName[0] == 'T') {
@@ -989,7 +989,7 @@ void AsmGenerator::generateGetArrayValue(IM::Quaternion& q) {
 
 void AsmGenerator::generateAssignArray(IM::Quaternion& q) {
     int baseOffset = q[2].var->getOffset();
-    int flag = q.isSymbol();
+    int flag = q.getFlag();
     int totalOffset = baseOffset;
     asmRegister offsetReg = asmRegister::unset;
     std::string offsetEbpStr = "";

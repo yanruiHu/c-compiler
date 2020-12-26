@@ -29,7 +29,7 @@ push ebx
 call func-i
 mov ebx,eax
 add esp,4
-mov [ebp-12],dword -697088112
+mov [ebp-12],ebx
 pop ecx
 pop ebx
 leave
