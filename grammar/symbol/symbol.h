@@ -88,6 +88,7 @@ namespace SMB {
             int total_arg_offset;                     // 参数偏移量  
             bool is_func;
             SymbolTable *root_table;
+            static SymbolTable *global_table;
             std::string table_name;
             
             Symbol *findInTable(const std::string name);
@@ -118,6 +119,7 @@ namespace SMB {
             inline int getTotalOffset() { return this->total_offset; }
             //inline int getArgTotalOffset() { return this->argTotalOffset; }
             inline StructTable *getStructTable() { return this->struct_list; }
+            inline static void setGlobalTable(SymbolTable *glb) { global_table = glb; }
     };
 } // namespace SMB
 

@@ -1,6 +1,8 @@
 #include "./symbol.h"
 #include <string>
 
+SMB::SymbolTable* SMB::SymbolTable::global_table;
+
 SMB::Symbol::Symbol() {
     this->name = "";
     this->type = SMB::SymbolType::integer;
@@ -237,9 +239,9 @@ int SMB::SymbolTable::addStructSymbol(std::string struct_type, std::string id_na
     if(this->findInTable(id_name)!=NULL)
         return FAIL;
     else{
-        std::cout << "root_table: " << this->root_table << std::endl;
-        std::cout << "struct_list: " << this->root_table->struct_list << std::endl;
-        StructSymbol *target = this->root_table->struct_list->findStruct(struct_type);
+        std::cout << "global_table: " << this->global_table << std::endl;
+        std::cout << "struct_list: " << this->global_table->struct_list << std::endl;
+        StructSymbol *target = this->global_table->struct_list->findStruct(struct_type);
         if(target == NULL){
             return FAIL;
         }else{
