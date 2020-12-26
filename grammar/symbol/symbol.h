@@ -85,7 +85,7 @@ namespace SMB {
             StructTable *struct_list;
             int total_symbol_count;
             int total_offset;
-            //int argTotalOffset;                     // 参数偏移量  
+            int total_arg_offset;                     // 参数偏移量  
             bool is_func;
             SymbolTable *root_table;
             std::string table_name;

@@ -33,6 +33,7 @@ AST::LoopNode::LoopNode(std::string content,
     : BaseNode(content, AST::loop) {
     this->loop_type = loop_type;
     this->cond = condition;
+    condition->setParentNode(this);
     this->dec = NULL;
     this->action = NULL;
 }
@@ -46,8 +47,11 @@ AST::LoopNode::LoopNode(std::string content,
     : BaseNode(content, AST::loop) {
     this->loop_type = loop_type;
     this->cond = cond;
+    cond->setParentNode(this);
     this->dec = dec;
+    dec->setParentNode(this);
     this->action = action;
+    action->setParentNode(this);
 }
 
 void AST::LoopNode::printInfo(int) {

@@ -15,20 +15,20 @@ private:
     std::vector<Quaternion> quads;
     std::vector<SMB::Symbol*> temp_vars;
     // FuncTable funcTable;
-    SMB::SymbolTable *symbol_table;
+    SMB::SymbolTable *root_symbol_table;
 
     std::stack< std::list<int> > true_list;
     std::stack< std::list<int> > false_list;
     std::stack<int> signal;
-    std::stack<SMB::Symbol*> childValue;
-    // Function for backpatch.
-    std::list<int> *makelist(int index);
+    std::stack<SMB::Symbol*> child_value;
+    // Function for backPatch.
+    std::list<int> *makeList(int index);
     std::list<int> *merge(std::list<int> *list1, std::list<int> *list2);
-    void backpatch(std::list<int> *backList, int target);
+    void backPatch(std::list<int> *backList, int target);
 
 public:
     inline AST::BaseNode *getRoot() { return this->root; }
-    inline SMB::SymbolTable *getTable() { return this->symbol_table; }
+    inline SMB::SymbolTable *getTable() { return this->root_symbol_table; }
     // inline FuncTable &getFuncTable() { return this->funcTable; }
     inline std::vector<Quaternion> &getQuads() { return this->quads; }
     inline std::vector<SMB::Symbol*> &getTempVars() { return this->temp_vars; }

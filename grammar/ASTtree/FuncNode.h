@@ -28,7 +28,7 @@ namespace AST {
     public:
         CallFuncNode();
         CallFuncNode(std::string);
-        inline void setVarList(BaseNode *v) {this->var_list = v;}
+        inline void setVarList(BaseNode *v) {this->var_list = v; v->setParentNode(this);}
         inline BaseNode* getVarList() {return this->var_list;}
         void printInfo(int);
         ~CallFuncNode();
