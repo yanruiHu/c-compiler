@@ -40,6 +40,7 @@ SMB::FuncSymbol::FuncSymbol(AST::BaseNode* node) {
         }else if(arg_type == SMB::SymbolType::pointer){
             this->dec_name += "-p";
         }
+        total_arg_offset += 4;
         p = (AST::DefineVarNode*)(p->getCousinNode());
     }
 }
@@ -114,10 +115,22 @@ SMB::SymbolTable::SymbolTable() {
 
 void SMB::SymbolTable::addFromFunctionArgs(FuncSymbol *func_node) {
     AST::BaseNode* args = func_node->getArgList();
+    int offset = -4;
+    int index = -1;
     while (args) {
-        this->addSymbol(args);
-        args = args->getCousinNode();
+        // this->addSymbol(args);
+        AST::DefineVarNode *arg = (AST::DefineVarNode *)args;
+        if(arg->getSymbolType() == SMB::SymbolType::integer || arg->getSymbolType() == SMB::SymbolType::pointer){
+            offset -= 4;
+            SMB::Symbol *arg_symbol = new SMB::Symbol(arg->getContent(),arg->getSymbolType());
+            arg_symbol->setIndex(index--);
+            arg_symbol->setOffset(offset);
+            std::cout<< "add symbol:" << arg_symbol->getName() << " in " << this->getTableName() <<std::endl;
+            symbol_hash_map[arg_symbol->getName()] = arg_symbol;
+            args = args->getCousinNode();
+        }
     }
+    this->total_arg_offset = offset;
 }
 
 SMB::SymbolTable::SymbolTable(SymbolTable *parent, bool is_func) {
@@ -186,9 +199,10 @@ int SMB::SymbolTable::addSymbol(AST::BaseNode *node){
         //offset的地方可能还需要修改
         if(symbol_type == SMB::SymbolType::integer || symbol_type == SMB::SymbolType::pointer){
             this->root_table->total_offset += INT_OFFSET;
-        } else if(symbol_type == SMB::SymbolType::array) {
-            //this->root_table->total_offset += 0;//加一个数组长度
         }
+        // } else if(symbol_type == SMB::SymbolType::array) {
+        //     this->root_table->total_offset += tmp->getArrayLength()*4;
+        // }
         this->symbol_hash_map[s->getName()] = s;
         std::cout<< "add symbol:" << s->getName() << " in " << this->getTableName() <<std::endl;
         return SUCCESS;
