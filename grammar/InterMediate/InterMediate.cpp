@@ -8,6 +8,15 @@ IM::InterMediate::InterMediate(AST::BaseNode *root_node, SMB::StructTable *struc
     SMB::SymbolTable::setGlobalTable(this->root_symbol_table);
     std::cout << "root_symbol_table: " << this->root_symbol_table << std::endl;
     std::cout << "struct_table: " << struct_table << std::endl;
+    this->functionRegister();
+}
+
+void IM::InterMediate::buildInFunctionRegister() {
+    AST::DefineVarNode  *tmp_arg = new AST::DefineVarNode("i");
+    tmp_arg->setAllSymbolType("int");
+    AST::DefineFuncNode *tmp_func = new AST::DefineFuncNode("print_int", tmp_arg);
+    SMB::FuncSymbol *func_symbol = new SMB::FuncSymbol(tmp_func);
+    this->root_symbol_table->addFuncSymbol(func_symbol);
 }
 
 void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbol_table) {

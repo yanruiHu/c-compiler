@@ -26,6 +26,8 @@ private:
     std::list<int> *merge(std::list<int> *list1, std::list<int> *list2);
     void backPatch(std::list<int> *backList, int target);
 
+    void buildInFunctionRegister();
+
 public:
     inline AST::BaseNode *getRoot() { return this->root; }
     inline SMB::SymbolTable *getTable() { return this->root_symbol_table; }
