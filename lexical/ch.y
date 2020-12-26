@@ -348,6 +348,8 @@ expression: expression '=' expression {
                 AST::OperatorNode *tmp = (AST::OperatorNode *)$1;
                 if (tmp->getOpType() == AST::get_member) {
                     temp->setOpType(AST::assign_member);
+                } else if (tmp->getOpType() == AST::get_arr_var) {
+                    temp->setOpType(AST::assign_arr);
                 }
             }
             temp->addChildNode($1);

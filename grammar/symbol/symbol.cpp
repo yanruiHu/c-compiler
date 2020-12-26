@@ -234,6 +234,7 @@ int SMB::SymbolTable::addStructSymbol(std::string struct_type, std::string id_na
             s->setOffset(this->root_table->total_offset);
             this->root_table->total_offset += target->getTotalMemberOffset();
             this->symbol_hash_map[s->getName()] = s;
+            std::cout<< "add struct symbol:" << s->getName() << " in " << this->getTableName() <<std::endl;
             return SUCCESS;
         }
     }
@@ -251,6 +252,7 @@ int SMB::SymbolTable::addArraySymbol(AST::BaseNode *array_node){
         s->setOffset(this->root_table->total_offset);
         this->root_table->total_offset += curr_array->getArrayLength()*4;
         this->symbol_hash_map[array_name] = s;
+        std::cout<< "add array:" << s->getName() << " in " << this->getTableName() <<std::endl;
         return SUCCESS;
     }
 }
