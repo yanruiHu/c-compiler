@@ -6,8 +6,8 @@ IM::InterMediate::InterMediate(AST::BaseNode *root_node, SMB::StructTable *struc
     this->root = root_node;
     this->rootSymbolTable = new SMB::SymbolTable(false, struct_table);
     SMB::SymbolTable::setGlobalTable(this->rootSymbolTable);
-    std::cout << "rootSymbolTable: " << this->rootSymbolTable << std::endl;
-    std::cout << "struct_table: " << struct_table << std::endl;
+    // std::cout << "rootSymbolTable: " << this->rootSymbolTable << std::endl;
+    // std::cout << "struct_table: " << struct_table << std::endl;
     this->buildInFunctionRegister();
 }
 
@@ -23,8 +23,6 @@ void IM::InterMediate::buildInFunctionRegister() {
     tmp_func->setReturnSymbolType("void");
     func_symbol = new SMB::FuncSymbol(tmp_func);
     this->rootSymbolTable->addFuncSymbol(func_symbol);
-    delete tmp_arg;
-    delete tmp_func;
 
 }
 

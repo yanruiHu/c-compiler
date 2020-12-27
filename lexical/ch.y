@@ -522,10 +522,9 @@ int main(int argc,char * argv[]){  //不确定语法的在哪里输出
     // SMB::tree(root_symbol_table,root,0);
     IM::InterMediate *im = new IM::InterMediate(root, struct_table);
     im->generate(root, im->getTable());
-   
     im->print();
     //add ASM
-    AsmGenerator* asmgenerator = new AsmGenerator(im->getQuads(), im->getTempVars(), im->getTable());
+    ASM::AsmGenerator* asmgenerator = new ASM::AsmGenerator(im->getQuads(), im->getTempVars(), im->getTable());
     asmgenerator->generate();
     // if (flag_print_asm) {
     std::cout << asmgenerator->getAsmCode();
