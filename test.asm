@@ -3,7 +3,7 @@ section .text
 global main
 
 main:
-enter 44,0
+enter 52,0
 push ebx
 push ecx
 pop ecx
