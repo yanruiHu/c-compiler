@@ -2,11 +2,11 @@
 #include <typeinfo>
 #include <cstdio>
 IM::InterMediate::InterMediate(AST::BaseNode *root_node, SMB::StructTable *struct_table) {
-    temp_vars.reserve(100);
+    tempVars.reserve(100);
     this->root = root_node;
-    this->root_symbol_table = new SMB::SymbolTable(false, struct_table);
-    SMB::SymbolTable::setGlobalTable(this->root_symbol_table);
-    std::cout << "root_symbol_table: " << this->root_symbol_table << std::endl;
+    this->rootSymbolTable = new SMB::SymbolTable(false, struct_table);
+    SMB::SymbolTable::setGlobalTable(this->rootSymbolTable);
+    std::cout << "rootSymbolTable: " << this->rootSymbolTable << std::endl;
     std::cout << "struct_table: " << struct_table << std::endl;
     this->buildInFunctionRegister();
 }
@@ -16,7 +16,7 @@ void IM::InterMediate::buildInFunctionRegister() {
     tmp_arg->setAllSymbolType("int");
     AST::DefineFuncNode *tmp_func = new AST::DefineFuncNode("print_int", tmp_arg);
     SMB::FuncSymbol *func_symbol = new SMB::FuncSymbol(tmp_func);
-    this->root_symbol_table->addFuncSymbol(func_symbol);
+    this->rootSymbolTable->addFuncSymbol(func_symbol);
 }
 
 void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbol_table) {
@@ -28,7 +28,7 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbol_ta
     switch (node->getASTNodeType()) {
     case AST::def_func: {
         SMB::FuncSymbol *func = new SMB::FuncSymbol(node);
-        this->root_symbol_table->addFuncSymbol(func);
+        this->rootSymbolTable->addFuncSymbol(func);
         Quaternion *temp;
         SMB::Symbol *temp_symbol = new SMB::Symbol(func->getDecName(), SMB::void_type);
         temp = new Quaternion(IM::FUNC_DEF, temp_symbol, (SMB::Symbol *)NULL);
@@ -92,7 +92,7 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbol_ta
             this->quads.push_back(*temp);
             var = var->getCousinNode();
         }
-        SMB::FuncSymbol *fun_sym = (SMB::FuncSymbol*)this->root_symbol_table->findSymbol(node->getContent() + add_on);
+        SMB::FuncSymbol *fun_sym = (SMB::FuncSymbol*)this->rootSymbolTable->findSymbol(node->getContent() + add_on);
         if (fun_sym == NULL) {
             std::cout << "\033[31mError: \033[0m"
                       << " function is not decleared." << std::endl;
@@ -108,13 +108,13 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbol_ta
                 temp_v = NULL;
             }
             else {
-                temp_v = new SMB::Symbol("Temp" + std::to_string(temp_vars.size()), SMB::integer);
-                temp_vars.push_back(temp_v);
+                temp_v = new SMB::Symbol("Temp" + std::to_string(tempVars.size()), SMB::integer);
+                tempVars.push_back(temp_v);
             }
         }
         else {
-            temp_v = new SMB::Symbol("Temp" + std::to_string(temp_vars.size()), SMB::integer);
-            temp_vars.push_back(temp_v);
+            temp_v = new SMB::Symbol("Temp" + std::to_string(tempVars.size()), SMB::integer);
+            tempVars.push_back(temp_v);
         }
 
         Quaternion *temp = new Quaternion(IM::CALL, func_symbol, count, temp_v);
@@ -135,8 +135,8 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbol_ta
                 std::list<int> false_l;
                 false_l.push_back(quads.size());
                 this->quads.push_back(*false_quad);
-                true_list.push(true_l);
-                false_list.push(false_l);
+                trueList.push(true_l);
+                falseList.push(false_l);
             }
         }
         break;
@@ -208,7 +208,7 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbol_ta
             }
             else if (p->getASTNodeType() == AST::call_func) {
                 generate(p, symbol_table);
-                SMB::Symbol *arg1 = temp_vars.back();
+                SMB::Symbol *arg1 = tempVars.back();
                 temp = new Quaternion(IM::ASSIGN, arg1, var_symbol);
             }
             else {
@@ -236,8 +236,8 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbol_ta
                 std::list<int> falseL;
                 falseL.push_back(quads.size());
                 this->quads.push_back(*false_quad);
-                true_list.push(trueL);
-                false_list.push(falseL);
+                trueList.push(trueL);
+                falseList.push(falseL);
             }
         }
         break;
@@ -252,10 +252,10 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbol_ta
             generate(((AST::LoopNode*)node)->getDecNode(), child_table);
             int start = quads.size();
             generate(((AST::LoopNode*)node)->getCondNode(), child_table);
-            std::list<int> Judge_true = true_list.top();
-            std::list<int> Judge_false = false_list.top();
-            true_list.pop();
-            false_list.pop();
+            std::list<int> Judge_true = trueList.top();
+            std::list<int> Judge_false = falseList.top();
+            trueList.pop();
+            falseList.pop();
             backPatch(&Judge_true, Judge_true.back() + 2);
             while (p != NULL)
             {
@@ -273,10 +273,10 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbol_ta
         {
             int start = quads.size();
             generate(((AST::LoopNode*)node)->getCondNode(), symbol_table);
-            std::list<int> Judge_true = true_list.top();
-            std::list<int> Judge_false = false_list.top();
-            true_list.pop();
-            false_list.pop();
+            std::list<int> Judge_true = trueList.top();
+            std::list<int> Judge_false = falseList.top();
+            trueList.pop();
+            falseList.pop();
             backPatch(&Judge_true, Judge_true.back() + 2);
             while (p != NULL) {
                 SMB::SymbolTable *child_table = symbol_table->createChildTable(false);
@@ -298,11 +298,11 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbol_ta
         generate(select->getCondNode(), symbol_table);
         // std::cout << "generate finished!\n";
         int start = quads.size();
-        std::cout << "true_list pop!\n";
-        std::list<int> Judge_true = true_list.top();
-        std::list<int> Judge_false = false_list.top();
-        true_list.pop();
-        false_list.pop();
+        std::cout << "trueList pop!\n";
+        std::list<int> Judge_true = trueList.top();
+        std::list<int> Judge_false = falseList.top();
+        trueList.pop();
+        falseList.pop();
 
         backPatch(&Judge_true, start);
         // Body:
@@ -361,8 +361,8 @@ SMB::SymbolTable *IM::InterMediate::generateReturn(AST::StatementNode *node, SMB
 {
     AST::BaseNode *p = node->getChildNode();
     Quaternion *temp;
-    SMB::Symbol *result = new SMB::Symbol("Temp" + std::to_string(temp_vars.size()), SMB::integer);
-    temp_vars.push_back(result);
+    SMB::Symbol *result = new SMB::Symbol("Temp" + std::to_string(tempVars.size()), SMB::integer);
+    tempVars.push_back(result);
     if (p == NULL) {
         temp = new Quaternion(IM::RETURN, (SMB::Symbol *)NULL, (SMB::Symbol *)NULL, (SMB::Symbol *)NULL);
     }
@@ -380,7 +380,7 @@ SMB::SymbolTable *IM::InterMediate::generateReturn(AST::StatementNode *node, SMB
     }
     else if (p->getASTNodeType() == AST::call_func) {
         generate(p, symbol_table);
-        SMB::Symbol *arg1 = temp_vars.back();
+        SMB::Symbol *arg1 = tempVars.back();
         temp = new Quaternion(IM::RETURN, arg1, (SMB::Symbol *)NULL);
     }
     else {
@@ -444,7 +444,7 @@ SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::Sy
         }
         else if (arg1_node->getASTNodeType() == AST::call_func) {
             generate(arg1_node, symbol_table);
-            SMB::Symbol *arg1 = temp_vars.back();
+            SMB::Symbol *arg1 = tempVars.back();
             temp = new Quaternion(op, arg1, result);
         }
         else {
@@ -464,8 +464,8 @@ SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::Sy
         }
         result = generateOperator((AST::OperatorNode *)node->getChildNode(), symbol_table);
         AST::BaseNode *arg1_node = node->getChildNode()->getCousinNode();
-        SMB::Symbol *arg2 = this->child_value.top();
-        this->child_value.pop();
+        SMB::Symbol *arg2 = this->childValue.top();
+        this->childValue.pop();
         if (arg1_node->getASTNodeType() == AST::assign_var) {
             SMB::Symbol *arg1 = symbol_table->findSymbol(arg1_node->getContent());
             temp = new Quaternion(IM::ASSIGN_ARRAY, arg1, arg2, result);
@@ -480,7 +480,7 @@ SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::Sy
         }
         else if (arg1_node->getASTNodeType() == AST::call_func) {
             generate(arg1_node, symbol_table);
-            SMB::Symbol *arg1 = temp_vars.back();
+            SMB::Symbol *arg1 = tempVars.back();
             temp = new Quaternion(IM::ASSIGN_ARRAY, arg1, arg2, result);
         }
         else {
@@ -501,8 +501,8 @@ SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::Sy
         }
         result = generateOperator((AST::OperatorNode *)node->getChildNode(), symbol_table);
         AST::BaseNode *arg1_node = node->getChildNode()->getCousinNode();
-        SMB::Symbol *arg2 = this->child_value.top();
-        this->child_value.pop();
+        SMB::Symbol *arg2 = this->childValue.top();
+        this->childValue.pop();
         if (arg1_node->getASTNodeType() == AST::assign_var) {
             SMB::Symbol *arg1 = symbol_table->findSymbol(arg1_node->getContent());
             temp = new Quaternion(IM::ASSIGN_STRUCT, arg1, arg2, result);
@@ -514,7 +514,7 @@ SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::Sy
             temp = new Quaternion(IM::ASSIGN_STRUCT, arg1, arg2, result);
         } else if (arg1_node->getASTNodeType() == AST::call_func) {
             generate(arg1_node, symbol_table);
-            SMB::Symbol *arg1 = temp_vars.back();
+            SMB::Symbol *arg1 = tempVars.back();
             temp = new Quaternion(IM::ASSIGN_STRUCT, arg1, arg2, result);
         }
         else {
@@ -556,76 +556,76 @@ SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::Sy
     }
     case AST::add: // 可能需要重构一下，方便看
     {
-        SMB::Symbol *result = new SMB::Symbol("Temp" + std::to_string(temp_vars.size()), SMB::integer);
+        SMB::Symbol *result = new SMB::Symbol("Temp" + std::to_string(tempVars.size()), SMB::integer);
         arg1_node = node->getChildNode();
         arg2_node = arg1_node->getCousinNode();
-        temp_vars.push_back(result);
-        result = temp_vars.back();
+        tempVars.push_back(result);
+        result = tempVars.back();
         temp = this->caculateOperator(IM::PLUS, arg1_node, arg2_node, result, symbol_table);
         this->quads.push_back(*temp);
         return result;
         break;
     }
     case AST::minus: {
-        SMB::Symbol *result = new SMB::Symbol("Temp" + std::to_string(temp_vars.size()), SMB::integer);
+        SMB::Symbol *result = new SMB::Symbol("Temp" + std::to_string(tempVars.size()), SMB::integer);
         arg1_node = node->getChildNode();
         arg2_node = arg1_node->getCousinNode();
-        temp_vars.push_back(result);
-        result = temp_vars.back();
+        tempVars.push_back(result);
+        result = tempVars.back();
         temp = this->caculateOperator(IM::MINUS, arg1_node, arg2_node, result, symbol_table);
         this->quads.push_back(*temp);
         return result;
         break;
     }
     case AST::multi: {
-        SMB::Symbol *result = new SMB::Symbol("Temp" + std::to_string(temp_vars.size()), SMB::integer);
+        SMB::Symbol *result = new SMB::Symbol("Temp" + std::to_string(tempVars.size()), SMB::integer);
         arg1_node = node->getChildNode();
         arg2_node = arg1_node->getCousinNode();
-        temp_vars.push_back(result);
-        result = temp_vars.back();
+        tempVars.push_back(result);
+        result = tempVars.back();
         temp = this->caculateOperator(IM::TIMES, arg1_node, arg2_node, result, symbol_table);
         this->quads.push_back(*temp);
         return result;
         break;
     }
     case AST::div: {
-        SMB::Symbol *result = new SMB::Symbol("Temp" + std::to_string(temp_vars.size()), SMB::integer);
+        SMB::Symbol *result = new SMB::Symbol("Temp" + std::to_string(tempVars.size()), SMB::integer);
         arg1_node = node->getChildNode();
         arg2_node = arg1_node->getCousinNode();
-        temp_vars.push_back(result);
-        result = temp_vars.back();
+        tempVars.push_back(result);
+        result = tempVars.back();
         temp = this->caculateOperator(IM::DIV, arg1_node, arg2_node, result, symbol_table);
         this->quads.push_back(*temp);
         return result;
         break;
     }
     case AST::mod: {
-        SMB::Symbol *result = new SMB::Symbol("Temp" + std::to_string(temp_vars.size()), SMB::integer);
+        SMB::Symbol *result = new SMB::Symbol("Temp" + std::to_string(tempVars.size()), SMB::integer);
         arg1_node = node->getChildNode();
         arg2_node = arg1_node->getCousinNode();
-        temp_vars.push_back(result);
-        result = temp_vars.back();
+        tempVars.push_back(result);
+        result = tempVars.back();
         temp = this->caculateOperator(IM::MOD, arg1_node, arg2_node, result, symbol_table);
         this->quads.push_back(*temp);
         return result;
         break;
     }
     case AST::pow: {
-        SMB::Symbol *result = new SMB::Symbol("Temp" + std::to_string(temp_vars.size()), SMB::integer);
+        SMB::Symbol *result = new SMB::Symbol("Temp" + std::to_string(tempVars.size()), SMB::integer);
         arg1_node = node->getChildNode();
         arg2_node = arg1_node->getCousinNode();
-        temp_vars.push_back(result);
-        result = temp_vars.back();
+        tempVars.push_back(result);
+        result = tempVars.back();
         temp = this->caculateOperator(IM::POWER, arg1_node, arg2_node, result, symbol_table);
         this->quads.push_back(*temp);
         return result;
         break;
     }
     case AST::negative: {
-        SMB::Symbol *result = new SMB::Symbol("Temp" + std::to_string(temp_vars.size()), SMB::integer);
+        SMB::Symbol *result = new SMB::Symbol("Temp" + std::to_string(tempVars.size()), SMB::integer);
         arg1_node = node->getChildNode();
-        temp_vars.push_back(result);
-        result = temp_vars.back();
+        tempVars.push_back(result);
+        result = tempVars.back();
         if (arg1_node->getASTNodeType() == AST::assign_var) {
             SMB::Symbol *arg1 = symbol_table->findSymbol(arg1_node->getContent());
             temp = new Quaternion(IM::NEGATIVE, arg1, result);
@@ -643,9 +643,9 @@ SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::Sy
         break;
     }
     case AST::get_address: {
-        SMB::Symbol *result = new SMB::Symbol("Temp" + std::to_string(temp_vars.size()), SMB::pointer);
+        SMB::Symbol *result = new SMB::Symbol("Temp" + std::to_string(tempVars.size()), SMB::pointer);
         arg1_node = node->getChildNode();
-        temp_vars.push_back(result);
+        tempVars.push_back(result);
         if (arg1_node->getASTNodeType() == AST::assign_var) {
             SMB::Symbol *arg1 = symbol_table->findSymbol(arg1_node->getContent());
             temp = new Quaternion(IM::GET_ADDRESS, arg1, result);
@@ -662,60 +662,60 @@ SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::Sy
     case AST::and_op: // 保证栈顶是：node2List, node1List,所以得先遍历子节点，再到&&节点
     {
         std::list<int> left_true, right_true, left_false, right_false;
-        right_true = true_list.top();
-        true_list.pop();
-        left_true = true_list.top();
-        true_list.pop();
-        right_false = false_list.top();
-        false_list.pop();
-        left_false = false_list.top();
-        false_list.pop();
+        right_true = trueList.top();
+        trueList.pop();
+        left_true = trueList.top();
+        trueList.pop();
+        right_false = falseList.top();
+        falseList.pop();
+        left_false = falseList.top();
+        falseList.pop();
         left_false.merge(right_false);
-        false_list.push(left_false);
-        true_list.push(right_true);
+        falseList.push(left_false);
+        trueList.push(right_true);
         backPatch(&left_true, signal.top());
         signal.pop();
         break;
     }
     case AST::or_op: {
         std::list<int> left_true, right_true, left_false, right_false;
-        right_true = true_list.top();
-        true_list.pop();
-        left_true = true_list.top();
-        true_list.pop();
-        right_false = false_list.top();
-        false_list.pop();
-        left_false = false_list.top();
-        false_list.pop();
+        right_true = trueList.top();
+        trueList.pop();
+        left_true = trueList.top();
+        trueList.pop();
+        right_false = falseList.top();
+        falseList.pop();
+        left_false = falseList.top();
+        falseList.pop();
         left_true.merge(right_true);
-        true_list.push(left_true);
-        false_list.push(right_false);
+        trueList.push(left_true);
+        falseList.push(right_false);
         backPatch(&left_false, signal.top());
         signal.pop();
         break;
     }
     case AST::not_op: {
         std::list<int> trueL, falseL;
-        trueL = true_list.top();
-        true_list.pop();
-        falseL = false_list.top();
-        false_list.pop();
-        true_list.push(falseL);
-        false_list.push(trueL);
+        trueL = trueList.top();
+        trueList.pop();
+        falseL = falseList.top();
+        falseList.pop();
+        trueList.push(falseL);
+        falseList.push(trueL);
         break;
     }
     case AST::get_var: {
         Quaternion *temp;
-        SMB::Symbol *result = new SMB::Symbol("Temp" + std::to_string(temp_vars.size()), SMB::integer);
+        SMB::Symbol *result = new SMB::Symbol("Temp" + std::to_string(tempVars.size()), SMB::integer);
         arg1_node = node->getChildNode();
-        temp_vars.push_back(result);
+        tempVars.push_back(result);
         if (arg1_node->getASTNodeType() == AST::assign_var) {
             SMB::Symbol *arg1 = symbol_table->findSymbol(arg1_node->getContent());
             temp = new Quaternion(IM::GET_VALUE, arg1, result);
         }
         else if (arg1_node->getASTNodeType() == AST::call_func) {
             generate(arg1_node, symbol_table);
-            SMB::Symbol *arg1 = temp_vars.back();
+            SMB::Symbol *arg1 = tempVars.back();
             temp = new Quaternion(IM::GET_VALUE, arg1, result);
         }
         else if (arg1_node->getASTNodeType() == AST::op) {
@@ -734,30 +734,30 @@ SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::Sy
     case AST::get_arr_var:
     {
         Quaternion *temp;
-        SMB::Symbol *result = new SMB::Symbol("Temp" + std::to_string(temp_vars.size()), SMB::integer);
+        SMB::Symbol *result = new SMB::Symbol("Temp" + std::to_string(tempVars.size()), SMB::integer);
         AST::BaseNode *arg1_node = node->getChildNode();
         AST::BaseNode *arg2_node = arg1_node->getCousinNode();
         SMB::Symbol *arg1 = symbol_table->findSymbol(arg1_node->getContent());
-        // 如果赋值，就把index push到 child_value中 返回arg1
+        // 如果赋值，就把index push到 childValue中 返回arg1
         // 如果是别的运算，就把值放到temp中，返回temp，并且加一条四元式
         if (node->getParentNode()->getASTNodeType() == AST::op 
         && ((AST::OperatorNode *)node->getParentNode())->getOpType() == AST::assign_arr)
         {
             if (arg2_node->getASTNodeType() == AST::assign_var) {
-                child_value.push(symbol_table->findSymbol(arg2_node->getContent()));
+                childValue.push(symbol_table->findSymbol(arg2_node->getContent()));
             }
             else if (arg2_node->getASTNodeType() == AST::call_func) {
                 generate(arg2_node, symbol_table);
-                SMB::Symbol *arg2 = temp_vars.back();
-                child_value.push(arg2);
+                SMB::Symbol *arg2 = tempVars.back();
+                childValue.push(arg2);
             }
             else if (arg2_node->getASTNodeType() == AST::literal) {
                 SMB::Symbol *arg2 = new SMB::Symbol(arg2_node->getContent(), SMB::literal);
-                child_value.push(arg2);
+                childValue.push(arg2);
             }
             else if (arg2_node->getASTNodeType() == AST::op) {
                 SMB::Symbol *arg2 = generateOperator((AST::OperatorNode *)arg2_node, symbol_table);
-                child_value.push(arg2);
+                childValue.push(arg2);
             }
             else {
                 std::cout << "\033[31mError: \033[0m"
@@ -773,7 +773,7 @@ SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::Sy
             }
             else if (arg2_node->getASTNodeType() == AST::call_func) {
                 generate(arg2_node, symbol_table);
-                SMB::Symbol *arg2 = temp_vars.back();
+                SMB::Symbol *arg2 = tempVars.back();
                 temp = new Quaternion(IM::GET_ARRAY, arg1, arg2, result);
             }
             else if (arg2_node->getASTNodeType() == AST::literal) {
@@ -789,7 +789,7 @@ SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::Sy
                           << "Type error" << std::endl;
                 exit(1);
             }
-            temp_vars.push_back(result);
+            tempVars.push_back(result);
             this->quads.push_back(*temp);
             return result;
         }
@@ -798,7 +798,7 @@ SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::Sy
     {
         std::cout << "get_member\n";
         Quaternion *temp;
-        SMB::Symbol *result = new SMB::Symbol("Temp" + std::to_string(temp_vars.size()), SMB::integer);
+        SMB::Symbol *result = new SMB::Symbol("Temp" + std::to_string(tempVars.size()), SMB::integer);
         AST::BaseNode *arg1_node = node->getChildNode();
         AST::BaseNode *arg2_node = arg1_node->getCousinNode();
         SMB::Symbol *arg1 = symbol_table->findSymbol(arg1_node->getContent());
@@ -810,10 +810,10 @@ SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::Sy
             if (arg2_node->getASTNodeType() == AST::assign_var) {
                 // TODO: struct table
                 std::string type_name = ((SMB::StructDefSymbol *)arg1)->getTypeName();
-                // std::cout<<"struct_list:"<<this->root_symbol_table->getStructTable()<<std::endl;
-                int offset = this->root_symbol_table->getStructTable()->findStruct(type_name)->getMemberOffset(arg2_node->getContent());
+                // std::cout<<"struct_list:"<<this->rootSymbolTable->getStructTable()<<std::endl;
+                int offset = this->rootSymbolTable->getStructTable()->findStruct(type_name)->getMemberOffset(arg2_node->getContent());
                 SMB::Symbol *arg2 = new SMB::Symbol(std::to_string(offset), SMB::literal);
-                child_value.push(arg2);
+                childValue.push(arg2);
             }
             else {
                 std::cout << "\033[31mError: \033[0m"
@@ -824,8 +824,8 @@ SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::Sy
         } else {
             if (arg2_node->getASTNodeType() == AST::assign_var) {
                 std::string type_name = ((SMB::StructDefSymbol *)arg1)->getTypeName();
-                // std::cout<<"struct_list:"<<this->root_symbol_table->getStructTable()<<std::endl;
-                int offset = this->root_symbol_table->getStructTable()->findStruct(type_name)->getMemberOffset(arg2_node->getContent());
+                // std::cout<<"struct_list:"<<this->rootSymbolTable->getStructTable()<<std::endl;
+                int offset = this->rootSymbolTable->getStructTable()->findStruct(type_name)->getMemberOffset(arg2_node->getContent());
                 SMB::Symbol *arg2 = new SMB::Symbol(std::to_string(offset), SMB::literal);
                 temp = new Quaternion(IM::GET_STRUCT, arg1, arg2, result);
             } else {
@@ -833,7 +833,7 @@ SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::Sy
                           << "Type error" << std::endl;
                 exit(1);
             }
-            temp_vars.push_back(result);
+            tempVars.push_back(result);
             this->quads.push_back(*temp);
             return result;
         }
@@ -851,9 +851,9 @@ IM::Quaternion *IM::InterMediate::caculateOperator(OperatorCode op,
                                                    SMB::SymbolTable *symbol_table)
 {
     Quaternion *temp;
-    // SMB::Symbol *result = new SMB::Symbol(std::to_string(temp_vars.size()), SMB::integer);
-    // temp_vars.push_back(result);
-    // result = temp_vars.back();
+    // SMB::Symbol *result = new SMB::Symbol(std::to_string(tempVars.size()), SMB::integer);
+    // tempVars.push_back(result);
+    // result = tempVars.back();
 
     if (arg1_node->getASTNodeType() == AST::assign_var 
      && arg2_node->getASTNodeType() == AST::assign_var) 
@@ -974,9 +974,9 @@ void IM::InterMediate::relopOperator(Quaternion *true_quad,
     std::list<int> falseL; // Same as the upper one
     falseL.push_back(quads.size());
     this->quads.push_back(*false_quad);
-    std::cout << "true_list add\n";
-    true_list.push(trueL);
-    false_list.push(falseL);
+    std::cout << "trueList add\n";
+    trueList.push(trueL);
+    falseList.push(falseL);
     return;
 }
 

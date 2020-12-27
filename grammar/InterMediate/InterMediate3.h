@@ -16,8 +16,8 @@
 //         std::vector<BaseTriple*> triples;
         
 //         // bool expr
-//         std::stack< std::list<int> > true_list;
-//         std::stack< std::list<int> > false_list;
+//         std::stack< std::list<int> > trueList;
+//         std::stack< std::list<int> > falseList;
 
 //         // func return
 //         std::stack<int> signal;
