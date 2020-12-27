@@ -12,16 +12,25 @@ IM::InterMediate::InterMediate(AST::BaseNode *root_node, SMB::StructTable *struc
 }
 
 void IM::InterMediate::buildInFunctionRegister() {
-    AST::DefineVarNode  *tmp_arg = new AST::DefineVarNode("i");
+    AST::DefineVarNode  *tmp_arg;
+    AST::DefineFuncNode *tmp_func;
+    SMB::FuncSymbol *func_symbol;
+
+    // print_int
+    tmp_arg = new AST::DefineVarNode("i");
     tmp_arg->setAllSymbolType("int");
-    AST::DefineFuncNode *tmp_func = new AST::DefineFuncNode("print_int", tmp_arg);
-    SMB::FuncSymbol *func_symbol = new SMB::FuncSymbol(tmp_func);
+    tmp_func = new AST::DefineFuncNode("print_int", tmp_arg);
+    tmp_func->setReturnSymbolType("void");
+    func_symbol = new SMB::FuncSymbol(tmp_func);
     this->rootSymbolTable->addFuncSymbol(func_symbol);
+    delete tmp_arg;
+    delete tmp_func;
+
 }
 
 void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbol_table) {
     if (node == NULL) {
-        std::cout << "NULL" << std::endl;
+        std::cout << "node is NULL" << std::endl;
         return;
     }
     AST::BaseNode *p = node->getChildNode();
@@ -67,18 +76,15 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbol_ta
                     std::cout << "Wrong Type!\n";
                     break;
                 }
-            }
-            else if (var->getASTNodeType() == AST::literal) {
+            } else if (var->getASTNodeType() == AST::literal) {
                 int arg1 = std::stoi(var->getContent());
                 temp = new Quaternion(IM::PARAM, arg1, (SMB::Symbol*)NULL);
                 add_on = add_on + "_i";
-            }
-            else if (var->getASTNodeType() == AST::op) {
+            } else if (var->getASTNodeType() == AST::op) {
                 SMB::Symbol *arg1 = generateOperator((AST::OperatorNode*)var, symbol_table);
-                std::cout << "generate op finished!\n";
+                // std::cout << "generate op finished!\n";
                 temp = new Quaternion(IM::PARAM, arg1, (SMB::Symbol*)NULL);
-                switch (arg1->getType())
-                {
+                switch (arg1->getType()) {
                 case SMB::integer:
                     add_on = add_on + "_i";
                     break;
@@ -245,8 +251,7 @@ void IM::InterMediate::generate(AST::BaseNode *node, SMB::SymbolTable *symbol_ta
     case AST::loop: // for(1.DefASTNODE, 2.OperatorASTNODE, 3.OperatorASTNODE, 4.StmtASTNODE)
     {
         AST::LoopNode *loop = (AST::LoopNode*)node;
-        if (loop->getLoopType() == AST::for_loop)
-        {
+        if (loop->getLoopType() == AST::for_loop) {
             SMB::SymbolTable *child_table = symbol_table->createChildTable(false);
             child_table->setTableName("for");
             generate(((AST::LoopNode*)node)->getDecNode(), child_table);

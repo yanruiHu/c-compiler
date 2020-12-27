@@ -8,8 +8,7 @@
 
 namespace IM {
 
-class InterMediate
-{
+class InterMediate {
 private:
     AST::BaseNode *root;
     std::vector<Quaternion> quads;
@@ -27,6 +26,9 @@ private:
     void backPatch(std::list<int> *backList, int target);
 
     void buildInFunctionRegister();
+
+    // generate:
+    
 
 public:
     inline AST::BaseNode *getRoot() { return this->root; }

@@ -1,11 +1,11 @@
 #include "AsmGenerator.h"
 
-AsmCode::AsmCode() {
+ASM::AsmCode::AsmCode() {
 
 }
 
 // 寄存器转换，类型转换为宏定义
-std::string AsmCode::transRegister(asmRegister reg) {
+std::string ASM::AsmCode::transRegister(asmRegister reg) {
     if (reg == asmRegister::eax) return ASM_EAX;
     else if (reg == asmRegister::ebx) return ASM_EBX;
     else if (reg == asmRegister::ecx) return ASM_ECX;
@@ -16,7 +16,7 @@ std::string AsmCode::transRegister(asmRegister reg) {
 }
 
 // 生成变量
-std::string AsmCode::generateVar(int offset) {
+std::string ASM::AsmCode::generateVar(int offset) {
     std::string ans = ASM_LB + std::string(ASM_EBP); // [ebp
     if (offset > 0) {
         ans += "-";
@@ -30,7 +30,7 @@ std::string AsmCode::generateVar(int offset) {
     return ans;
 }
 
-std::string AsmCode::generateInstanceNumber(int value) {
+std::string ASM::AsmCode::generateInstanceNumber(int value) {
     std::string ans = DOUBLE_WORD;
     ans += " " + std::to_string(value);
     // ans = dword  value
@@ -39,7 +39,7 @@ std::string AsmCode::generateInstanceNumber(int value) {
 
 // 生成双指令
 // codeBuffer 存放以前的东西
-void AsmCode::generateBinaryInstructor(std::string instructor, asmRegister reg1, asmRegister reg2) {
+void ASM::AsmCode::generateBinaryInstructor(std::string instructor, asmRegister reg1, asmRegister reg2) {
     this->codeBuffer += instructor + std::string(" ") + this->transRegister(reg1) 
                         + "," + this->transRegister(reg2) + "\n";
     // mov eax ebx 
@@ -47,92 +47,92 @@ void AsmCode::generateBinaryInstructor(std::string instructor, asmRegister reg1,
 
 // 把变量与寄存器做运算：
 // add eax 12
-void AsmCode::generateBinaryInstructor(std::string instructor, asmRegister reg, std::string var) {
+void ASM::AsmCode::generateBinaryInstructor(std::string instructor, asmRegister reg, std::string var) {
     this->codeBuffer += instructor + std::string(" ") + this->transRegister(reg) 
                         + "," + var + "\n";
 }
 
 // 寄存器与变量做运算？
 // add 12 eax ?
-void AsmCode::generateBinaryInstructor(std::string instructor, std::string var, asmRegister reg) {
+void ASM::AsmCode::generateBinaryInstructor(std::string instructor, std::string var, asmRegister reg) {
     this->codeBuffer += instructor + std::string(" ") + var
                         + "," + this->transRegister(reg) + "\n";
 }
 
 // 变量变量运算
-void AsmCode::generateBinaryInstructor(std::string instructor, std::string var1, std::string var2) {
+void ASM::AsmCode::generateBinaryInstructor(std::string instructor, std::string var1, std::string var2) {
     this->codeBuffer += instructor + " " + var1 +
                         + ASM_COMMA + var2 + "\n";
 }
 
 // 生成单变量指令
-void AsmCode::generateUnaryInstructor(std::string instructor, asmRegister reg) {
+void ASM::AsmCode::generateUnaryInstructor(std::string instructor, asmRegister reg) {
     this->codeBuffer += instructor + " " + this->transRegister(reg) + "\n";
 }
 
 // 单变量指令
-void AsmCode::generateUnaryInstructor(std::string instructor, std::string var) {
+void ASM::AsmCode::generateUnaryInstructor(std::string instructor, std::string var) {
     this->codeBuffer += instructor + " " + var + "\n";
 }
 
 // 通过地址找值
 // [ ebx ]
-std::string AsmCode::findValueByAddress(asmRegister reg) {
+std::string ASM::AsmCode::findValueByAddress(asmRegister reg) {
     return ASM_LB + this->transRegister(reg) + ASM_RB;
 }
 
 // 加代码
-void AsmCode::addCode(std::string code) {
+void ASM::AsmCode::addCode(std::string code) {
     this->codeBuffer += code;
     this->codeBuffer += "\n";
 }
 
 // 寄存器相加指令：add eax ebx
-void AsmCode::add(asmRegister reg1, asmRegister reg2) {
+void ASM::AsmCode::add(asmRegister reg1, asmRegister reg2) {
     this->generateBinaryInstructor(ASM_ADD, reg1, reg2);
 }
 
 // 
-void AsmCode::add(asmRegister reg, std::string var) {
+void ASM::AsmCode::add(asmRegister reg, std::string var) {
     this->generateBinaryInstructor(ASM_ADD, reg, var);
 }
 
 // 想减
-void AsmCode::sub(asmRegister reg1, asmRegister reg2) {
+void ASM::AsmCode::sub(asmRegister reg1, asmRegister reg2) {
     this->generateBinaryInstructor(ASM_SUB, reg1, reg2);
 }
 
-void AsmCode::sub(asmRegister reg, std::string var) {
+void ASM::AsmCode::sub(asmRegister reg, std::string var) {
     this->generateBinaryInstructor(ASM_SUB, reg, var);
 }
 
 // 移动
-void AsmCode::mov(asmRegister reg1, asmRegister reg2) {
+void ASM::AsmCode::mov(asmRegister reg1, asmRegister reg2) {
     this->generateBinaryInstructor(ASM_MOV, reg1, reg2);
 }
 
-void AsmCode::mov(asmRegister reg, std::string var) {
+void ASM::AsmCode::mov(asmRegister reg, std::string var) {
     this->generateBinaryInstructor(ASM_MOV, reg, var);
 }
 
 // 寄存器移动到变量（内存）
-void AsmCode::mov(std::string var, asmRegister reg) {
+void ASM::AsmCode::mov(std::string var, asmRegister reg) {
     this->generateBinaryInstructor(ASM_MOV, var, reg);
 }
 // 变量移动
-void AsmCode::mov(std::string var1, std::string var2) {
+void ASM::AsmCode::mov(std::string var1, std::string var2) {
     this->generateBinaryInstructor(ASM_MOV, var1, var2);
 }
 
 // Save the answer to eax
-void AsmCode::mul(asmRegister reg1, asmRegister reg2) {
+void ASM::AsmCode::mul(asmRegister reg1, asmRegister reg2) {
     this->asmXor(asmRegister::edx, asmRegister::edx);
     this->mov(asmRegister::eax, reg1);
     this->generateUnaryInstructor(ASM_MUL, reg2);
 }
 
 
-void AsmCode::mul(asmRegister reg, std::string var) {
+void ASM::AsmCode::mul(asmRegister reg, std::string var) {
     // 两个寄存器按位亦或
     this->asmXor(asmRegister::edx, asmRegister::edx);
     // reg的值移动到eax
@@ -142,70 +142,73 @@ void AsmCode::mul(asmRegister reg, std::string var) {
 }
 
 // 乘法？
-void AsmCode::mul(std::string var1, std::string var2) {
+void ASM::AsmCode::mul(std::string var1, std::string var2) {
     this->asmXor(asmRegister::edx, asmRegister::edx);
     this->mov(asmRegister::eax, var1);
     this->generateUnaryInstructor(ASM_MUL, DOUBLE_WORD + var2);
 }
 
 // 除法？
-void AsmCode::div(asmRegister reg1, asmRegister reg2) {
+void ASM::AsmCode::div(asmRegister reg1, asmRegister reg2) {
     this->asmXor(asmRegister::edx, asmRegister::edx);
     this->mov(asmRegister::eax, reg1);
     this->generateUnaryInstructor(ASM_DIV, reg2);
 }
 
 // 除法
-void AsmCode::div(asmRegister reg, std::string var) {
+void ASM::AsmCode::div(asmRegister reg, std::string var) {
     this->asmXor(asmRegister::edx, asmRegister::edx);
     this->mov(asmRegister::eax, reg);
     this->generateUnaryInstructor(ASM_DIV, DOUBLE_WORD + var);
 }
 
-void AsmCode::div(std::string var, asmRegister reg) {
+void ASM::AsmCode::div(std::string var, asmRegister reg) {
     this->asmXor(asmRegister::edx, asmRegister::edx);
     this->mov(asmRegister::eax, var);
     this->generateUnaryInstructor(ASM_DIV, reg);
 }
 
-void AsmCode::div(std::string var1, std::string var2) {
+void ASM::AsmCode::div(std::string var1, std::string var2) {
     this->asmXor(asmRegister::edx, asmRegister::edx);
     this->mov(asmRegister::eax, var1);
     this->generateUnaryInstructor(ASM_DIV, DOUBLE_WORD + var2);
 }
 
 // xor eax ebx，亦或
-void AsmCode::asmXor(asmRegister reg1, asmRegister reg2) {
+void ASM::AsmCode::asmXor(asmRegister reg1, asmRegister reg2) {
     this->generateBinaryInstructor(ASM_XOR, reg1, reg2);
 }
 
 // 生成push指令
-void AsmCode::push(asmRegister reg) {
+void ASM::AsmCode::push(asmRegister reg) {
     this->generateUnaryInstructor(ASM_PUSH, reg);
 }
 
 // push变量
-void AsmCode::push(std::string var) {
+void ASM::AsmCode::push(std::string var) {
     this->generateUnaryInstructor(ASM_PUSH, var);
 }
 
-void AsmCode::pop(asmRegister reg) {
+void ASM::AsmCode::pop(asmRegister reg) {
     this->generateUnaryInstructor(ASM_POP, reg);
 }
 
 // label : \n ?
-void AsmCode::label(std::string label) {
+void ASM::AsmCode::label(std::string label) {
     this->codeBuffer += label + ASM_COLON + "\n";
 }
 
 // 输出
-std::ostream& operator<<(std::ostream& os, const AsmCode& code) {
+std::ostream& ASM::operator<<(std::ostream& os, const ASM::AsmCode& code) {
     os << code.codeBuffer;
     return os;
 }
 
 // 构造函数
-AsmGenerator::AsmGenerator(std::vector<IM::Quaternion>& quads, std::vector<SMB::Symbol*>& tempVar, SMB::SymbolTable* rootTable) {
+ASM::AsmGenerator::AsmGenerator(std::vector<IM::Quaternion>& quads, 
+                                std::vector<SMB::Symbol*>& tempVar, 
+                                SMB::SymbolTable* rootTable) 
+{
     this->Quaternions = quads;
     this->tempVar = tempVar;
     this->rootTable = rootTable;
@@ -221,7 +224,7 @@ AsmGenerator::AsmGenerator(std::vector<IM::Quaternion>& quads, std::vector<SMB::
 }
 
 // 释放寄存器？
-void AsmGenerator::releaseRegister(asmRegister reg) {
+void ASM::AsmGenerator::releaseRegister(asmRegister reg) {
     if (reg == asmRegister::ebx) {
         ebx = 0;
         int index = (int)asmRegister::ebx;
@@ -234,7 +237,7 @@ void AsmGenerator::releaseRegister(asmRegister reg) {
 }
 
 // 拿到寄存器？
-asmRegister AsmGenerator::getRegister(std::string var) {
+ASM::asmRegister ASM::AsmGenerator::getRegister(std::string var) {
     if (ebx == 0) {
         ebx = 1;
         int index = (int)asmRegister::ebx;
@@ -249,7 +252,7 @@ asmRegister AsmGenerator::getRegister(std::string var) {
 }
 
 // 找到寄存器
-asmRegister AsmGenerator::findRegister(std::string var) {
+ASM::asmRegister ASM::AsmGenerator::findRegister(std::string var) {
     for (int i = 0; i < 6; i++) {
         if (this->registerUsedVar[i] == var) {
             return asmRegister(i + 1);
@@ -258,7 +261,7 @@ asmRegister AsmGenerator::findRegister(std::string var) {
 }
 
 // 生成四则运算
-void AsmGenerator::generateArithmetic(IM::Quaternion& q) {
+void ASM::AsmGenerator::generateArithmetic(IM::Quaternion& q) {
     std::string instructor;
     IM::OperatorCode opcode = q.getOperator();// 拿到四元式的code
     int flag = q.getFlag(); //　这个flag表示了不同的情况
@@ -598,7 +601,7 @@ void AsmGenerator::generateArithmetic(IM::Quaternion& q) {
 }
 
 // 生成函数定义
-void AsmGenerator::generateDefFunction(IM::Quaternion& q) {
+void ASM::AsmGenerator::generateDefFunction(IM::Quaternion& q) {
     std::string funcName = q[0].var->getName();
     this->asmcode.label(funcName);
     int totalOffset = currentTable->getTotalOffset();
@@ -608,7 +611,7 @@ void AsmGenerator::generateDefFunction(IM::Quaternion& q) {
 }
 
 // 生成返回
-void AsmGenerator::generateReturn(IM::Quaternion& q) {
+void ASM::AsmGenerator::generateReturn(IM::Quaternion& q) {
     if (q[0].literal == 0) {
         this->generateEndFunction(q);
         return;
@@ -635,14 +638,14 @@ void AsmGenerator::generateReturn(IM::Quaternion& q) {
 }
 
 
-void AsmGenerator::generateEndFunction(IM::Quaternion& q) {
+void ASM::AsmGenerator::generateEndFunction(IM::Quaternion& q) {
     this->asmcode.pop(asmRegister::ecx);
     this->asmcode.pop(asmRegister::ebx);
     this->asmcode.addCode(ASM_LEAVE);
     this->asmcode.addCode(ASM_RET);
 }
 
-void AsmGenerator::generateCallBuildInFunction(IM::Quaternion& q, IM::Quaternion& arg) {
+void ASM::AsmGenerator::generateCallBuildInFunction(IM::Quaternion& q, IM::Quaternion& arg) {
     std::string funcName = q[0].var->getName();
     int tempVar = 0;
     int varOffSet = 0;
@@ -679,7 +682,7 @@ void AsmGenerator::generateCallBuildInFunction(IM::Quaternion& q, IM::Quaternion
     }
 }
 
-void AsmGenerator::generateCallFunction(IM::Quaternion& q) {
+void ASM::AsmGenerator::generateCallFunction(IM::Quaternion& q) {
     std::string funcName = q[0].var->getName();
     this->asmcode.generateUnaryInstructor(ASM_CALL, funcName);
     if (q[2].var != NULL) {
@@ -693,7 +696,7 @@ void AsmGenerator::generateCallFunction(IM::Quaternion& q) {
     if (offset != 0) this->asmcode.add(asmRegister::esp, std::to_string(offset));
 }
 
-void AsmGenerator::generateSetArg(IM::Quaternion& q) {
+void ASM::AsmGenerator::generateSetArg(IM::Quaternion& q) {
     int flag = q.getFlag();
     std::string varName = "";
     if (flag == 7) {
@@ -715,7 +718,7 @@ void AsmGenerator::generateSetArg(IM::Quaternion& q) {
     }
 }
 
-void AsmGenerator::generateJump(IM::Quaternion& q) {
+void ASM::AsmGenerator::generateJump(IM::Quaternion& q) {
     IM::OperatorCode opcode = q.getOperator();
     std::string label = "label" + std::to_string(labelMap[q[2].literal]);
     if (opcode == IM::OperatorCode::JUMP) {
@@ -793,7 +796,7 @@ void AsmGenerator::generateJump(IM::Quaternion& q) {
     }
 }
 
-void AsmGenerator::generateNeg(IM::Quaternion& q) {
+void ASM::AsmGenerator::generateNeg(IM::Quaternion& q) {
     std::string varName = q[0].var->getName();
     std::string result = q[2].var->getName();
     if (varName[0] == 'T' && result[0] == 'T') {
@@ -828,7 +831,7 @@ void AsmGenerator::generateNeg(IM::Quaternion& q) {
     }
 }
 
-void AsmGenerator::generatePower(IM::Quaternion& q) {
+void ASM::AsmGenerator::generatePower(IM::Quaternion& q) {
     int flag = q.getFlag();
     if (flag == 7) {
         std::string var1Name = q[0].var->getName();
@@ -895,7 +898,7 @@ void AsmGenerator::generatePower(IM::Quaternion& q) {
     this->asmcode.add(asmRegister::esp, "8");
 }
 
-void AsmGenerator::generateGetAddress(IM::Quaternion& q) {
+void ASM::AsmGenerator::generateGetAddress(IM::Quaternion& q) {
     int offset = q[0].var->getOffset();
     std::string resultName = q[2].var->getName();
     if (resultName[0] == 'T') {
@@ -909,7 +912,7 @@ void AsmGenerator::generateGetAddress(IM::Quaternion& q) {
     }
 }
 
-void AsmGenerator::generateAssignMember(IM::Quaternion& q) {
+void ASM::AsmGenerator::generateAssignMember(IM::Quaternion& q) {
     int offsetOfMember = std::atoi(q[1].var->getName().c_str());
     std::string structIdName = q[2].var->getName();
     int offsetOfStruct = currentTable->findSymbol(structIdName)->getOffset();
@@ -936,7 +939,7 @@ void AsmGenerator::generateAssignMember(IM::Quaternion& q) {
     }
 }
 
-void AsmGenerator::generateGetMember(IM::Quaternion& q) {
+void ASM::AsmGenerator::generateGetMember(IM::Quaternion& q) {
     std::string tempResult = q[2].var->getName();
     std::string structIdName = q[0].var->getName();
     int offsetOfMember = std::atoi(q[1].var->getName().c_str());
@@ -947,7 +950,7 @@ void AsmGenerator::generateGetMember(IM::Quaternion& q) {
     this->asmcode.mov(tempReg, memberEbpOffset);
 }
 
-void AsmGenerator::generateGetArrayValue(IM::Quaternion& q) {
+void ASM::AsmGenerator::generateGetArrayValue(IM::Quaternion& q) {
     std::string resultName = q[2].var->getName();
     asmRegister reg = this->getRegister(resultName);
     int baseOffset = q[0].var->getOffset();
@@ -988,7 +991,7 @@ void AsmGenerator::generateGetArrayValue(IM::Quaternion& q) {
     }
 }
 
-void AsmGenerator::generateAssignArray(IM::Quaternion& q) {
+void ASM::AsmGenerator::generateAssignArray(IM::Quaternion& q) {
     int baseOffset = q[2].var->getOffset();
     int flag = q.getFlag();
     int totalOffset = baseOffset;
@@ -1067,7 +1070,7 @@ void AsmGenerator::generateAssignArray(IM::Quaternion& q) {
     }
 }
 
-void AsmGenerator::preSetLabel() {
+void ASM::AsmGenerator::preSetLabel() {
     std::vector<IM::Quaternion> quad;
     int labelNumber = 0;
     // std::cout<<"preSetLabel - before for1\n";
@@ -1095,14 +1098,14 @@ void AsmGenerator::preSetLabel() {
     // std::cout<<"preSetLabel - after for2\n";
 }
 
-bool AsmGenerator::isJumpQuaternion(IM::OperatorCode opcode) {
+bool ASM::AsmGenerator::isJumpQuaternion(IM::OperatorCode opcode) {
     return opcode == IM::OperatorCode::JUMP || opcode == IM::OperatorCode::JUMP_SMALL || opcode == IM::OperatorCode::JUMP_EQ_SMALL ||
         opcode == IM::OperatorCode::JUMP_GREAT || opcode == IM::OperatorCode::JUMP_EQ_GREAT || opcode == IM::OperatorCode::JUMP_EQUAL ||
         opcode == IM::OperatorCode::JUMP_NOT_EQUAL;
 }
 
 // 最主要的，生成函数
-void AsmGenerator::generate() {
+void ASM::AsmGenerator::generate() {
     currentTable = rootTable;
     // Set header info
     this->asmcode.addCode("\%include \"io/asm_io.inc\"\nsection .text\nglobal main\n");

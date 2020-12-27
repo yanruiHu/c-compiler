@@ -6,8 +6,7 @@
 
 namespace IM {
 
-enum OperatorCode
-{
+enum OperatorCode {
     JUMP,
     JUMP_SMALL,
     JUMP_EQ_SMALL,
@@ -39,6 +38,38 @@ enum OperatorCode
     NONE
 };
 
+static std::string operator_string[] = {
+    "JUMP",
+    "JUMP_SMALL",
+    "JUMP_EQ_SMALL",
+    "JUMP_GREAT",
+    "JUMP_EQ_GREAT",
+    "JUMP_EQUAL",
+    "JUMP_NOT_EQUAL",
+    "PLUS",
+    "MINUS",
+    "TIMES",
+    "DIV",
+    "MOD",
+    "POWER",
+    "NEGATIVE",
+    "ASSIGN",
+    "ASSIGN_ARRAY",
+    "ASSIGN_STRUCT",
+    "ASSIGN_POINTER",
+    "GET_ADDRESS",
+    "PARAM",
+    "CALL",
+    "RETURN",
+    "FUNC_DEF",
+    "END_FUNCTION",
+    "LABEL",
+    "GET_VALUE",
+    "GET_ARRAY",
+    "GET_STRUCT",
+    "NONE"
+};
+
 union Arg {
     SMB::Symbol *var=NULL;
     int literal;
@@ -50,7 +81,7 @@ private:
     // 0: arg1, 1: arg2, 2: result
     Arg args[3];
     int flag;
-    std::string __str__();
+    inline std::string __op_str__() { return operator_string[op]; }
 
 public:
     inline Quaternion(OperatorCode op, int result) {

@@ -9,6 +9,9 @@
 #include "../symbol/symbol.h"
 #include "./Quaternion.h"
 // assembly language，缩写为 asm，中文译为汇编语言
+namespace ASM
+{
+
 enum class asmRegister {
     unset = -1,
     eax = 1,
@@ -103,5 +106,7 @@ public:
     AsmGenerator(std::vector<IM::Quaternion>& quads, std::vector<SMB::Symbol*>& tempVar, SMB::SymbolTable* rootTable);
     void generate();
 };
+
+} // namespace ASM
 
 #endif
