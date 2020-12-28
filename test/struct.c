@@ -1,13 +1,14 @@
 struct test {
     int a;
-    int b;
-    int c;
-    int d;
 };
 
 int main() {
     struct test t;
-    int m;
-    t = m;
-    print_int(t.d);
+    int b[1];
+    b[0]=1;
+    t.a=1;
+    t.a = t.a * t.a+t.a;
+    int a=1;
+    a=a*a+a;
+    print_int(t.a);
 }

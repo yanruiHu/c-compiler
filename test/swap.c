@@ -10,9 +10,9 @@ int main()
     int b = 3;
     print_int(a);
     print_int(b);
-    int* pa = &a;
+    /*int* pa = &a;
     int* pb = &b;
-    swap(pa, pb);
+    swap(pa, pb);*/
     print_int(a);
     print_int(b);
 }

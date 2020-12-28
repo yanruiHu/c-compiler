@@ -67,7 +67,8 @@ void ASM::AsmCode::generateBinaryInstructor(std::string instructor, std::string 
 
 // 生成单变量指令
 void ASM::AsmCode::generateUnaryInstructor(std::string instructor, asmRegister reg) {
-    this->codeBuffer += instructor + " " + this->transRegister(reg) + "\n";
+    this->codeBuffer += instructor + " " + "ecx" + "\n";  //modify
+    std::cout<<"wrong"<<std::endl;
 }
 
 // 单变量指令
@@ -128,6 +129,7 @@ void ASM::AsmCode::mov(std::string var1, std::string var2) {
 void ASM::AsmCode::mul(asmRegister reg1, asmRegister reg2) {
     this->asmXor(asmRegister::edx, asmRegister::edx);
     this->mov(asmRegister::eax, reg1);
+    std::cout<<"register 2"<<std::endl;
     this->generateUnaryInstructor(ASM_MUL, reg2);
 }
 
