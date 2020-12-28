@@ -1,4 +1,5 @@
 #include "./VarNode.h"
+#include "./OperatorNode.h"
 
 AST::DefineVarNode::DefineVarNode() : BaseNode(AST::def_var) {
     this->symbol_type = SMB::SymbolType::none;
@@ -45,13 +46,21 @@ void AST::DefineVarNode::setAllSymbolType(std::string symbol_type) {
         // std::cout<<var_type<<std::endl;
         this->symbol_type = var_type;
     }
-    DefineVarNode *cousin = (DefineVarNode *)this->getCousinNode();
-    while (cousin != NULL) {
-        if (cousin->symbol_type == SMB::SymbolType::none) {
-            cousin->symbol_type = var_type;
-        }
-        cousin = (DefineVarNode *)cousin->getCousinNode();
+    BaseNode *cousin = this->getCousinNode();
+    if (!cousin) return;
+    if (cousin->getASTNodeType() == AST::op) {
+        OperatorNode* tmp = (OperatorNode*) cousin;
+        tmp->setAllSymbolType(symbol_type);
+    } else if (cousin->getASTNodeType() == AST::def_var) {
+        DefineVarNode* tmp = (DefineVarNode*) cousin;
+        tmp->setAllSymbolType(symbol_type);
     }
+    // while (cousin != NULL) {
+    //     if (cousin->symbol_type == SMB::SymbolType::none) {
+    //         cousin->symbol_type = var_type;
+    //     }
+    //     cousin = (DefineVarNode *)cousin->getCousinNode();
+    // }
 }
 
 void AST::DefineVarNode::setArrayLength(std::string length) {

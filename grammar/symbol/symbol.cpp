@@ -54,6 +54,7 @@ bool SMB::FuncSymbol::operator==(const SMB::FuncSymbol& second) {
 
 // Struct
 SMB::StructDefSymbol::StructDefSymbol(std::string struct_type_name, std::string id_name){
+    this->type = SMB::SymbolType::struct_type;
     this->stuct_type_name=struct_type_name;
     this->name = id_name;
 }
@@ -66,6 +67,7 @@ SMB::StructSymbol::StructSymbol(std::string name, AST::BaseNode* node){
     this->total_member_offset = 0;
     int offset = 0;
     this->name = name;
+    this->type = SMB::struct_type;
     std::cout << "struct_name: " << name << std::endl;
     AST::BaseNode *curr_node = node;
     while(curr_node){

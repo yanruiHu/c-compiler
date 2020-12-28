@@ -5,7 +5,7 @@ BUILDFOLDER = build/
 # all: test # fibo  larra swap struct loop
 test1: test/lpy.c
 	$(PROGRAM) test/lpy.c
-	$(NASM) -f elf test/lpy.asm -o lpy.o
+	$(NASM) -f elf test/lpy.asm -o lpy.o 
 	$(CC) -o lpy lpy.o io/asm_io.o -m32
 
 swap: test/swap.c
