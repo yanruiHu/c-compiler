@@ -430,24 +430,36 @@ SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::Sy
         AST::BaseNode *arg1_node = node->getChildNode()->getCousinNode();
         if (arg1_node->getASTNodeType() == AST::assign_var) {
             SMB::Symbol *arg1 = symbol_table->findSymbol(arg1_node->getContent());
-            if (result->getType() == SMB::integer && arg1->getType() == SMB::pointer) {
-                std::cout << "\033[31mError: \033[0m"
-                          << "Syntax error, maybe you have used the wrong type: " << (int)arg1_node->getASTNodeType() << "  Content:" << arg1_node->getContent() << std::endl;
-                exit(1);
-            }
+            // if (result->getType() == SMB::integer && arg1->getType() == SMB::pointer) {
+            //     std::cout << "\033[31mError: \033[0m"
+            //               << "Syntax error, maybe you have used the wrong type: " << (int)arg1_node->getASTNodeType() << "  Content:" << arg1_node->getContent() << std::endl;
+            //     exit(1);
+            // } else if (result->getType() == arg1->getType()){
+            //     std::cout << "\033[31mError: \033[0m"
+            //               << "Type error!" << std::endl;
+            //     exit(1);
+            // }
+            typeCheck(ASSIGN, result, arg1);
             temp = new Quaternion(op, arg1, result);
         }
         else if (arg1_node->getASTNodeType() == AST::op) {
             SMB::Symbol *arg1 = generateOperator((AST::OperatorNode *)arg1_node, symbol_table);
+            typeCheck(ASSIGN, result, arg1);
             temp = new Quaternion(op, arg1, result);
         }
         else if (arg1_node->getASTNodeType() == AST::literal) {
             int arg1 = std::stoi(arg1_node->getContent());
+            if (result->getType() != SMB::integer) {
+                std::cout << "\033[31mError: \033[0m"
+                          << "Type error!" << std::endl;
+                exit(1);
+            }
             temp = new Quaternion(op, arg1, result);
         }
         else if (arg1_node->getASTNodeType() == AST::call_func) {
             generate(arg1_node, symbol_table);
             SMB::Symbol *arg1 = tempVars.back();
+            typeCheck(ASSIGN, result, arg1);
             temp = new Quaternion(op, arg1, result);
         }
         else {
@@ -472,6 +484,11 @@ SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::Sy
         if (arg1_node->getASTNodeType() == AST::assign_var) {
             SMB::Symbol *arg1 = symbol_table->findSymbol(arg1_node->getContent());
             temp = new Quaternion(IM::ASSIGN_ARRAY, arg1, arg2, result);
+            if (result->getType() != arg2->getType()) {
+                std::cout << "\033[31mError: \033[0m"
+                          << "Type error!" << std::endl;
+                exit(1);
+            }
         }
         else if (arg1_node->getASTNodeType() == AST::op) {
             SMB::Symbol *arg1 = generateOperator((AST::OperatorNode *)arg1_node, symbol_table);
@@ -805,7 +822,6 @@ SMB::Symbol *IM::InterMediate::generateOperator(AST::OperatorNode *node, SMB::Sy
         AST::BaseNode *arg1_node = node->getChildNode();
         AST::BaseNode *arg2_node = arg1_node->getCousinNode();
         SMB::Symbol *arg1 = symbol_table->findSymbol(arg1_node->getContent());
-        // 短路写法，应该没啥问题，不行再改
         std::cout << "parent: " << node->getParentNode() << std::endl;
         if (node->getParentNode()->getASTNodeType() == AST::op 
         && ((AST::OperatorNode *)node->getParentNode())->getOpType() == AST::assign_member)
@@ -863,6 +879,7 @@ IM::Quaternion *IM::InterMediate::caculateOperator(OperatorCode op,
     {
         SMB::Symbol *arg1 = symbol_table->findSymbol(arg1_node->getContent());
         SMB::Symbol *arg2 = symbol_table->findSymbol(arg2_node->getContent());
+        typeCheck(op, arg1, arg2);
         temp = new Quaternion(op, arg1, arg2, result);
     }
     else if (arg1_node->getASTNodeType() == AST::assign_var 
@@ -870,6 +887,7 @@ IM::Quaternion *IM::InterMediate::caculateOperator(OperatorCode op,
     {
         SMB::Symbol *arg1 = symbol_table->findSymbol(arg1_node->getContent());
         SMB::Symbol *arg2 = generateOperator((AST::OperatorNode *)arg2_node, symbol_table);
+        typeCheck(op, arg1, arg2);
         temp = new Quaternion(op, arg1, arg2, result);
     }
     else if (arg1_node->getASTNodeType() == AST::assign_var 
@@ -877,6 +895,11 @@ IM::Quaternion *IM::InterMediate::caculateOperator(OperatorCode op,
     {
         SMB::Symbol *arg1 = symbol_table->findSymbol(arg1_node->getContent());
         int arg2 = std::stoi(arg2_node->getContent());
+        if (arg1->getType() != SMB::integer) {
+            std::cout << "\033[31mError: \033[0m"
+                      << "Type error!" << std::endl;
+            exit(1);
+        }
         temp = new Quaternion(op, arg1, arg2, result);
     }
     else if (arg1_node->getASTNodeType() == AST::op 
@@ -884,6 +907,7 @@ IM::Quaternion *IM::InterMediate::caculateOperator(OperatorCode op,
     {
         SMB::Symbol *arg1 = generateOperator((AST::OperatorNode *)arg1_node, symbol_table);
         SMB::Symbol *arg2 = symbol_table->findSymbol(arg2_node->getContent());
+        typeCheck(op, arg1, arg2);
         temp = new Quaternion(op, arg1, arg2, result);
     }
     else if (arg1_node->getASTNodeType() == AST::op 
@@ -891,12 +915,18 @@ IM::Quaternion *IM::InterMediate::caculateOperator(OperatorCode op,
     {
         SMB::Symbol *arg1 = generateOperator((AST::OperatorNode *)arg1_node, symbol_table);
         SMB::Symbol *arg2 = generateOperator((AST::OperatorNode *)arg2_node, symbol_table);
+        typeCheck(op, arg1, arg2);
         temp = new Quaternion(op, arg1, arg2, result);
     }
     else if (arg1_node->getASTNodeType() == AST::op 
           && arg2_node->getASTNodeType() == AST::literal)
     {
         SMB::Symbol *arg1 = generateOperator((AST::OperatorNode *)arg1_node, symbol_table);
+        if (arg1->getType() != SMB::integer) {
+            std::cout << "\033[31mError: \033[0m"
+                      << "Type error!" << std::endl;
+            exit(1);
+        }
         int arg2 = std::stoi(arg2_node->getContent());
         temp = new Quaternion(op, arg1, arg2, result);
     }
@@ -906,6 +936,11 @@ IM::Quaternion *IM::InterMediate::caculateOperator(OperatorCode op,
     {
         int arg1 = std::stoi(arg1_node->getContent());
         SMB::Symbol *arg2 = symbol_table->findSymbol(arg2_node->getContent());
+        if (arg2->getType() != SMB::integer) {
+            std::cout << "\033[31mError: \033[0m"
+                      << "Type error!" << std::endl;
+            exit(1);
+        }
         temp = new Quaternion(op, arg1, arg2, result);
     }
     else if (arg1_node->getASTNodeType() == AST::literal 
@@ -913,6 +948,11 @@ IM::Quaternion *IM::InterMediate::caculateOperator(OperatorCode op,
     {
         int arg1 = std::stoi(arg1_node->getContent());
         SMB::Symbol *arg2 = generateOperator((AST::OperatorNode *)arg2_node, symbol_table);
+        if (arg2->getType() != SMB::integer) {
+            std::cout << "\033[31mError: \033[0m"
+                      << "Type error!" << std::endl;
+            exit(1);
+        }
         temp = new Quaternion(op, arg1, arg2, result);
     }
     else if (arg1_node->getASTNodeType() == AST::literal 
@@ -1011,4 +1051,42 @@ void IM::InterMediate::print() {
         else it->print();
     }
     return;
+}
+
+void IM::InterMediate::typeCheck(OperatorCode op, SMB::Symbol *arg1, SMB::Symbol *arg2) {
+    switch (op) {
+    case ASSIGN:
+        if (arg1->getType() != arg2->getType()) 
+        {
+            std::cout << "\033[31mError: \033[0m"
+                      << "Type error!" << std::endl;
+            exit(1);
+        }
+        break;
+    case PLUS:
+        if (arg1->getType() == SMB::pointer &&
+            arg2->getType() == SMB::pointer) 
+        {
+            std::cout << "\033[31mError: \033[0m"
+                      << "Type error!" << std::endl;
+            exit(1);
+        }
+        break;
+    case MINUS:
+        break;
+    case TIMES:
+    case DIV:
+    case POWER:
+    case MOD:
+        if (!(arg1->getType() == SMB::integer &&
+            arg2->getType() == SMB::integer)) 
+        {
+            std::cout << "\033[31mError: \033[0m"
+                      << "Type error!" << std::endl;
+            exit(1);
+        }
+        break;
+    default:
+        break;
+    }
 }

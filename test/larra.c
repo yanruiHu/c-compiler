@@ -1,6 +1,8 @@
 int main() {
     int a[10];
     int i=0;
+    int b;
+    i = a;
     for (i; i < 10; i=i+1) {
         a[i] = i;
     }

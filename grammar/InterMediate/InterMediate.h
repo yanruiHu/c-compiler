@@ -27,7 +27,8 @@ private:
 
     void buildInFunctionRegister();
 
-    // generate:
+    // typecheck:
+    void typeCheck(OperatorCode, SMB::Symbol*, SMB::Symbol*);
     
 
 public:
