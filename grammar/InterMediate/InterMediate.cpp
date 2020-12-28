@@ -1055,6 +1055,7 @@ void IM::InterMediate::print() {
 
 void IM::InterMediate::typeCheck(OperatorCode op, SMB::Symbol *arg1, SMB::Symbol *arg2) {
     switch (op) {
+    std::cout<<"here!\n";
     case ASSIGN:
         if (arg1->getType() != arg2->getType()) 
         {
