@@ -1,8 +1,12 @@
 CC = gcc
 NASM = nasm
 PROGRAM = ./parser
-
-all: fibo  larra swap struct loop
+BUILDFOLDER = build/
+# all: test # fibo  larra swap struct loop
+test1: test/lpy.c
+	$(PROGRAM) test/lpy.c
+	$(NASM) -f elf test/lpy.asm -o lpy.o
+	$(CC) -o lpy lpy.o io/asm_io.o -m32
 
 swap: test/swap.c
 	$(PROGRAM) test/swap.c
@@ -29,3 +33,6 @@ struct: test/struct.c
 	$(PROGRAM) test/struct.c
 	$(NASM) -f elf test/struct.asm -o struct.o
 	$(CC) -o struct struct.o io/asm_io.o -m32
+
+clean:
+	rm -rf build/
