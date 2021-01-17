@@ -1,37 +1,40 @@
-- # c-compiler
+# c-compiler
 
-  2020秋-南开大学-编译原理-c语言编译器
+2020秋-南开大学-编译原理-c语言编译器
 
-  ## 主要分工
+[TOC]
 
-  | 功能     | 负责人                     |
-  | -------- | -------------------------- |
-  | 词法分析 | 刘雨缇、郝可欣             |
-  | 语法分析 | 靳鑫、张祥玙、刘茵、郝可欣 |
-  | 类型检查 | 靳鑫、刘茵                 |
-  | 代码优化 | 靳鑫                       |
-  | 汇编程序 | 刘茵、刘雨缇               |
+## 主要分工
+
+| 功能     | 负责人                     |
+| -------- | -------------------------- |
+| 词法分析 | 刘雨缇、郝可欣             |
+| 语法分析 | 靳鑫、张祥玙、刘茵、郝可欣 |
+| 类型检查 | 靳鑫、刘茵                 |
+| 代码优化 | 靳鑫                       |
+| 汇编程序 | 刘茵、刘雨缇               |
 
   
 
-  ## 项目架构
+## 项目架构
 
   - example目录
-    - 
+    - 运行测试用例的相关make指令
   - grammar目录
     - ASTtree目录 -- 语法树相关源文件和头文件
-    - InterMediate目录 -- 中间代码生成相关源文件和头文件
+    - InterMediate目录 -- 中间代码生成相关源文件和头文件、生成汇编头文件和相关原文件
     - symbol目录 -- 符号表相关源文件和头文件
     - Nodes.h -- 总头文件 
     - SymbolTableTree.cpp / SymbolTableTree.h -- 生成符号表树
   - lexical目录
     - 词法分析、语法分析文件
-  - test目录
+- test目录
+  
     - 测试用例
 
   
 
-  ## 主要思路
+## 主要思路
 
   在lexical.l中实现主要词法分析功能，识别输入串匹配为token，将识别出的token交给同文件夹下的ch.y文件。
 
@@ -62,7 +65,7 @@
   
   // printers:
   void printTree();                       // 输出以当前节点为根节点的子树
-  virtual void printInfo(int);            // 输出节点信息（不同类型节点的信息不同）
+virtual void printInfo(int);            // 输出节点信息（不同类型节点的信息不同）
   ```
 
   #### DefineVarNode
@@ -81,7 +84,7 @@
   void setTypeToArray();                      // 设置该节点的symbol类型为数组（array）
   void setAllSymbolType(std::string);         // 设置该节点及其兄弟节点的symbol类型（int、void、int ptr、struct、array）
   void setArrayLength(std::string);           // 设置数组长度
-  virtual void printInfo(int) override;       // 输出变量名（若是数组，还会输出数组长度）
+virtual void printInfo(int) override;       // 输出变量名（若是数组，还会输出数组长度）
   ```
 
   #### DefineVarNode
@@ -100,7 +103,7 @@
   void setTypeToArray();                      // 设置该节点的symbol类型为数组（array）
   void setAllSymbolType(std::string);         // 设置该节点及其兄弟节点的symbol类型（int、void、int ptr、struct、array）
   void setArrayLength(std::string);           // 设置数组长度
-  virtual void printInfo(int) override;       // 输出变量名（若是数组，还会输出数组长度）
+virtual void printInfo(int) override;       // 输出变量名（若是数组，还会输出数组长度）
   ```
 
   #### AssignVarNode
@@ -110,7 +113,7 @@
   ```cpp
   AssignVarNode();
   AssignVarNode(std::string);              // 传入节点内容
-  virtual void printInfo(int) override;    // 输出节点内容
+virtual void printInfo(int) override;    // 输出节点内容
   ```
 
   #### LiteralNode
@@ -121,7 +124,7 @@
   LiteralNode();
   LiteralNode(std::string);                // 传入字面量的值作为节点内容
   int getValue();
-  virtual void printInfo(int) override;    // 输出字面量的值
+virtual void printInfo(int) override;    // 输出字面量的值
   ```
 
   #### DefineFuncNode
@@ -135,7 +138,7 @@
   BaseNode* getArgList();                  // 返回参数节点列表的头指针
   SMB::SymbolType getReturnSymbolType();   // 返回返回值的symbol类型（int、void、int ptr）
   void setReturnSymbolType(std::string);   // 设置返回值的symbolsymbol类型（int、void、int ptr）
-  virtual void printInfo(int) override;    // 输出函数名
+virtual void printInfo(int) override;    // 输出函数名
   ```
 
   #### CallFuncNode
@@ -147,7 +150,7 @@
   CallFuncNode(std::string);               // 传入函数名作为节点内容
   void setVarList(BaseNode *v);            // 设置参数节点列表，传入参数节点列表的头指针
   BaseNode* getVarList();                  // 返回参数列表的头指针
-  virtual void printInfo(int) override;    // 输出函数名
+virtual void printInfo(int) override;    // 输出函数名
   ```
 
   #### LoopNode
@@ -194,7 +197,7 @@
       relop = 11,     // =
       mod = 12,       // %
       get_adress = 13 // &
-  };
+};
   ```
 
   ```cpp
@@ -248,7 +251,7 @@
       defination = 2,     // 定义语句
       return_stmt = 3,    // 返回语句
       expression = 4      // 表达式语句
-  };
+};
   ```
 
   ```cpp
@@ -268,5 +271,6 @@
 
   ## 遇到的问题&解决方法
 
+  - 产生式和语义规则不适配，后期参考ANSI C grammar官方文档进行参考和修改。
   - 代码编译过程中经常遇到段错误，解决方法：没有注意对空指针的管理和判断，在程序中对空指针进行操作，引起段错误
   - 生成AST时对其在代码中的数据结构不清楚，解决方法：查询相关资料，决定使用树的儿子兄弟表示法
