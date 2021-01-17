@@ -5,24 +5,24 @@
 #include <string>
 #include <vector>
 
-// namespace AST {
+namespace AST {
 
     enum ASTNodeType {
-        root_ = 0,
-        dec_var = 1,
+        root = 0,
+        def_var = 1,
         assign_var = 2,
-        dec_func = 3,
+        def_func = 3,
         call_func = 4,
         op = 5,
         stmt = 6,
-        loop = 7, 
-        //select = 8,
-        literal = 9,        // unknown
+        loop = 7,
+        select = 8,
+        literal = 9,
     };
 
-    static std::string prefix[2] = {"`- ", "|- "};
-    static std::string separator[2] = {"|  ", "   "};
-
+    static std::string prefix[2] = {"└─ ", "├─ "};
+    static std::string separator[2] = {"│  ", "   "};
+    
     class BaseNode {
     private:
         ASTNodeType type;
@@ -32,24 +32,36 @@
 
     protected:
         std::string content;
-        // static void tree(BaseNode*, int);
-        static void tree(BaseNode*, int, bool, std::vector<bool>);
+        static void tree(BaseNode*, int, bool, std::vector<bool>, std::string="");
 
     public:
+        // constructors:
         BaseNode();
         BaseNode(ASTNodeType);
-        BaseNode(char*, ASTNodeType);
-        BaseNode(char*);
+        BaseNode(std::string, ASTNodeType);
+        BaseNode(std::string);
+
+        // setters: 
         inline void setParentNode(BaseNode *parent) { this->parent = parent; }
-        inline ASTNodeType getASTNodeType() { return this->type; }
         void addChildNode(BaseNode*);
         void addCousinNode(BaseNode*);
+        
+        // getters:
         BaseNode *getFinalCousinNode();
-        void printTree();
+        inline ASTNodeType getASTNodeType() { return this->type; }
         inline std::string getContent() { return this->content; }
-        void printInfo(int);
+        inline BaseNode* getChildNode() { return this->child; }
+        inline BaseNode* getParentNode() { return this->parent; }
+        inline BaseNode* getCousinNode() { return this->cousin; }
+
+        // printers:
+        void printTree();
+        virtual void printInfo(int);
+
+        // deconstructor:
+        virtual ~BaseNode();
     };
 
-// }
+}
 
 #endif

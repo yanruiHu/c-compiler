@@ -1,4 +1,5 @@
 PROGRAM = parser
+PROGRAM1 = ./parser
 GRAMMARFOLDER = ./Linux/
 BUILDFOLDER = build/
 BUILDIO = build/io
@@ -17,19 +18,19 @@ CXXVER = c++11
 $(PROGRAM): $(OBJ)
 	$(CXX) -o $(PROGRAM) $(OBJ) -std=$(CXXVER) -g
 
-grammar: ./lexical/lexical.l ./lexical/ch.y
+run: ./lexical/lexical.l ./lexical/ch.y
 ifeq ($(GRAMMAREXIST),notexist)
 	mkdir $(GRAMMARFOLDER)
 endif
 	$(BISON) --output="./Linux/grammar.tab.cpp" --defines="./Linux/grammar.tab.h" ./lexical/ch.y
 	$(FLEX) --outfile="./Linux/lexer.flex.cpp" ./lexical/lexical.l
-	sed -i "1i\#include \"../grammar/ASTtree/BaseNode.h\"" ./Linux/grammar.tab.h 
+	sed -i "1i\#include \"../grammar/Nodes.h\"" ./Linux/grammar.tab.h 
 
 %.o: %.cpp $(DEPS)
 	$(CXX) -c $< -o $@ -std=$(CXXVER) -g
 
 clean:
-	rm -rf $(GRAMMARFOLDER) $(OBJ) $(PROGRAM) $(BUILDFOLDER) common/util/io/asm_io.o
+	rm -rf $(GRAMMARFOLDER) $(OBJ) $(PROGRAM) $(BUILDFOLDER) grammar/InterMediate/asm_io.o
 
 build:
 ifeq ($(BUILDEXIST),notexist)
@@ -38,9 +39,15 @@ endif
 ifeq ($(BUILDIOEXIST),notexist)
 	mkdir $(BUILDIO)
 endif
-	$(NASM) -f elf -d ELF_TYPE common/util/io/asm_io.asm -o common/util/io/asm_io.o
+	$(NASM) -f elf -d ELF_TYPE grammar/InterMediate/asm_io.asm -o grammar/InterMediate/asm_io.o
 	cp $(PROGRAM) $(BUILDFOLDER)
-	cp common/util/io/asm_io.o $(BUILDIO)
-	cp common/util/io/asm_io.inc $(BUILDIO)
+	cp grammar/InterMediate/asm_io.o $(BUILDIO)
+	cp grammar/InterMediate/asm_io.inc $(BUILDIO)
 	cp -r test/ $(BUILDFOLDER)
 	cp example/Makefile $(BUILDFOLDER)
+	# $(PROGRAM1) ./test.c
+	# $(NASM) -f elf test.asm -o test.o
+	# $(CXX) -o test test.o grammar/InterMediate/asm_io.o -m32
+
+
+	
